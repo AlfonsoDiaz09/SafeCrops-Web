@@ -1,0 +1,60 @@
+{% extends "baseA.html" %}
+
+{% block titulo %} Inicio Expertos {% endblock %}
+
+{% block contenido %} 
+
+<link rel="stylesheet" href="../static/css/inicio.css">
+<!--    {% if user.is_authenticated %}
+        <h1>Hola {{ user.username }}</h1>
+    {% else %}
+        <a href="#">Registrate</a>
+    {% endif %}
+-->
+    <div class="row row-cols-1 row-cols-md-3 g-3 container-inicio">
+        <a href="{% url 'directivos' %}">
+            <div class="col">
+                <div class="card card1">
+                    <div class="card-body">
+                        <p class="card-title">21</p>
+                        <h5 class="card-text">Directivos</h5>
+                    </div>
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+            </div>
+        </a>
+        <a href="{% url 'profesores' %}">
+            <div class="col">
+                <div class="card card2">
+                    <div class="card-body">
+                        <p class="card-title">12</p>
+                        <h5 class="card-text">Docentes</h5>
+                    </div>
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                </div>
+            </div>
+        </a>
+        <a href="{% url 'alumnos' %}">
+            <div class="col">
+                <div class="card card3">
+                    <div class="card-body">
+                        <p class="card-title">25</p>
+                        <h5 class="card-text">Estudiantes</h5>
+                    </div>
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+            </div>
+        </a>
+        <a href="{% url 'usuarios' %}">
+            <div class="col">
+                <div class="card card4">
+                    <div class="card-body">
+                        <p class="card-title">17</p>
+                        <h5 class="card-text">Usuarios</h5>
+                    </div>
+                    <i class="fa-solid fa-users"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "baseA.html" %}
+
+{% block titulo %} Lista de Expertos {% endblock %}
+
+{% block contenido %} 
+
+<link rel="stylesheet" href="../static/css/index.css">
+
+    <div class="card">
+        <div class="card-header">
+            <div class="titleTypeUser">
+                <i class="fa-solid fa-user-gear"></i>
+                <h4 class="">Expertos</h4>
+            </div>
+            <a name="" id="" class="btn btn-warning" href="{% url 'crearE' %}" role="button"><i class="fa-solid fa-circle-plus"></i> Nuevo</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-primary">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Apellido P</th>
+                            <th scope="col">Apellido M</th>
+                            <th scope="col">Fecha Nac</th>
+                            <th scope="col">Correo</th>
+                            <th scope="col">Institución</th>
+                            <th scope="col">Foto</th>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Usuario</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for experto in expertos %}
+                            <tr class="">
+                                <td>{{ experto.id }}</td>
+                                <td>{{ experto.nombre }}</td>
+                                <td>{{ experto.apellidoP }}</td>
+                                <td>{{ experto.apellidoM }}</td>
+                                <td>{{ experto.fechaNac|date:'Y-m-d' }}</td>
+                                <td>{{ experto.correo }}</td>
+                                <td>{{ experto.institucionPerteneciente }}</td>
+                                <td>
+                                    <img src="{{ experto.imagen.url }}" width="70" height="70">
+                                </td>
+                                <td>{{ experto.userType }}</td>
+                                <td>{{ experto.user.username }}</td>
+                                <td>
+                                    <a name="" id="" class="btn btn-info" href="{% url 'editarE' experto.id_Experto%}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarE' experto.id_Experto%}" role="button"><i class="fa-solid fa-trash"></i></a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="11">No hay registros</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+        <div class="card-footer text-muted">
+            
+        </div>
+    </div>
+{% endblock %}

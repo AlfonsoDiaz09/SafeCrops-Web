@@ -1,0 +1,55 @@
+{% extends "baseA.html" %}
+
+{% block titulo %} Inicio Administradores {% endblock %}
+
+{% block contenido %} 
+
+<link rel="stylesheet" href="../static/css/inicio.css">
+
+    <div class="row row-cols-1 row-cols-md-3 g-3 container-inicio">
+        <a href="#">
+            <div class="col">
+                <div class="card card1">
+                    <div class="card-body">
+                        <p class="card-title">10</p>
+                        <h5 class="card-text">Usuarios</h5>
+                    </div>
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+            </div>
+        </a>
+        <a href="#">
+            <div class="col">
+                <div class="card card2">
+                    <div class="card-body">
+                        <p class="card-title">12</p>
+                        <h5 class="card-text">Datasets</h5>
+                    </div>
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                </div>
+            </div>
+        </a>
+        <a href="#">
+            <div class="col">
+                <div class="card card3">
+                    <div class="card-body">
+                        <p class="card-title">15</p>
+                        <h5 class="card-text">Modelos</h5>
+                    </div>
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+            </div>
+        </a>
+        <a href="#">
+            <div class="col">
+                <div class="card card4">
+                    <div class="card-body">
+                        <p class="card-title">19</p>
+                        <h5 class="card-text">Reportes</h5>
+                    </div>
+                    <i class="fa-solid fa-file-pdf"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+{% endblock %}

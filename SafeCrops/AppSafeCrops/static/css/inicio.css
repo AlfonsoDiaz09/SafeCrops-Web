@@ -1,0 +1,61 @@
+*{
+    margin: 0;
+    padding: 0;   
+}
+
+a{
+    text-decoration: none;
+}
+
+.card{
+    border-radius: 30px;
+    padding: 1em;
+    display: flexbox;
+    flex-direction: row;
+    align-items: center;
+}
+
+.card > i{
+    font-size: 3em;
+    color: #fff;
+    margin-right: 1em;
+}
+
+.card1{
+    background-color: #FA4343;
+}
+
+.card2{
+    background-color: #852DBB;
+}
+
+.card3{
+    background-color: #EFC017;
+}
+
+.card4{
+    background-color: #17efb9;
+}
+
+.card5{
+    background-color: #ef17e4;
+}
+
+.card6{
+    background-color: #ef7817;
+}
+
+.card7{
+    background-color: #2571ff;
+}
+
+.card-text{
+    color: #fff;
+    font-size: 1.5em;
+}
+
+.card-title{
+    color: #fff;
+    font-size: 2em;
+    font-weight: 900;
+}

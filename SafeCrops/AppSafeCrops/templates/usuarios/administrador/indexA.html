@@ -1,0 +1,70 @@
+{% extends "baseA.html" %}
+
+{% block titulo %} Lista de Administradores {% endblock %}
+
+{% block contenido %} 
+
+<link rel="stylesheet" href="../static/css/index.css">
+
+    <div class="card">
+        <div class="card-header">
+            <div class="titleTypeUser">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <!--<img src="http://127.0.0.1:8000/imagenes/imagenes/cerdo2.jpg" alt="" width="300" height="300">
+                <h3>{{ user.is_staff }}mas</h3>-->
+                <h4 class="">Administradores</h4>
+            </div>
+            <a name="" id="" class="btn btn-warning" href="{% url 'crearA' %}" role="button"><i class="fa-solid fa-circle-plus"></i> Nuevo</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-primary">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">ApellidoP</th>
+                            <th scope="col">ApellidoM</th>
+                            <th scope="col">FechaNac</th>
+                            <th scope="col">Correo</th>
+                            <th scope="col">Foto</th>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Usuario</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for administrador in administradores %}
+                            <tr class="">
+                                <td>{{ administrador.id_Administrador }}</td>
+                                <td>{{ administrador.nombre }}</td>
+                                <td>{{ administrador.apellidoP }}</td>
+                                <td>{{ administrador.apellidoM }}</td>
+                                <td>{{ administrador.fechaNac|date:'Y-m-d' }}</td>
+                                <td>{{ administrador.correo }}</td>
+                                <td>
+                                    <img src="{{ administrador.imagen.url }}" width="70" height="70">
+                                </td>
+                                <td>{{ administrador.userType }}</td>
+                                <td>{{ administrador.user.username }}</td>
+                                <td>
+                                    <a name="" id="" class="btn btn-info" href="{% url 'editarA' administrador.id_Administrador%}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarA' administrador.id_Administrador%}" role="button"><i class="fa-solid fa-trash"></i></a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="10">No hay registros</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+        <div class="card-footer text-muted">
+            
+        </div>
+    </div>
+
+{% endblock %}

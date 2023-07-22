@@ -1,0 +1,26 @@
+.titleTypeUser{
+    display: flex;
+    align-items: center;
+    color: #fff;
+    font-size: 2em;
+}
+
+.titleTypeUser h4{
+    margin-left: 0.5em;
+}
+
+.btn-warning{
+    border-radius: 30px;
+}
+
+.card-header{
+    background-color: #059D26;
+    color: #fff;
+    padding: 1em;
+    display: flex;
+    justify-content: space-between;
+}
+
+.card-header a{
+    color: #1c064e;
+}

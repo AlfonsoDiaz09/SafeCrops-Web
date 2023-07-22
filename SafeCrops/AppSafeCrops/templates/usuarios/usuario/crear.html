@@ -1,0 +1,16 @@
+{% extends "baseA.html" %} <!--Manda a traer el menú de directivo-->
+
+{% block titulo %} Agregar nuevo Usuario {% endblock %} <!--coloca el titulo a la página-->
+
+{% block contenido %} 
+    <div class="card">
+        <div class="card-header">
+            Agregar un usuario
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Datos del usuario</h4>
+
+            {% include 'usuarios/usuario/form.html' %} <!--Manda a traer el formulario de agregar usuario-->
+        </div>
+    </div>
+{% endblock %}

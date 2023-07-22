@@ -1,0 +1,287 @@
+*{
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+::-webkit-scrollbar{
+    width: 12px;
+}
+
+::-webkit-scrollbar-track{
+    /*background-color: white;*/
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb{
+    height: 50px;
+    background: linear-gradient(#1c064e, #c53117,  #1c064e); /**/
+    border-radius: 20px;
+    /*border: 2px solid white;*/
+}
+
+::-webkit-scrollbar-thumb:hover{
+    background: linear-gradient(#ec5215, #1c064e, #ec5215);
+    border-radius: 20px;
+}
+
+body{
+    display: flex;
+}
+
+.before_header{
+    width: 20%;
+}
+
+header{
+    height: calc(100vh - 4em); /*calc(100vh - 10vh)*/
+    margin-top: 4em;
+    overflow-y: scroll;
+    position: fixed;
+    z-index: 10;
+}
+
+.w-18{
+    width: 16%;
+    transition: all 0.5s;
+}
+
+.w-6_5{
+    width: 5.5%;
+    transition: all 0.5s;
+}
+
+.iconMenu{
+    margin-left: 1.4em;
+}
+
+.iconMenu > i{
+    color: #ffffff;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+.iconMenu > i:hover{
+    color: #ffb731;
+}
+
+.iconProfile{
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-right: 1em;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    border: 4px solid #f10e0e;
+    cursor: pointer;
+}
+
+.fa-user{
+    color: white;
+    font-size: 1em;
+}
+
+#userContainer{
+    width: 20%;
+    position: absolute;
+    right: 0.5em;
+    top: 4em;
+    padding: 2em;
+    border-radius: 10px;
+    background: #6a6a6e;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+}
+
+#userContainer .iconProfile{
+    width: 5rem;
+    height: 5rem;
+    margin: 0;
+}
+
+#userContainer .fa-user{
+    font-size: 2em;
+}
+
+#iconProfile > i{
+    color: #fff;
+}
+
+#userContainer h3{
+    color: #fff;
+    font-size: 1.3em;
+    text-transform: uppercase;
+    margin: 1em 0 0.2em 0;
+}
+
+#userContainer h4{
+    color: #fff;
+    font-size: 1em;
+    margin: 0.2em 0 0.5em 0;
+}
+
+#userContainer hr{
+    width: 100%;
+    opacity: 1;
+    height: 2px;
+    background-color: #c5c5c5;
+}
+
+.arrow__up{
+    position: absolute;
+    top: -1em;
+    left: 86%;
+}
+
+.arrow__up > i{
+    color: #6a6a6e;
+    font-size: 1.5em;
+}
+
+nav{
+    padding: 0;
+    width: 100%;
+}
+
+.navbar ul{
+    width: 100%;
+    list-style: none;
+    padding: 0;
+}
+
+.navbar ul a{
+    padding: 0.6em 0 0.6em 1em;
+    /* margin: 0.5em;
+    width: 92%; */
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+}
+
+.navbar ul li > i{
+    color: #FAFF0D;
+    font-size: 1.1em;
+}
+
+.active{
+    background-color: #059D26;
+    border-radius: 10px;
+}
+
+.navbar a{
+    color: #fff;
+    margin-left: 0.5em;
+    font-size: 1em;
+    text-decoration: none;
+    /* background-color: #f10e0e; */
+}
+
+.navbar a:hover{
+    color: #fff;
+    text-decoration: none;
+}
+
+.nav-li{
+    overflow: hidden;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+    align-items: center;
+}
+
+.nav__span{
+    margin-left: 1.8em;
+    width: 7em;
+    display: inline-block;
+    overflow: hidden;
+	white-space:nowrap;
+    text-overflow: ellipsis;
+}
+
+.navbar ul a:hover{
+    background-color: #0abe31;
+    border-radius: 10px;
+    color: #fff;
+}
+
+.card-header{
+    background-color: #059D26;
+    color: #fff;
+}
+
+.card-header a{
+    color: #1c064e;
+}
+
+.panel_container{
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+    flex-direction: column;
+}
+
+.option__bar{
+    width: 100%;
+    height: 4em;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    z-index: 99;
+}
+
+.option__bar > div{
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+    align-items: center;
+}
+
+.brandSafeCrops a{
+    margin-left: 2.5em;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.brandSafeCrops img{
+    width: 2.5em;
+    border: 2px solid #1FBF42;
+    border-radius: 50%;
+}
+
+.brandSafeCrops span{
+    margin-left: 0.5em;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #fff;
+}
+
+.container{
+    margin-top: 10vh;
+    padding-bottom: 1em;
+}
+

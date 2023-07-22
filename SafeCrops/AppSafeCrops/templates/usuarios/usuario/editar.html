@@ -1,0 +1,16 @@
+{% extends "baseA.html" %} <!--Manda a traer el menú de directivo-->
+
+{% block titulo %} Editar usuario {% endblock %} <!--coloca el titulo a la página-->
+
+{% block contenido %}  
+    <div class="card">
+        <div class="card-header">
+            Editar informacion del usuario
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Datos del usuario</h4>
+
+            {% include 'usuarios/usuario/formEdit.html' %} <!--Manda a traer el formulario de editar usuario-->
+        </div>
+    </div>
+{% endblock %}

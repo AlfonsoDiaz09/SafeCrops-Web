@@ -1,0 +1,16 @@
+{% extends "baseA.html" %}
+
+{% block titulo %} Agregar nuevo experto {% endblock %}
+
+{% block contenido %} 
+    <div class="card">
+        <div class="card-header">
+            Agregar un experto
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Datos del experto</h4>
+
+            {% include 'usuarios/experto/form.html' %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends "baseP.html" %} <!--Manda a traer el menú de profesor-->
+
+{% block titulo %} Inicio Testers {% endblock %} <!--coloca el titulo a la página-->
+
+{% block contenido %} 
+
+<link rel="stylesheet" href="../static/css/inicio.css">
+
+    <div class="row row-cols-1 row-cols-md-3 g-3 container-inicio"> <!--Crea una fila de 3 columnas-->
+        <a href="{% url 'alumnos' %}"> <!--Manda a traer la vista de alumnos-->
+            <div class="col"> <!--Crea una columna-->
+                <div class="card card1"> <!--Crea una tarjeta-->
+                    <div class="card-body"> <!--Crea el cuerpo de la tarjeta-->
+                        <p class="card-title">10</p> <!--Crea el titulo de la tarjeta-->
+                        <h5 class="card-text">Alumnos</h5> <!--Crea el texto de la tarjeta-->
+                    </div>
+                    <i class="fa-solid fa-graduation-cap"></i> <!--Crea un icono-->
+                </div>
+            </div>
+        </a>
+        <a href="{% url 'grupos' %}"> <!--Manda a traer la vista de grupos-->
+            <div class="col">
+                <div class="card card2">
+                    <div class="card-body">
+                        <p class="card-title">12</p>
+                        <h5 class="card-text">Grupos</h5>
+                    </div>
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                </div>
+            </div>
+        </a>
+        <a href="{% url 'horarios' %}"> <!--Manda a traer la vista de horarios-->
+            <div class="col">
+                <div class="card card3">
+                    <div class="card-body">
+                        <p class="card-title">25</p>
+                        <h5 class="card-text">Horarios</h5>
+                    </div>
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+            </div>
+        </a>
+        <a href="{% url 'asistencias' %}"> <!--Manda a traer la vista de asistencias-->
+            <div class="col">
+                <div class="card card4">
+                    <div class="card-body">
+                        <p class="card-title">31</p>
+                        <h5 class="card-text">Asistencias</h5>
+                    </div>
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+            </div>
+        </a>
+        <a href="{% url 'justificantes' %}"> <!--Manda a traer la vista de justificantes-->
+            <div class="col">
+                <div class="card card5">
+                    <div class="card-body">
+                        <p class="card-title">15</p>
+                        <h5 class="card-text">Justificantes</h5>
+                    </div>
+                    <i class="fa-solid fa-file-signature"></i>
+                </div>
+            </div>
+        </a>
+        <a href="{% url 'reporte' %}"> <!--Manda a traer la vista de reportes-->
+            <div class="col">
+                <div class="card card6">
+                    <div class="card-body">
+                        <p class="card-title">19</p>
+                        <h5 class="card-text">Reportes Excel</h5>
+                    </div>
+                    <i class="fa-solid fa-file-excel"></i>
+                </div>
+            </div>
+        </a>
+        <a href="{% url 'paseLista' %}"> <!--Manda a traer la vista de pase de lista-->
+            <div class="col">
+                <div class="card card7">
+                    <div class="card-body">
+                        <p class="card-title">19</p>
+                        <h5 class="card-text">Pase de Lista</h5>
+                    </div>
+                    <i class="fa-solid fa-list-check"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+{% endblock %}

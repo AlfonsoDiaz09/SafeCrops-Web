@@ -1,0 +1,39 @@
+{% extends "baseInicio.html" %}
+
+{% load static %}
+
+{% block titulo %} Inicio {% endblock %}
+
+{% block contenido %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-15">
+                <div class="card_login">
+                    <div class="card_logo">
+                        <img src="{% static 'img/logoSafeCrops.png' %}" alt="Logo">
+                        <div class="textLogo">
+                            <p class="parrafo1"><span class="txtgreen">Safe Crops</p>
+                        </div>
+                    </div>
+                    <form method="POST" action="" class="formLogin" novalidate>
+                        <legend class="legend">Login</legend>
+                        <fieldset class="fieldset">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" class="btn btn-warning">Login</button>
+                            <a href="{% url 'passwordReset' %}" class="btn_resetpass">¿Olvidaste tu contraseña?</a>
+                            <div class="linkRegister">
+                                <div class="separate">
+                                    <hr class="hr">
+                                    <p>¿No tienes una cuenta?</p>
+                                    <hr class="hr">
+                                </div>
+                                <a href="#">Registrate</a>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

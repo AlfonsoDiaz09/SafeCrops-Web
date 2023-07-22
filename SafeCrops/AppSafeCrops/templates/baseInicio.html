@@ -1,0 +1,99 @@
+{% load static %}
+<!--
+    Template utilizado para el menú de inicio antes de iniciar sesión
+-->
+<!doctype html>
+<html lang="es">
+
+<head>
+    <title>{% block titulo %} {% endblock %}</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="../static/css/baseInicio.css">
+    <!-- Bootstrap CSS v5.2.0-beta1 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+    
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="nav__logo">
+            <a class="nav-item nav-link" href="{% url 'inicio' %}">
+                <img src="{% static 'img/logoSafeCrops.png' %}" alt="Logo" width="50" height="50">
+                <h3>SafeCrops / Login</h3>
+            </a>
+        </div>
+        <div class="nav__btnAccess">
+            <a class="btn bg-light text-success" href="{% url 'login' %}">Iniciar Sesión</a>
+            <a class="btn btn-warning" href="#">Registrarse</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            {% for message in messages %}
+                {%if message.tags == 'info' %}
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.18/dist/sweetalert2.all.min.js"></script>
+                    <script>
+                        const txtMessageI = "{{ message }}";
+                        Swal.fire({
+                            title: 'Info',
+                            text: txtMessageE,
+                            icon: 'info',
+                            confirmButtonText: 'Ok',
+                        });
+                    </script>
+                    {% elif message.tags == 'success' %}
+                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.18/dist/sweetalert2.all.min.js"></script>
+                        <script>
+                            const txtMessageS = "{{ message }}";
+                            Swal.fire({
+                                title: 'Success',
+                                text: txtMessageS,
+                                icon: 'success',
+                                confirmButtonText: 'Ok',
+                            });
+                        </script>
+                    {% elif message.tags == 'warning' %}
+                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.18/dist/sweetalert2.all.min.js"></script>
+                        <script>
+                            const txtMessageW = "{{ message }}";
+                            Swal.fire({
+                                title: 'Warning',
+                                text: txtMessageW,
+                                icon: 'warning',
+                                confirmButtonText: 'Ok',
+                            });
+                        </script>
+                    {% elif message.tags == 'error' %}
+                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.18/dist/sweetalert2.all.min.js"></script>
+                        <script>
+                            const txtMessageE = "{{ message }}";
+                            Swal.fire({
+                                title: 'Error',
+                                text: txtMessageE,
+                                icon: 'error',
+                                confirmButtonText: 'Ok',
+                            });
+                        </script>
+                {% endif %}
+            {% endfor %}
+            <div class="col-12">
+                <br>
+                {% block contenido %} {% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Fontawesome Libraries -->
+    <script src="https://kit.fontawesome.com/2bd37f87ea.js" crossorigin="anonymous"></script>
+    <!-- Bootstrap JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous"></script>
+    <!-- Sweet alert 2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+
+</html>

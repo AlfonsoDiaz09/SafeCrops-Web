@@ -1,0 +1,218 @@
+.navbar{
+    background-color: #075618;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav__logo a{
+    display: flex;
+    margin-left: 2em;
+}
+
+.nav__btnAccess{
+    display: flex;
+    margin-right: 3em;
+}
+
+.nav__btnAccess a{
+    margin-left: 1em;
+}
+
+.nav__logo img{
+    width: 2.5em;
+    height: 2.5em;
+    border: 2px solid #1FBF42;
+    border-radius: 50%;
+}
+
+.nav__logo h3{
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    margin-left: 1em;
+    margin-top: 7px;
+}
+
+.nav a:hover{
+    color: #ffb731;
+}
+
+.col-md-15{
+    height: 83vh;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+}
+
+.card_login{
+    width: 100%;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card_logo{
+    width: 40%;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card_logo img{
+    width: 60%;
+}
+
+.textLogo{
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+    flex-direction: column;
+    margin-top: 50px;
+}
+
+.textLogo p{
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    margin: 0;
+}
+
+.txtgreen{
+    font-size: 40px;
+    color: #059D26;
+    font-weight: bold;
+}
+
+.txtYellow{
+    font-size: 40px;
+    color: #FF9E00;
+    font-weight: bold;
+}
+
+.formLogin{
+    width: 50%;
+}
+
+.legend{
+    color: #059D26;
+    font-size: 40px;
+    font-weight: bold;
+    margin-top: -20px;
+    margin-left: 70px;
+    padding: 0px 25px;
+    width: auto;
+    background: #fff;
+    position: absolute;
+}
+
+.fieldset{
+    border: 7px solid #059D26;
+    border-radius: 25px;
+    padding: 40px 20px;
+    margin: 10px;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    flex-direction: column;
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    align-items: center;
+}
+
+.fieldset p{
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+}
+.fieldset input{
+    border: none;
+    background: none;
+    border-bottom: 2px solid #908B83;
+    padding: 5px;
+    font-size: 15px;
+}
+.fieldset input:focus{
+    outline: none;
+    border-bottom: 2px solid #FF9E00;
+    /*animation: borderBottom 1s 1;*/
+}
+@keyframes borderBottom{
+    0%{
+        width: 0;
+    }
+    100%{
+        width: 100%;
+    }
+}
+.fieldset label{
+    color: #F50103;
+    font-weight: bold;
+}
+.fieldset button{
+    width: 70%;
+    border: none;
+}
+.btn_resetpass{
+    margin-top: 15px;
+}
+.linkRegister{
+    width: 70%;
+    margin-top: 20px;
+    text-align: center;
+}
+.linkRegister a{
+    width: 100%;
+}
+.linkRegister a{
+    color: #059D26;
+    text-decoration: none;
+    font-weight: bold;
+}
+.linkRegister a:hover{
+    color: #12d83d;
+}
+.separate{
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.separate p{
+    width: auto;
+    text-align: center;
+    color: #908B83;
+}
+.hr{
+    width: 70px;
+    height: 1px;
+    background: #908B83;
+    border: none;
+    opacity: 1;
+}

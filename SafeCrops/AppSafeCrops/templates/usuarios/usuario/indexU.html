@@ -1,0 +1,63 @@
+{% extends "baseA.html" %}<!--Manda a traer el menú de directivo-->
+
+{% block titulo %} Lista de Usuarios {% endblock %}<!--coloca el titulo a la página-->
+
+{% block contenido %}
+
+<link rel="stylesheet" href="../static/css/index.css"> <!--Hace referncia al a hoja de estilos CSS -->
+
+    <div class="card">
+        <div class="card-header">
+            <div class="titleTypeUser">
+                <i class="fa-solid fa-users"></i>
+                <h4 class="">Usuarios</h4>
+            </div>
+            <a name="" id="" class="btn btn-warning" href="{% url 'crearU' %}" role="button"><i class="fa-solid fa-circle-plus"></i> Nuevo</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-primary">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Usuario</th>
+                            <th scope="col">Password</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in usuarios %} <!--Recorre la lista de usuarios-->
+                            <tr class="">
+                                <td>{{ user.id }}</td> <!--Muestra el id del usuario-->
+                                {% if user.id == user.administradorUser.user.id %} <!--Si el id del usuario es igual al id del administrador-->
+                                    <td>{{ user.administradorUser.userType }}</td> <!--Muestra el tipo de usuario administrador-->
+                                {% elif user.id == user.expertoUser.user.id %} <!--Si el id del usuario es igual al id del profesor-->
+                                    <td>{{ user.expertoUser.userType }}</td> <!--Muestra el tipo de usuario profesor-->
+                                {% elif user.id == user.testerUser.user.id %} <!--Si el id del usuario es igual al id del alumno-->
+                                    <td>{{ user.testerUser.userType }}</td> <!--Muestra el tipo de usuario alumno-->
+                                {% else %} <!--Si no es ninguno de los anteriores-->
+                                    <td></td> <!--No muestra nada-->
+                                {% endif %} <!--Termina la condición-->
+                                <td>{{ user.username }}</td> <!--Muestra el nombre de usuario-->
+                                <td>ENCRIPTED</td>   <!--Muestra la contraseña encriptada-->
+                                <td> <!--Muestra las acciones-->
+                                    <a name="" id="" class="btn btn-info" href="{% url 'editarU' user.id%}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
+                                     <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarU' user.id%}" role="button"><i class="fa-solid fa-trash"></i></a>
+                                </td>
+                            </tr>
+                            {% empty %} <!--Si no hay usuarios-->
+                            <tr>
+                                <td colspan="8">No hay registros</td> <!--Muestra el mensaje-->
+                            </tr>
+                        {% endfor %} <!--Termina el ciclo-->
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+        <div class="card-footer text-muted"> 
+            
+        </div>
+    </div>
+{% endblock %}

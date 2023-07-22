@@ -1,0 +1,17 @@
+{% extends "baseA.html" %}
+<link rel="stylesheet" href="../static/css/base.css">
+
+{% block titulo %} Editar experto {% endblock %}
+
+{% block contenido %} 
+    <div class="card">
+        <div class="card-header">
+            Editar informacion del experto
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Datos del experto</h4>
+
+            {% include 'usuarios/experto/formEdit.html' %}
+        </div>
+    </div>
+{% endblock %}
