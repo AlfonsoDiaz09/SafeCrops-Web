@@ -12,10 +12,10 @@ from django.contrib.staticfiles.urls import static
 
 urlpatterns = [
     path('login/', views.validation, name='login'), #URL de la vista de validacion de login
-    path('passwordReset/', views.ResetPassword, name="passwordReset"), #URL de la vista de ingresar correo para recuperar contraseña
+    path('password_Reset/', views.ResetPassword, name="passwordReset"), #URL de la vista de ingresar correo para recuperar contraseña
     path('send_email_reset/', views.sendEmail, name="sendEmailReset"), #URL que envia el correo para recuperar contraseña
+    path('change_password/<str:token>/', views.ChangePassword, name="changePassword"), #URL de la vista de cambiar contraseña
     path('profile/', views.user_profile, name='profile'), #URL de la vista de perfil
-    #path('login', LoginView.as_view(template_name="registration/login.html"),name="login"), #URL de la vista de login
     path('logout/', LogoutView.as_view(template_name="paginas/inicio.html"),name="salir"), #URL de la vista de logout
 
     path('', views.inicio, name='inicio'), # El nombre es para acceder a una url con ese nombre
@@ -42,5 +42,15 @@ urlpatterns = [
     path('usuario/crear', views.crearUsuario, name='crearU'), #crear usuario
     path('usuario/editar<int:id>', login_required(views.editarUsuario), name='editarU'), #editar usuario
     path('eliminarU/<int:id>', login_required(views.eliminarUsuario), name='eliminarU'), #eliminar usuario
+
+    path('enfermedades', login_required(views.enfermedades), name='enfermedades'), #consulta de enfermedades
+    path('enfermedad/crear', login_required(views.crearEnfermedad), name='crearEnfermedad'), #crear enfermedad
+    path('enfermedad/editar<int:id_Enfermedad>', login_required(views.editarEnfermedad), name='editarEnfermedad'), #editar enfermedad
+    path('eliminarEnfermedad/<int:id_Enfermedad>', login_required(views.eliminarEnfermedad), name='eliminarEnfermedad'), #eliminar enfermedad
+
+    path('datasets', login_required(views.datasets), name='datasets'), #consulta de datasets
+    path('dataset/crear', login_required(views.crearDataset), name='crearDataset'), #crear dataset
+    path('dataset/editar<int:id_Dataset>', login_required(views.editarDataset), name='editarDataset'), #editar dataset
+    path('eliminarDataset/<int:id_Dataset>', login_required(views.eliminarDataset), name='eliminarDataset'), #eliminar dataset
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

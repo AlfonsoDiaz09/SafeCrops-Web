@@ -1,51 +1,42 @@
 <link rel="stylesheet" href="../static/css/base.css">
+
 <form enctype="multipart/form-data" method="post">
   {% csrf_token %}
-  {% for campo in formulario %}
-    <div class="mb-3">
-      {% if campo.name != 'userType' %}
-        <label for="" class="form-label">{{ campo.label }}</label>
+  {% for campo in formulario %} <!-- Recorremos los campos del formulario -->
+
+    <div class="mb-3"> <!-- Div para cada campo -->
+
+      {% if campo.name != 'userType' %} <!-- Si el campo no es userType, lo mostramos -->
+        <label for="" class="form-label">{{ campo.label }}</label> <!-- Mostramos el label del campo -->
+
       {% endif %}
-      {% if campo.name == 'fechaNac' %}
-        <input
-          type="date"
-          class="form-control" 
-          name="{{ campo.name }}" 
-          id="" 
-          aria-describedby="helpId" 
-          placeholder="{{ campo.label }}" 
-          value=""
-        />
+
+      {% if campo.name == 'fechaNac' %} <!-- Si el campo es fechaNac, lo mostramos -->
+          <input type="date" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
+      
+        {% elif campo.name == 'userType' %} <!-- Si el campo es userType, lo mostramos -->
+          <input type="hidden" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="Experto" />
+        
+        {% elif campo.name == 'user' %}
+          {{ campo.form.user }}
+
         {% else %}
-          {% if campo.name == 'userType' %}
-            <input
-              type="hidden"
-              class="form-control" 
-              name="{{ campo.name }}" 
-              id="" 
-              aria-describedby="helpId" 
-              placeholder="{{ campo.label }}" 
-              value="Directivo"
-            >
-            {% else %}
-            {% if campo.name == 'user' %}
-              {{ campo.form.user }}
-            {% else %}
-              <input 
-                type="{{ campo.field.widget.input_type }}"
-                class="form-control" 
-                name="{{ campo.name }}" 
-                id="" 
-                aria-describedby="helpId" 
-                placeholder="{{ campo.label }}" 
-                value=""
-              />
-              {% endif %}
-          {% endif %}
+          <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
+        
       {% endif %}
+
+      {% if campo.field.widget.input_type == 'file' and campo.value %} <!-- Si el campo es file y tiene valor, lo mostramos -->
+        <br>
+        <img src="{{MEDIA_URL}}/imagenes/{{campo.value}}" width="100" height="100" alt="">
+        
+      {% endif %}
+
     </div>
-    <div class="col-12 help-text">{{ campo.errors }}</div>
+
+    <div class="col-12 help-text">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
+
   {% endfor %}
+
   <input name="" id="" class="btn btn-success" type="submit" value="Enviar información">
   <a name="" id="" class="btn btn-primary" href="{% url 'expertos' %}" role="button">Cancelar</a>
 </form>

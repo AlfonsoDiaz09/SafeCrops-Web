@@ -2,55 +2,39 @@
 <form enctype="multipart/form-data" method="post">
   {% csrf_token %}
   {% for campo in formulario %}
+
     <div class="mb-3">
+
       {% if campo.name != 'userType' %}
         <label for="" class="form-label">{{ campo.label }}</label>
       {% endif %}
       
       {% if campo.name == 'fechaNac' %}
-        <input
-          type="date"
-          class="form-control" 
-          name="{{ campo.name }}" 
-          id="" 
-          aria-describedby="helpId" 
-          placeholder="{{ campo.label }}" 
-          value="{{ campo.value|date:'Y-m-d' }}"
-        />
+          <input type="date" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ campo.value|date:'Y-m-d' }}" />
+
+        {% elif campo.name == 'userType' %}
+          <input type="hidden" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="Administrador" />  
+
+        {% elif campo.name == 'user' %}
+          {{ campo.form.user }}
+          
         {% else %}
-          {% if campo.name == 'userType' %}
-            <input
-              type="hidden"
-              class="form-control" 
-              name="{{ campo.name }}" 
-              id="" 
-              aria-describedby="helpId" 
-              placeholder="{{ campo.label }}" 
-              value="Administrador"
-            />  
-            {% else %}
-            {% if campo.name == 'user' %}
-                  {{ campo.form.user }}
-            {% else %}
-              <input 
-                type="{{ campo.field.widget.input_type }}"
-                class="form-control" 
-                name="{{ campo.name }}" 
-                id="" 
-                aria-describedby="helpId" 
-                placeholder="{{ campo.label }}" 
-                value="{{ campo.value }}"
-              />
-          {% endif %}
-          {% endif %}
+          <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ campo.value }}" />
+    
       {% endif %}
+
       {% if campo.field.widget.input_type == 'file' and campo.value %}
         <br>
         <img src="{{MEDIA_URL}}/imagenes/{{campo.value}}" width="100" height="100" alt="">
+
       {% endif %}
+
     </div>
+
     <div class="col-12 help-text">{{ campo.errors }}</div>
+
   {% endfor %}
+
   <input name="" id="" class="btn btn-success" type="submit" value="Enviar información">
   <a name="" id="" class="btn btn-primary" href="{% url 'administradores' %}" role="button">Cancelar</a>
 </form>

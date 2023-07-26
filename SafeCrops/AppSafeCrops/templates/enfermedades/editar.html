@@ -1,0 +1,18 @@
+<link rel="stylesheet" href="../static/css/base.css">
+
+{% extends "baseA.html" %}
+
+{% block titulo %} Editar endfermedad {% endblock %}
+
+{% block contenido %} 
+    <div class="card">
+        <div class="card-header">
+            Editar informacion de la endfermedad
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Datos de la endfermedad</h4>
+
+            {% include 'enfermedades/formEdit.html' %}
+        </div>
+    </div>
+{% endblock %}

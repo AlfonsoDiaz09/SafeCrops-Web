@@ -1,0 +1,30 @@
+{% extends "baseInicio.html" %}
+
+{% load static %}
+
+{% block titulo %} Recuperar contraseña {% endblock %}
+
+{% block contenido %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-15">
+                <div class="card_login">
+                    <div class="card_logo">
+                        <img src="{% static 'img/logoSafeCrops.png' %}" alt="Logo">
+                        <div class="textLogo">
+                            <p class="parrafo1"><span class="txtgreen">Safe Crops</p>
+                        </div>
+                    </div>
+                    <form method="GET" action="{% url 'sendEmailReset' %}" class="formLogin" novalidate>
+                        <legend class="legend">Restablecer contraseña</legend>
+                        <fieldset class="fieldset">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" class="btn btn-warning">Recuperar contraseña</button>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

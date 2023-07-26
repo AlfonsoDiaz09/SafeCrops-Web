@@ -49,6 +49,33 @@
 })();
 
 
+(function(){
+  const btnCollapse = document.getElementById("iconCollapse");
+
+      btnCollapse.addEventListener('click', (e) => {
+          const nameClass = document.getElementById("userCollapse").className;
+          console.log(nameClass);
+          if(nameClass == "displayNone"){
+            const collapse = document.getElementById("userCollapse");
+            const collapseIcon = document.getElementById("row_collapse");
+
+            collapse.classList.replace("displayNone", "displayFlex");
+            collapse.style.display = "flex";
+            collapse.style.flexDirection = "column";
+            collapseIcon.classList.replace("fa-chevron-right", "fa-chevron-down");
+          }
+          if(nameClass == "displayFlex"){
+            const collapse = document.getElementById("userCollapse");
+            const collapseIcon = document.getElementById("row_collapse");
+
+            collapse.classList.replace("displayFlex", "displayNone");
+            collapse.style.display = "none";
+            collapseIcon.classList.replace("fa-chevron-down", "fa-chevron-right");
+          }
+      });
+})();
+
+
 
 
 

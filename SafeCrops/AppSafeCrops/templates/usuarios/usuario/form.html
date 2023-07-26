@@ -3,25 +3,21 @@
 -->
 
 <link rel="stylesheet" href="../static/css/base.css">
+
 <form enctype="multipart/form-data" method="post">
   {% csrf_token %} <!--Token de seguridad-->
   {% for campo in formulario %} <!--Recorre el formulario-->
+
     <div class="mb-3">
 
       <label for="" class="form-label">{{ campo.label }}</label> <!--Muestra el campo del label-->
-
-      <input 
-        type="{{ campo.field.widget.input_type }}"
-        class="form-control" 
-        name="{{ campo.name }}" 
-        id="" 
-        aria-describedby="helpId" 
-        placeholder="{{ campo.label }}" 
-        value=""
-      /> <!--Muestra el campo de texto-->
+      <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" /> <!--Muestra el campo de texto-->
+    
     </div>
     <div class="col-12 help-text">{{ campo.errors }}</div> <!--Muestra los errores del campo-->
+  
   {% endfor %} <!--Fin del recorrido del formulario-->
+
   <input name="" id="" class="btn btn-success" type="submit" value="Registrarse"> <!--Botón de envío-->
   <a name="" id="" class="btn btn-primary" href="{% url 'usuarios' %}" role="button">Cancelar</a> <!--Botón de cancelar-->
 </form>

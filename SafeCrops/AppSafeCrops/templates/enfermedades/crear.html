@@ -1,0 +1,16 @@
+{% extends "baseA.html" %}
+
+{% block titulo %} Agregar nueva enfermedad {% endblock %}
+
+{% block contenido %} 
+    <div class="card">
+        <div class="card-header">
+            Agregar una enfermedad
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Datos de la enfermedad</h4>
+
+            {% include 'enfermedades/form.html' %}
+        </div>
+    </div>
+{% endblock %}

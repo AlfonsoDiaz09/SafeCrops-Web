@@ -3,14 +3,15 @@ from django.conf import settings
 from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required 
-from .models import Administrador, Experto, Tester
-from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm
+from .models import Administrador, Experto, Tester, Enfermedad, Dataset
+from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm, ChangePasswordForm, EnfermedadForm, DatasetForm
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.views.generic import FormView
 from django.urls import reverse_lazy
+from .zip import Zip
 #import mysql.connector
 
 ###################################
@@ -223,7 +224,7 @@ def ResetPassword(request):
     return render(request, 'registration/password_reset.html', {'form': form_class})
 '''
 
-#NO FUNCIONA ENVIO DE CORREO
+#FUNCIONA ENVIO DE CORREO
 
 def sendEmail(request):
     mail = request.GET.get('email')
@@ -240,7 +241,7 @@ def sendEmail(request):
             context={
                 'mail':mail, 
                 'user':user,
-                'link_resetpwd': 'http://{}/login/change/password/{}/'.format(settings.DOMAIN, str(user.token)),
+                'link_resetpwd': 'http://{}/change_password/{}/'.format(URL, str(user.token)),
                 'link_home': 'http://{}'.format(URL)
                 }
             template = get_template('registration/send_email_reset_pwd.html')
@@ -265,6 +266,54 @@ def sendEmail(request):
 def ResetPassword(request):
     form_class = ResetPasswordForm(request.GET or None)
     return render(request, 'registration/password_reset.html', {'form': form_class})
+
+'''
+def changePassword(request, token):
+    form_class = ChangePasswordForm(request.POST or None)
+    usuarios = User.objects.all()
+    
+    for user in usuarios:
+        if User.objects.filter(token=token).exists():
+            if request.method == 'POST':
+                form = ChangePasswordForm(request.POST)
+                if form.is_valid():
+                    user.set_password(form.cleaned_data['password1'])
+                    user.save()
+                    messages.success(request, f'Contraseña cambiada correctamente')
+                    return redirect('login/')
+            else:
+                form = ChangePasswordForm()
+            return render(request, 'registration/change_password.html', {'form': form_class})
+    return redirect('login/')
+'''
+def ChangePass(request, token):
+    form_class = ChangePasswordForm(request.POST or None)
+    usuarios = User.objects.all()
+    
+    for user in usuarios:
+        if User.objects.filter(token=token).exists():
+            if request.method == 'POST':
+                form = ChangePasswordForm(request.POST)
+                if form.is_valid():
+                    user.set_password(form.cleaned_data['password1'])
+                    user.save()
+                    messages.success(request, f'Contraseña cambiada correctamente')
+                    return redirect('login/')
+            else:
+                form = ChangePasswordForm()
+            return render(request, 'registration/change_password.html', {'form': form_class})
+    return redirect('login/' )
+
+def ChangePassword(request, token):
+    form_class = ChangePasswordForm(request.POST or None)
+
+    def get(self, request, *args, **kwargs):
+        token = self.kwargs['token']
+        if User.objects.filter(token=token).exists():
+            return get(request, *args, **kwargs)
+        return redirect('passwordReset')
+
+
 
 def user_profile(request):
     return render(request, 'usuarios/tester/inicioT.html')
@@ -295,16 +344,16 @@ def administradores(request): #función para redireccionar a la página donde se
     administradores = Administrador.objects.all()
     return render(request, 'usuarios/administrador/indexA.html', {'administradores': administradores})
 
-def crearAdministrador(request):
-    formulario = AdministradorForm(request.POST or None, request.FILES or None)
-    if formulario.is_valid():
-        nombre = formulario.cleaned_data['nombre']
-        messages.success(request, f'Administrador(a) {nombre} creado correctamente')
-        formulario.save()
-        return redirect('administradores')
-    return render(request, 'usuarios/administrador/crear.html', {'formulario': formulario})
+def crearAdministrador(request): #función para crear un nuevo administrador
+    formulario = AdministradorForm(request.POST or None, request.FILES or None) #se crea un formulario con los datos del administrador
+    if formulario.is_valid(): #si el formulario es válido
+        nombre = formulario.cleaned_data['nombre'] #se obtiene el nombre del administrador
+        messages.success(request, f'Administrador(a) {nombre} creado correctamente') #se muestra un mensaje de éxito
+        formulario.save() #se guarda el formulario
+        return redirect('administradores') #se redirecciona a la página de administradores
+    return render(request, 'usuarios/administrador/crear.html', {'formulario': formulario}) #se renderiza la página de crear administrador
 
-def editarAdministrador(request, id_Administrador):
+def editarAdministrador(request, id_Administrador): #función para editar un administrador con parametros de matricula
     administrador = Administrador.objects.get(id_Administrador=id_Administrador)
     formulario = AdministradorForm(request.POST or None, request.FILES or None, instance=administrador)
     if formulario.is_valid():
@@ -314,7 +363,7 @@ def editarAdministrador(request, id_Administrador):
         return redirect('administradores')
     return render(request, 'usuarios/administrador/editar.html', {'formulario': formulario, 'administrador': administrador})
 
-def eliminarAdministrador(request, id_Administrador):
+def eliminarAdministrador(request, id_Administrador): #función para eliminar un administrador con parametros de matricula
     administrador = Administrador.objects.get(id_Administrador=id_Administrador)
     administrador.delete()
     return redirect('administradores')
@@ -408,3 +457,69 @@ def eliminarUsuario(request, id):
     usuario = User.objects.get(id=id)
     usuario.delete()
     return redirect('usuarios')
+
+
+def enfermedades(request): #función para redireccionar a la página donde se enlista todas las enfermedades
+    enfermedades = Enfermedad.objects.all()
+    return render(request, 'enfermedades/indexE.html', {'enfermedades': enfermedades})
+
+def crearEnfermedad(request):
+    formulario = EnfermedadForm(request.POST or None)
+    if formulario.is_valid():
+        nombre = formulario.cleaned_data['nombreEnfermedad']
+        messages.success(request, f'Enfermedad {nombre} creada correctamente')
+        formulario.save()
+        return redirect('enfermedades')
+    return render(request, 'enfermedades/crear.html', {'formulario': formulario})
+
+def editarEnfermedad(request, id_Enfermedad):
+    enfermedad = Enfermedad.objects.get(id_Enfermedad=id_Enfermedad)
+    formulario = EnfermedadForm(request.POST or None, instance=enfermedad)
+    if formulario.is_valid():
+        nombre = formulario.cleaned_data['nombreEnfermedad']
+        messages.success(request, f'Enfermedad {nombre} modificada correctamente')
+        formulario.save()
+        return redirect('enfermedades')
+    return render(request, 'enfermedades/editar.html', {'formulario': formulario, 'enfermedad': enfermedad})
+
+def eliminarEnfermedad(request, id_Enfermedad):
+    enfermedad = Enfermedad.objects.get(id_Enfermedad=id_Enfermedad)
+    enfermedad.delete()
+    return redirect('enfermedades')
+
+def datasets(request): #función para redireccionar a la página donde se enlista todos los datasets
+    datasets = Dataset.objects.all()
+    return render(request, 'datasets/indexD.html', {'datasets': datasets})
+
+def crearDataset(request):
+    if request.method == 'POST':
+        formulario = DatasetForm(request.POST, request.FILES)
+        if formulario.is_valid():
+            formulario.save()
+            rutaName = formulario.cleaned_data['ruta'].name
+            print("RUTA DATASET view ",rutaName)
+            tipo = formulario.cleaned_data['tipoDataset']
+            numImgEntrenamiento = formulario.cleaned_data['numImgEntrenamiento']
+            nombreD = formulario.cleaned_data['nombreDataset']
+            imgTotal = formulario.cleaned_data['numImgTotal']
+            Zip.descomprimir(str(formulario.instance.ruta.name), rutaName, tipo, numImgEntrenamiento, nombreD, imgTotal)
+            messages.success(request, f'Dataset {nombreD} creado correctamente')
+            return redirect('datasets')
+    else:
+        formulario = DatasetForm()
+    return render(request, 'datasets/crear.html', {'formulario': formulario})
+
+def editarDataset(request, id_Dataset):
+    dataset = Dataset.objects.get(id_Dataset=id_Dataset)
+    formulario = DatasetForm(request.POST or None, request.FILES or None, instance=dataset)
+    if formulario.is_valid():
+        nombre = formulario.cleaned_data['nombreDataset']
+        messages.success(request, f'Dataset {nombre} modificado correctamente')
+        formulario.save()
+        return redirect('datasets')
+    return render(request, 'datasets/editar.html', {'formulario': formulario, 'dataset': dataset})
+
+def eliminarDataset(request, id_Dataset):
+    dataset = Dataset.objects.get(id_Dataset=id_Dataset)
+    dataset.delete()
+    return redirect('datasets')

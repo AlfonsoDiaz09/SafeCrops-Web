@@ -2,7 +2,7 @@ from typing import Any, Dict
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Administrador, Experto, Tester
+from .models import Administrador, Experto, Tester, Enfermedad, Dataset
 
 '''
 Se crea los formularios a partir de los campos que se encuentran en los modelos o creando 
@@ -64,19 +64,28 @@ class ResetPasswordForm(forms.Form): # Formulario para restablecer la contraseñ
 
 class ResetPasswordForm(forms.Form):
     email = forms.CharField(widget=forms.TextInput(attrs={
-        'placeholder': 'Ingrese un email',
-        'class': 'form-control',
-        'autocomplete': 'off'
+        'autocomplete': 'off',
+        'autofocus': True
     }))
 
-    # def clean(self):
-    #     cleaned = super().clean()
-    #     if not User.objects.filter(username=cleaned['username']).exists():
-    #         # self._errors['error'] = self._errors.get('error', self.error_class())
-    #         # self._errors['error'].append('El usuario no existe')
-    #         raise forms.ValidationError('El usuario no existe')
-    #     return cleaned
+class ChangePasswordForm(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'autocomplete': 'off',
+        'autofocus': True,
+        'placeholder': 'Nueva contraseña'
+    }))
 
-    # def get_user(self):
-    #     username = self.cleaned_data.get('username')
-    #     return User.objects.get(username=username)
+    password_confirmation = forms.CharField(widget=forms.PasswordInput(attrs={
+        'autocomplete': 'off',
+        'placeholder': 'Confirmar contraseña'
+    }))
+
+class EnfermedadForm(forms.ModelForm):
+    class Meta:
+        model = Enfermedad
+        fields = '__all__'
+
+class DatasetForm(forms.ModelForm):
+    class Meta:
+        model = Dataset
+        fields = '__all__'

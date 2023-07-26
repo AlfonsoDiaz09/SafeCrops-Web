@@ -29,13 +29,42 @@
                             <span class="nav__span">Inicio</span>
                         </li>
                     </a>
-                    <a href="{% url 'administradores' %}" class="{% active 'administradores' %}">
+                    <a href="#" class="iconCollapse" id="iconCollapse">
                         <li>
                             <i class="fa-solid fa-user-gear"></i>
-                            <span class="nav__span">Usuarios</span>
+                            <span class="nav__span" style="margin-right: -1em;">Usuarios</span>
+                            <i class="fa-solid fa-chevron-right" id="row_collapse"></i>
                         </li>
                     </a>
-                    <a href="#">
+                    <div class="displayNone" id="userCollapse">
+                        <a href="{% url 'administradores' %}" class="{% active 'administradores' %}">
+                            <li>
+                                <i class="fa-solid fa-user-gear"></i>
+                                <span class="nav__span">Admins</span>
+                            </li>
+                        </a>
+                        <a href="{% url 'expertos' %}" class="{% active 'expertos' %}">
+                            <li>
+                                <i class="fa-solid fa-user-gear"></i>
+                                <span class="nav__span">Expertos</span>
+                            </li>
+                        </a>
+                        <a href="{% url 'testers' %}" class="{% active 'testers' %}">
+                            <li>
+                                <i class="fa-solid fa-user-gear"></i>
+                                <span class="nav__span">Testers</span>
+                            </li>
+                        </a>
+                        <hr>
+                    </div>
+
+                    <a href="{% url 'enfermedades' %}" class="{% active 'enfermedades' %}">
+                        <li>
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span class="nav__span">Enfermedades</span>
+                        </li>
+                    </a>
+                    <a href="{% url 'datasets' %}" class="{% active 'datasets' %}">
                         <li>
                             <i class="fa-solid fa-chalkboard-user"></i>
                             <span class="nav__span">Datasets</span>
@@ -90,49 +119,14 @@
 
     <div class="container">
         <div class="row">
-            {% for message in messages %}
-                {% if message.tags == 'success' %}
-                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.18/dist/sweetalert2.all.min.js"></script>
-                    <script>
-                        const txtMessageS = "{{ message }}";
-                        Swal.fire({
-                            title: 'Success',
-                            text: txtMessageS,
-                            icon: 'success',
-                            confirmButtonText: 'Ok',
-                        });
-                    </script>
-                    {% else %}
-                        {%if message.tags == 'warning' %}
-                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.18/dist/sweetalert2.all.min.js"></script>
-                            <script>
-                                const txtMessageW = "{{ message }}";
-                                Swal.fire({
-                                    
-                                });
-                            </script>
-                            {% else %}
-                                {%if message.tags == 'error' %}
-                                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.18/dist/sweetalert2.all.min.js"></script>
-                                    <script>
-                                        const txtMessageE = "{{ message }}";
-                                        Swal.fire({
-                                            title: 'Error',
-                                            text: txtMessageE,
-                                            icon: 'error',
-                                            confirmButtonText: 'Ok',
-                                        });
-                                    </script>
-                                {% endif %}
-                        {% endif %}
-                {% endif %}
-            {% endfor %}
+            {% include 'notifications.html' %}
         <div class="col-12">
             <br>
             {% block contenido %} {% endblock %}
         </div>
         </div>
     </div>
+
 
     <!-- Fontawesome Libraries -->
     <script src="https://kit.fontawesome.com/2bd37f87ea.js" crossorigin="anonymous"></script>

@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="../static/css/inicio.css">
 
     <div class="row row-cols-1 row-cols-md-3 g-3 container-inicio">
-        <a href="#">
+        <a href="{% url 'usuarios' %}">
             <div class="col">
                 <div class="card card1">
                     <div class="card-body">
@@ -18,11 +18,22 @@
                 </div>
             </div>
         </a>
-        <a href="#">
+        <a href="{% url 'enfermedades' %}">
+            <div class="col">
+                <div class="card card4">
+                    <div class="card-body">
+                        <p class="card-title">12</p>
+                        <h5 class="card-text">Enfermedades</h5>
+                    </div>
+                    <i class="fa-solid fa-file-pdf"></i>
+                </div>
+            </div>
+        </a>
+        <a href="{% url 'datasets' %}">
             <div class="col">
                 <div class="card card2">
                     <div class="card-body">
-                        <p class="card-title">12</p>
+                        <p class="card-title">22</p>
                         <h5 class="card-text">Datasets</h5>
                     </div>
                     <i class="fa-solid fa-chalkboard-user"></i>

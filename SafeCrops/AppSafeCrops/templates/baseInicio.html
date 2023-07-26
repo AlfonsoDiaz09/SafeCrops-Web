@@ -33,53 +33,7 @@
 
     <div class="container">
         <div class="row">
-            {% for message in messages %}
-                {%if message.tags == 'info' %}
-                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.18/dist/sweetalert2.all.min.js"></script>
-                    <script>
-                        const txtMessageI = "{{ message }}";
-                        Swal.fire({
-                            title: 'Info',
-                            text: txtMessageE,
-                            icon: 'info',
-                            confirmButtonText: 'Ok',
-                        });
-                    </script>
-                    {% elif message.tags == 'success' %}
-                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.18/dist/sweetalert2.all.min.js"></script>
-                        <script>
-                            const txtMessageS = "{{ message }}";
-                            Swal.fire({
-                                title: 'Success',
-                                text: txtMessageS,
-                                icon: 'success',
-                                confirmButtonText: 'Ok',
-                            });
-                        </script>
-                    {% elif message.tags == 'warning' %}
-                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.18/dist/sweetalert2.all.min.js"></script>
-                        <script>
-                            const txtMessageW = "{{ message }}";
-                            Swal.fire({
-                                title: 'Warning',
-                                text: txtMessageW,
-                                icon: 'warning',
-                                confirmButtonText: 'Ok',
-                            });
-                        </script>
-                    {% elif message.tags == 'error' %}
-                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.18/dist/sweetalert2.all.min.js"></script>
-                        <script>
-                            const txtMessageE = "{{ message }}";
-                            Swal.fire({
-                                title: 'Error',
-                                text: txtMessageE,
-                                icon: 'error',
-                                confirmButtonText: 'Ok',
-                            });
-                        </script>
-                {% endif %}
-            {% endfor %}
+            {% include 'notifications.html' %}
             <div class="col-12">
                 <br>
                 {% block contenido %} {% endblock %}

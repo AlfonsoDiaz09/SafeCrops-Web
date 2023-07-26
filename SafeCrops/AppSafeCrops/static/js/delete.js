@@ -7,7 +7,7 @@
             console.log(e.target.href);
             
             Swal.fire({
-                title: '¿Estás seguro de eliminar este usuario?',
+                title: '¿Estás seguro de eliminar este registro?',
                 text: "¡No podrás revertir esto!",
                 showCancelButton: true,
                 confirmButtonText: 'Eliminar',

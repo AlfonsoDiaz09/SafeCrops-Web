@@ -83,6 +83,10 @@ header{
     font-size: 1em;
 }
 
+#userCollapse{
+    display: none;
+}
+
 #userContainer{
     width: 20%;
     position: absolute;
