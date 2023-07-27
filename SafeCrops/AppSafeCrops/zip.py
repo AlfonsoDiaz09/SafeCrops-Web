@@ -6,13 +6,17 @@ import mysql.connector
 
 class Zip:
     #Función para descomprimir el dataset er archivo zip
-    def descomprimir(rutaDataset,rutaName,tipo,numImgEntrenamiento,nombreDataset,imgTotal):
+    def descomprimir(rutaDataset,rutaName,tipo,nombreDataset,formatoImg):
         rutaOrigen = settings.MEDIA_ROOT + 'datasets/' + rutaName
         rutaDestino = settings.MEDIA_ROOT + 'datasets/' + nombreDataset
         zip = zipfile.ZipFile(rutaOrigen, 'r')
         #Se crean las carpetas de entrenamiento y validacion
         zip.extractall(rutaDestino)
         listaImagenes = zip.namelist()
+        imgTotal = len(listaImagenes)
+        numImgEntrenamiento = int(imgTotal * 0.8)
+        numImgValidacion = imgTotal - numImgEntrenamiento
+        print("TOTAL DE IMAGENES ",imgTotal)
         os.mkdir(rutaDestino + '/entrenamiento')
         os.mkdir(rutaDestino + '/validacion')
 
@@ -22,10 +26,10 @@ class Zip:
         for img in range(imgTotal):
             ruta_imagen = rutaDestino + '/' + listaImagenes[img]
             if cont < numImgEntrenamiento:
-                shutil.copy(ruta_imagen, rutaDestino + '/entrenamiento/' + tipo + str(i) + '.jpg') #Se copia la imagen
+                shutil.copy(ruta_imagen, rutaDestino + '/entrenamiento/' + tipo + str(i) + '.'+formatoImg) #Se copia la imagen
                 os.remove(ruta_imagen) #Se elimina la imagen
             else:
-                shutil.copy(ruta_imagen, rutaDestino + '/validacion/' + tipo + str(i) + '.jpg')
+                shutil.copy(ruta_imagen, rutaDestino + '/validacion/' + tipo + str(i) + '.'+formatoImg)
                 os.remove(ruta_imagen)
             cont = cont + 1
             i = i + 1
@@ -41,7 +45,7 @@ class Zip:
         last_id.close() #se cierra el cursor
 
         myquery=conection.cursor() #se crea un cursor
-        myquery.execute("""UPDATE appsafecrops_dataset set ruta = %s WHERE nombreDataset = %s""", ("datasets/"+nombreDataset, nombreDataset)) #se actualiza la ruta del dataset
+        myquery.execute("""UPDATE appsafecrops_dataset set ruta = %s, numImgTotal = %s, numImgEntrenamiento = %s, numImgValidacion = %s WHERE nombreDataset = %s""", ("datasets/"+nombreDataset, imgTotal, numImgEntrenamiento, numImgValidacion, nombreDataset)) #se actualiza la ruta del dataset
         conection.commit() #se confirma la actualización
         myquery.close() #se cierra el cursor
         verificarCarpetaVacia = str(listaImagenes[0]).split('/')

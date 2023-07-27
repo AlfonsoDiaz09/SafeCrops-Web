@@ -1,4 +1,5 @@
 
+import os
 from django.conf import settings
 from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.http import HttpResponse, JsonResponse
@@ -21,7 +22,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from django.template.loader import render_to_string
-from django.template import Context
+from django.template import Context, RequestContext
 from django.template.loader import get_template
 from django.core.mail import EmailMessage
 from django.core.mail import send_mail
@@ -497,17 +498,21 @@ def crearDataset(request):
         if formulario.is_valid():
             formulario.save()
             rutaName = formulario.cleaned_data['ruta'].name
-            print("RUTA DATASET view ",rutaName)
             tipo = formulario.cleaned_data['tipoDataset']
-            numImgEntrenamiento = formulario.cleaned_data['numImgEntrenamiento']
             nombreD = formulario.cleaned_data['nombreDataset']
-            imgTotal = formulario.cleaned_data['numImgTotal']
-            Zip.descomprimir(str(formulario.instance.ruta.name), rutaName, tipo, numImgEntrenamiento, nombreD, imgTotal)
+            formatoImagen = formulario.cleaned_data['formatoImg']
+            Zip.descomprimir(str(formulario.instance.ruta.name), rutaName, tipo, nombreD, formatoImagen)
             messages.success(request, f'Dataset {nombreD} creado correctamente')
             return redirect('datasets')
     else:
         formulario = DatasetForm()
     return render(request, 'datasets/crear.html', {'formulario': formulario})
+
+def verDataset(request, id_Dataset):
+    dataset = Dataset.objects.get(id_Dataset=id_Dataset)
+    rutaDataset = '/datasets/'+dataset.ruta.name+'/entrenamiento/'
+    dirsTrain = os.listdir(dataset.ruta.name+'/entrenamiento')
+    return render(request, 'datasets/ver.html', {'imagenesEntrenamiento': dirsTrain, 'dataset': rutaDataset})
 
 def editarDataset(request, id_Dataset):
     dataset = Dataset.objects.get(id_Dataset=id_Dataset)

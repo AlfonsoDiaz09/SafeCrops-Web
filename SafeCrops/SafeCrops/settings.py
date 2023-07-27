@@ -138,6 +138,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static") #archivo estatico CSS
 
 MEDIA_ROOT = os.path.join(BASE_DIR, '')
 MEDIA_URL = '/imagenes/'
+MEDIA_URL_DATASET = '/datasets/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/login'

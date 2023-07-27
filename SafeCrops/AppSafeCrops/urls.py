@@ -50,7 +50,8 @@ urlpatterns = [
 
     path('datasets', login_required(views.datasets), name='datasets'), #consulta de datasets
     path('dataset/crear', login_required(views.crearDataset), name='crearDataset'), #crear dataset
+    path('dataset/ver<int:id_Dataset>', login_required(views.verDataset), name='verDataset'), #ver dataset
     path('dataset/editar<int:id_Dataset>', login_required(views.editarDataset), name='editarDataset'), #editar dataset
     path('eliminarDataset/<int:id_Dataset>', login_required(views.eliminarDataset), name='eliminarDataset'), #eliminar dataset
 
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.MEDIA_URL_DATASET, document_root=settings.MEDIA_ROOT)
