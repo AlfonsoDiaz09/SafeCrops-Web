@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="../static/css/base.css">
 <form enctype="multipart/form-data" method="post">
   {% csrf_token %}
-  {% for campo in formulario %} <!-- Recorremos los campos del formulario -->
+  {% for campo in formularioTester %} <!-- Recorremos los campos del formulario -->
 
     <div class="mb-3"> <!-- Div para cada campo -->
 
@@ -33,6 +33,21 @@
     </div>
 
     <div class="col-12 help-text">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
+
+  {% endfor %}
+
+  <!-- Formulario de usuario -->
+  {% for campo in formularioUsuario %}
+
+    <div class="mb-3">
+
+      <label for="" class="form-label">{{ campo.label }}</label>
+
+      <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
+    
+    </div>
+
+    <div class="col-12 help-text">{{ campo.errors }}</div>
 
   {% endfor %}
 

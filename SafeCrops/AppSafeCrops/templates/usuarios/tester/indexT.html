@@ -46,8 +46,8 @@
                                 <td>{{ tester.userType }}</td> <!--Muestra el tipo de usuario del tester-->
                                 <td>{{ tester.user.username }}</td> <!--Muestra el nombre de usuario del tester-->
                                 <td>
-                                    <a name="" id="" class="btn btn-info" href="{% url 'editarT' tester.id_Tester%}" role="button"><i class="fa-solid fa-pen-to-square"></i></a> <!--Botón para editar el tester-->
-                                    <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarT' tester.id_Tester%}" role="button"><i class="fa-solid fa-trash"></i></a>   
+                                    <a name="" id="" class="btn btn-info" href="{% url 'editarT' tester.id_Tester tester.user_id %}" role="button"><i class="fa-solid fa-pen-to-square"></i></a> <!--Botón para editar el tester-->
+                                    <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarT' tester.id_Tester %}" role="button"><i class="fa-solid fa-trash"></i></a>   
                                 </td>
                             </tr>
                             {% empty %} <!--Si no hay profesores, muestra el siguiente mensaje-->

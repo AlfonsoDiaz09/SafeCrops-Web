@@ -15,12 +15,12 @@
                             <p class="parrafo1"><span class="txtgreen">Safe Crops</p>
                         </div>
                     </div>
-                    <form method="GET" action="{% url 'sendEmailReset' %}" class="formLogin" novalidate>
-                        <legend class="legend">Restablecer contraseña</legend>
+                    <form method="POST" action="" class="formLogin" novalidate>
+                        <legend class="legend">Nueva contraseña</legend>
                         <fieldset class="fieldset">
                             {% csrf_token %}
                             {{ form.as_p }}
-                            <button type="submit" class="btn btn-warning">Recuperar contraseña</button>
+                            <button type="submit" class="btn btn-warning">Cambiar contraseña</button>
                         </fieldset>
                     </form>
                 </div>

@@ -12,7 +12,7 @@
                 <i class="fa-solid fa-users"></i>
                 <h4 class="">Usuarios</h4>
             </div>
-            <a name="" id="" class="btn btn-warning" href="{% url 'crearU' %}" role="button"><i class="fa-solid fa-circle-plus"></i> Nuevo</a>
+            <a name="" id="" class="btn btn-warning" href="#" role="button"><i class="fa-solid fa-circle-plus"></i> Nuevo</a>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -42,8 +42,8 @@
                                 <td>{{ user.username }}</td> <!--Muestra el nombre de usuario-->
                                 <td>ENCRIPTED</td>   <!--Muestra la contraseña encriptada-->
                                 <td> <!--Muestra las acciones-->
-                                    <a name="" id="" class="btn btn-info" href="{% url 'editarU' user.id%}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
-                                     <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarU' user.id%}" role="button"><i class="fa-solid fa-trash"></i></a>
+                                    <a name="" id="" class="btn btn-info" href="#" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
+                                     <a name="" id="" class="btn btn-danger btnDelete" href="#" role="button"><i class="fa-solid fa-trash"></i></a>
                                 </td>
                             </tr>
                             {% empty %} <!--Si no hay usuarios-->

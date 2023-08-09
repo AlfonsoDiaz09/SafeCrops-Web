@@ -2,7 +2,7 @@
 
 <form enctype="multipart/form-data" method="post">
   {% csrf_token %}
-  {% for campo in formulario %}
+  {% for campo in formularioExperto %}
 
     <div class="mb-3">
 
@@ -28,6 +28,23 @@
         <br>
         <img src="{{MEDIA_URL}}/imagenes/{{campo.value}}" width="100" height="100" alt="">
 
+      {% endif %}
+
+    </div>
+
+    <div class="col-12 help-text">{{ campo.errors }}</div>
+
+  {% endfor %}
+
+  <!-- Formulario de usuario -->
+  {% for campo in formularioUsuario %}
+
+    <div class="mb-3">
+
+      {% if campo.field.widget.input_type != 'password' %}
+        <label for="" class="form-label">{{ campo.label }}</label>
+        <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ campo.value }}" />
+      
       {% endif %}
 
     </div>

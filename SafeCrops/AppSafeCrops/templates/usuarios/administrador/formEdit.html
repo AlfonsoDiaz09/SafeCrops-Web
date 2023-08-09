@@ -1,23 +1,31 @@
 <link rel="stylesheet" href="../static/css/base.css">
+
 <form enctype="multipart/form-data" method="post">
-  {% csrf_token %}
-  {% for campo in formulario %}
+  {% csrf_token %} <!-- Token de seguridad -->
+  <!-- Formulario de editar administrador -->
+  {% for campo in formularioAdministrador %}
 
     <div class="mb-3">
 
-      {% if campo.name != 'userType' %}
+      {% if campo.name != 'userType' and campo.name != 'id_Administrador' %}
         <label for="" class="form-label">{{ campo.label }}</label>
       {% endif %}
       
-      {% if campo.name == 'fechaNac' %}
-          <input type="date" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ campo.value|date:'Y-m-d' }}" />
+      {% if campo.name == 'id_Administrador' %} <!-- Si el campo es id_Administrador no mostramos nada -->
+        <input type="hidden" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ administrador.id_Administrador }}" />
+        
+        {% elif campo.name == 'fechaNac' %}
+          <input type="date" class="form-control" name="{{ campo.name }}" id="upload_img" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ campo.value|date:'Y-m-d' }}" />
+
+        {% elif campo.name == 'imagen' %}
+          <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" accept="image/*" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
 
         {% elif campo.name == 'userType' %}
           <input type="hidden" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="Administrador" />  
 
-        {% elif campo.name == 'user' %}
-          {{ campo.form.user }}
-          
+        {% elif campo.name == 'user_id' %} <!-- Si el campo es user_id, lo mostramos -->
+          <input type="hidden" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ administrador.user_id }}" />
+
         {% else %}
           <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ campo.value }}" />
     
@@ -26,7 +34,25 @@
       {% if campo.field.widget.input_type == 'file' and campo.value %}
         <br>
         <img src="{{MEDIA_URL}}/imagenes/{{campo.value}}" width="100" height="100" alt="">
+        <div id="img_preview" width="100" height="100" alt=""></div>
+      {% endif %}
 
+
+    </div>
+
+    <div class="col-12 help-text">{{ campo.errors }}</div>
+
+  {% endfor %}
+
+  <!-- Formulario de usuario -->
+  {% for campo in formularioUsuario %}
+
+    <div class="mb-3">
+
+      {% if campo.field.widget.input_type != 'password' %}
+        <label for="" class="form-label">{{ campo.label }}</label>
+        <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ campo.value }}" />
+      
       {% endif %}
 
     </div>

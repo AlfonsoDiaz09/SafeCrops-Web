@@ -1,5 +1,6 @@
 from typing import Any, Dict
 from django import forms
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Administrador, Experto, Tester, Enfermedad, Dataset
@@ -15,27 +16,27 @@ class TempUsuario(forms.ModelChoiceField): # Se crea una clase para el campo de 
 
 
 class AdministradorForm(forms.ModelForm, forms.Form):  # Formulario para el modelo Administrador
-    user = TempUsuario(queryset=User.objects.all().order_by('-id'), label=None, widget=forms.Select(attrs={'class':'form-select'}), required=True) # Se crea un campo de tipo ModelChoiceField
+    #user = TempUsuario(queryset=User.objects.all().order_by('-id'), label=None, widget=forms.Select(attrs={'class':'form-select'}), required=True) # Se crea un campo de tipo ModelChoiceField
 
     class Meta: # Se define la clase Meta
         model = Administrador # Se define el modelo
-        fields = '__all__' # Se definen los campos que se van a mostrar en el formulario
+        fields = ['id_Administrador', 'nombre', 'apellidoP', 'apellidoM', 'fechaNac', 'correo', 'imagen', 'userType'] # Se definen los campos que se van a mostrar en el formulario
 
 
-class ExpertoForm(forms.ModelForm): # Formulario para el modelo Experto
-    user = TempUsuario(queryset=User.objects.all().order_by('-id'), label=None, widget=forms.Select(attrs={'class':'form-select'}), required=True) # Se crea un campo de tipo ModelChoiceField
+class ExpertoForm(forms.ModelForm, forms.Form): # Formulario para el modelo Experto
+    #user = TempUsuario(queryset=User.objects.all().order_by('-id'), label=None, widget=forms.Select(attrs={'class':'form-select'}), required=True) # Se crea un campo de tipo ModelChoiceField
 
     class Meta: # Se define la clase Meta 
         model = Experto # Se define el modelo
-        fields = '__all__'  # Se definen los campos que se van a mostrar en el formulario
+        fields = ['nombre', 'apellidoP', 'apellidoM', 'fechaNac', 'correo', 'institucionPerteneciente', 'imagen', 'userType']  # Se definen los campos que se van a mostrar en el formulario
 
 
 class TesterForm(forms.ModelForm): # Formulario para el modelo Tester
-    user = TempUsuario(queryset=User.objects.all().order_by('-id'), label=None, widget=forms.Select(attrs={'class':'form-select'}), required=True) # Se crea un campo de tipo ModelChoiceField
+    #user = TempUsuario(queryset=User.objects.all().order_by('-id'), label=None, widget=forms.Select(attrs={'class':'form-select'}), required=True) # Se crea un campo de tipo ModelChoiceField
 
     class Meta: # Se define la clase Meta
         model = Tester # Se define el modelo
-        fields = '__all__' # Se definen los campos que se van a mostrar en el formulario
+        fields = ['nombre', 'apellidoP', 'apellidoM', 'fechaNac', 'correo', 'imagen', 'userType'] # Se definen los campos que se van a mostrar en el formulario
 
 
 class UsuarioForm(UserCreationForm, forms.ModelForm): # Formulario para el modelo Usuario
@@ -45,6 +46,8 @@ class UsuarioForm(UserCreationForm, forms.ModelForm): # Formulario para el model
     class Meta: # Se define la clase Meta
         model = User # Se define el modelo
         fields = ['username', 'password1', 'password2'] # Se definen los campos que se van a mostrar en el formulario
+
+
 '''
 class ResetPasswordForm(forms.Form): # Formulario para restablecer la contraseña
     email = forms.CharField(label='Correo electronico', widget=forms.EmailInput(attrs={'class':'form-control'})) # Se define el campo email para mandar instrucciones

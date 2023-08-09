@@ -48,7 +48,7 @@
                                 <td>{{ administrador.userType }}</td>
                                 <td>{{ administrador.user.username }}</td>
                                 <td>
-                                    <a name="" id="" class="btn btn-info" href="{% url 'editarA' administrador.id_Administrador%}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <a name="" id="" class="btn btn-info" href="{% url 'editarA' administrador.id_Administrador administrador.user_id %}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
                                     <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarA' administrador.id_Administrador%}" role="button"><i class="fa-solid fa-trash"></i></a>
                                 </td>
                             </tr>

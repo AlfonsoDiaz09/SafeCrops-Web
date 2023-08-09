@@ -1,3 +1,22 @@
+// const inputFile = document.getElementById("upload_img");
+// const previewDiv = document.getElementById("img_preview");
+// const reader = new FileReader();
+
+// inputFile.addEventListener('change', handleFileChange(e));
+
+// reader.addEventListener('load', showPreview(e));
+
+// function handleFileChange(e){
+//   const [imageFile] = e.currentTarget.files;
+//   reader.readAsDataURL(imageFile);
+// }
+
+// function showPreview(e){
+//   const previewImage = new Image();
+//   previewImage.src = e.currentTarget.result;
+//   previewDiv.appendChild(previewImage);
+// }
+
 (function(){
   const btnMenu = document.getElementById("iconMenu");
 
@@ -75,6 +94,8 @@
       });
 })();
 
+
+  
 
 
 

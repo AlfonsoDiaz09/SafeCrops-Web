@@ -48,7 +48,7 @@
                                 <td>{{ experto.userType }}</td>
                                 <td>{{ experto.user.username }}</td>
                                 <td>
-                                    <a name="" id="" class="btn btn-info" href="{% url 'editarE' experto.id_Experto%}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <a name="" id="" class="btn btn-info" href="{% url 'editarE' experto.id_Experto experto.user_id %}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
                                     <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarE' experto.id_Experto%}" role="button"><i class="fa-solid fa-trash"></i></a>
                                 </td>
                             </tr>
