@@ -3,7 +3,7 @@ from django import forms
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Administrador, Experto, Tester, Enfermedad, Dataset
+from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Cultivo
 
 '''
 Se crea los formularios a partir de los campos que se encuentran en los modelos o creando 
@@ -67,23 +67,23 @@ class ResetPasswordForm(forms.Form): # Formulario para restablecer la contraseñ
 
 class ResetPasswordForm(forms.Form):
     email = forms.CharField(widget=forms.TextInput(attrs={
-        'autocomplete': 'off',
+        'autocomplete': 'on',
         'autofocus': True
     }))
 
 class ChangePasswordForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput(attrs={
         'autocomplete': 'off',
-        'autofocus': True,
-        'placeholder': 'Nueva contraseña'
+        'autofocus': True
     }))
 
     password_confirmation = forms.CharField(widget=forms.PasswordInput(attrs={
-        'autocomplete': 'off',
-        'placeholder': 'Confirmar contraseña'
+        'autocomplete': 'off'
     }))
 
 class EnfermedadForm(forms.ModelForm):
+    cultivoEnfermedad = forms.ModelChoiceField(queryset=Cultivo.objects.all().order_by('-id_Cultivo'), label=None, widget=forms.Select(attrs={'class':'form-select'}), required=True) # Se crea un campo de tipo ModelChoiceField
+    
     class Meta:
         model = Enfermedad
         fields = '__all__'
@@ -91,4 +91,9 @@ class EnfermedadForm(forms.ModelForm):
 class DatasetForm(forms.ModelForm):
     class Meta:
         model = Dataset
+        fields = '__all__'
+
+class CultivoForm(forms.ModelForm):
+    class Meta:
+        model = Cultivo
         fields = '__all__'

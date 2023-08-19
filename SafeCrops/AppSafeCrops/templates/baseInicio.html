@@ -22,12 +22,13 @@
         <div class="nav__logo">
             <a class="nav-item nav-link" href="{% url 'inicio' %}">
                 <img src="{% static 'img/logoSafeCrops.png' %}" alt="Logo" width="50" height="50">
-                <h3>SafeCrops / Login</h3>
+                <h3>SafeCrops</h3>
             </a>
+            <h3>/ {{ direccion }}</h3>
         </div>
         <div class="nav__btnAccess">
             <a class="btn bg-light text-success" href="{% url 'login' %}">Iniciar Sesión</a>
-            <a class="btn btn-warning" href="#">Registrarse</a>
+            <a class="btn btn-warning" href="{% url 'register' %}">Registrarse</a>
         </div>
     </nav>
 

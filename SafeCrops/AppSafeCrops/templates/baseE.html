@@ -66,25 +66,26 @@
                 <div class="brandSafeCrops">
                     <a href="{% url 'inicioE' %}">
                         <img src="{% static 'img/logoSafeCrops.png' %}" alt="">
-                        <span>SafeCrops</span> <!-- Intelligent Assistance Control System -->
+                        <span>SafeCrops /</span>
                     </a>
+                    <span>{{ direccion }}</span>
                 </div>
             </div>
             <div>
                 <div class="iconProfile" id="iconProfile">
-                    <i class="fa-solid fa-user"></i>
-                    <!--<img class="btn-md fa-user" src="{% static 'img/Logo.png' %}" alt="" style="border-radius:50%;">-->
+                    <img src="{{ imagen }}" alt="" width="25">
                 </div>
                 <div class="displayNone" id="userContainer">
                     <div class="arrow__up">
                         <i class="fa-solid fa-caret-up"></i>
                     </div>
+                    <h6>{{ correo }}</h6>
                     <div class="iconProfile" id="iconProfile">
-                        <i class="fa-solid fa-user"></i>
-                        <!--<img class="btn-md fa-user" src="{% static 'img/Logo.png' %}" alt="" style="border-radius:50%;">-->
+                        <img src="{{ imagen }}" alt="" width="50">
                     </div>
-                    <h3>{{ user.username }}</h3>
-                    <h4>Experto</h4><!--{{ user.directivo.userType }}--><!--{{ user.alumnoUser.userType }}-->
+                    <h3>¡Hola, {{ nombre }}!</h3>
+                    <h4>{{ user.username }}</h4>
+                    <h4>Experto</h4>
                     <hr>
                     <a href="{% url 'salir' %}" class="btn btn-danger">Cerrar Sesión</a>
                 </div>

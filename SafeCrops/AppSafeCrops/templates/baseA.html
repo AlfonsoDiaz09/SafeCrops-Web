@@ -57,7 +57,12 @@
                         </a>
                         <hr>
                     </div>
-
+                    <a href="{% url 'cultivos' %}" class="{% active 'cultivos' %}">
+                        <li>
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span class="nav__span">Cultivos</span>
+                        </li>
+                    </a>
                     <a href="{% url 'enfermedades' %}" class="{% active 'enfermedades' %}">
                         <li>
                             <i class="fa-solid fa-file-pdf"></i>
@@ -95,22 +100,27 @@
             <div class="brandSafeCrops">
                 <a href="{% url 'inicioA' %}">
                     <img src="{% static 'img/logoSafeCrops.png' %}" alt="">
-                    <span>SafeCrops</span>
+                    <span>SafeCrops /</span>
                 </a>
+                <span>{{ direccion }}</span>
             </div>
         </div>
         <div>
             <div class="iconProfile" id="iconProfile">
-                <i class="fa-solid fa-user"></i>
-                <!--<img class="btn-md fa-user" src="{% static 'img/Logo.png' %}" alt="" style="border-radius:50%;">-->
+                <img src="{{ imagen }}" alt="" width="25">
+                <!-- <i class="fa-solid fa-user"></i> -->
             </div>
             <div class="displayNone" id="userContainer">
-                <div class="iconProfile" id="iconProfile">
-                    <i class="fa-solid fa-user"></i>
-                    <!--<img class="btn-md fa-user" src="{% static 'img/Logo.png' %}" alt="" style="border-radius:50%;">-->
+                <div class="arrow__up">
+                    <i class="fa-solid fa-caret-up"></i>
                 </div>
-                <h3>{{ user.username }}</h3>
-                <h4>Administrador</h4><!--{{ user.directivo.userType }}--><!--{{ user.alumnoUser.userType }}-->
+                <h6>{{ correo }}</h6>
+                <div class="iconProfile" id="iconProfile">
+                    <img src="{{ imagen }}" alt="" width="50">
+                </div>
+                <h3>¡Hola, {{ nombre }}!</h3>
+                <h4>{{ user.username }}</h4>
+                <h4>Administrador</h4>
                 <hr>
                 <a href="{% url 'salir' %}" class="btn btn-danger">Cerrar Sesión</a>
             </div>

@@ -12,6 +12,9 @@ from django.contrib.staticfiles.urls import static
 
 urlpatterns = [
     path('login/', views.validation, name='login'), #URL de la vista de validacion de login
+    path('register/', views.registerUsers, name='register'), #URL de la vista de registro
+    path('register/admin', views.registerAdmin, name='register_admin'), #URL de la vista de registro de administrador
+    path('register/experto', views.registerExperto, name='register_experto'), #URL de la vista de registro de experto
     path('password_Reset/', views.ResetPassword, name="passwordReset"), #URL de la vista de ingresar correo para recuperar contraseña
     path('send_email_reset/', views.sendEmail, name="sendEmailReset"), #URL que envia el correo para recuperar contraseña
     path('change_password<str:token>', views.ChangePassword, name="changePassword"), #URL de la vista de cambiar contraseña
@@ -53,5 +56,10 @@ urlpatterns = [
     path('dataset/ver<int:id_Dataset>', login_required(views.verDataset), name='verDataset'), #ver dataset
     path('dataset/editar<int:id_Dataset>', login_required(views.editarDataset), name='editarDataset'), #editar dataset
     path('eliminarDataset/<int:id_Dataset>', login_required(views.eliminarDataset), name='eliminarDataset'), #eliminar dataset
+
+    path('cultivos', login_required(views.cultivos), name='cultivos'), #consulta de cultivos
+    path('cultivo/crear', login_required(views.crearCultivo), name='crearCultivo'), #crear cultivo
+    path('cultivo/editar<int:id_Cultivo>', login_required(views.editarCultivo), name='editarCultivo'), #editar cultivo
+    path('eliminarCultivo/<int:id_Cultivo>', login_required(views.eliminarCultivo), name='eliminarCultivo'), #eliminar cultivo
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.MEDIA_URL_DATASET, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,16 @@
+{% extends "baseA.html" %}
+
+{% block titulo %} Agregar nuevo cultivo {% endblock %}
+
+{% block contenido %} 
+    <div class="card">
+        <div class="card-header">
+            Agregar un cultivo
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Datos del cultivo</h4>
+
+            {% include 'cultivos/form.html' %}
+        </div>
+    </div>
+{% endblock %}

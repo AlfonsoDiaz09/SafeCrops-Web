@@ -23,7 +23,6 @@
                             <th scope="col">Tipo</th>
                             <th scope="col">Usuario</th>
                             <th scope="col">Password</th>
-                            <th scope="col">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -41,10 +40,6 @@
                                 {% endif %} <!--Termina la condición-->
                                 <td>{{ user.username }}</td> <!--Muestra el nombre de usuario-->
                                 <td>ENCRIPTED</td>   <!--Muestra la contraseña encriptada-->
-                                <td> <!--Muestra las acciones-->
-                                    <a name="" id="" class="btn btn-info" href="#" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
-                                     <a name="" id="" class="btn btn-danger btnDelete" href="#" role="button"><i class="fa-solid fa-trash"></i></a>
-                                </td>
                             </tr>
                             {% empty %} <!--Si no hay usuarios-->
                             <tr>

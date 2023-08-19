@@ -1,3 +1,24 @@
+::-webkit-scrollbar{
+    width: 12px;
+}
+
+::-webkit-scrollbar-track{
+    /*background-color: white;*/
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb{
+    height: 50px;
+    background: linear-gradient(#FF9E00, #f4f800,  #FF9E00); /**/
+    border-radius: 20px;
+    /*border: 2px solid white;*/
+}
+
+::-webkit-scrollbar-thumb:hover{
+    background: linear-gradient(#f4f800, #FF9E00, #f4f800);
+    border-radius: 20px;
+}
+
 .navbar{
     background-color: #075618;
     width: 100%;
@@ -5,6 +26,10 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+}
+
+.nav__logo{
+    display: flex;
 }
 
 .nav__logo a{
@@ -49,7 +74,7 @@
     display: flex;
 }
 
-.card_login{
+.card_login, .card_register{
     width: 100%;
     display: -webkit-flex;
     display: -moz-flex;
@@ -109,8 +134,13 @@
     font-weight: bold;
 }
 
-.formLogin{
+.formLogin, .formRegister{
     width: 50%;
+}
+
+.fregister{
+    height: 50vh;
+    overflow-y: scroll;
 }
 
 .legend{
@@ -179,20 +209,46 @@
 .btn_resetpass{
     margin-top: 15px;
 }
-.linkRegister{
+.userRegister{
+    margin-top: 20px;
+    width: 60%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+.userRegister a{
+    color: #fff;
+    font-weight: bold;
+    font-size: 15px;
+    text-decoration: none;
+    text-align: center;
+    background-color: #FF9E00;
+    border-radius: 15px;
+    width: 48%;
+    padding: 1em 0;
+}
+.userRegister a:hover{
+    background-color: #FFB731;
+    color: #059D26;
+}
+.userRegister a i{
+    font-size: 2.5em;
+}
+.linkRegister, .linkLogin{
     width: 70%;
     margin-top: 20px;
     text-align: center;
 }
-.linkRegister a{
+.linkRegister a, .linkLogin a{
     width: 100%;
 }
-.linkRegister a{
+.linkRegister a, .linkLogin a{
     color: #059D26;
     text-decoration: none;
     font-weight: bold;
 }
-.linkRegister a:hover{
+.linkRegister a:hover, .linkLogin a:hover{
     color: #12d83d;
 }
 .separate{

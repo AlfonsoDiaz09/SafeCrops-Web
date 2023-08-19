@@ -1,0 +1,91 @@
+
+{% extends "baseInicio.html" %}
+
+{% load static %}
+
+{% block titulo %} Inicio {% endblock %}
+
+{% block contenido %}
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-15">
+                <div class="card_register">
+                    <div class="card_logo">
+                        <img src="{% static 'img/logoSafeCrops.png' %}" alt="Logo">
+                        <div class="textLogo">
+                            <p class="parrafo1"><span class="txtgreen">Safe Crops</p>
+                        </div>
+                    </div>
+                    <form enctype="multipart/form-data" method="POST" action="" class="formRegister" novalidate>
+                        <legend class="legend">Register</legend>
+                        <fieldset class="fieldset fregister">
+                            {% csrf_token %}
+                            <!-- Formulario de crear experto -->
+                            {% for campo in formularioExperto %} <!-- Recorremos los campos del formulario -->
+
+                            <p> <!-- Div para cada campo -->
+
+                                {% if campo.name != 'userType' %} <!-- Si el campo no es userType, lo mostramos -->
+                                  <label for="" class="form-label">{{ campo.label }}</label> <!-- Mostramos el label del campo -->
+                          
+                                {% endif %}
+                          
+                                {% if campo.name == 'fechaNac' %} <!-- Si el campo es fechaNac, lo mostramos -->
+                                    <input type="date" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
+                                
+                                  {% elif campo.name == 'userType' %} <!-- Si el campo es userType, lo mostramos -->
+                                    <input type="hidden" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="Experto" />
+                                  
+                                  {% elif campo.name == 'user' %}
+                                    {{ campo.form.user }}
+                          
+                                  {% else %}
+                                    <input type="{{ campo.field.widget.input_type }}" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
+                                  
+                                {% endif %}
+                          
+                                {% if campo.field.widget.input_type == 'file' and campo.value %} <!-- Si el campo es file y tiene valor, lo mostramos -->
+                                  <br>
+                                  <img src="{{MEDIA_URL}}/imagenes/{{campo.value}}" width="100" height="100" alt="">
+                                  
+                                {% endif %}
+                          
+                            </p>
+                          
+                              <div class="col-12 help-text">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
+                          
+                            {% endfor %}
+                          
+                            <!-- Formulario de usuario -->
+                            {% for campo in formularioUsuario %}
+                          
+                              <p>
+                          
+                                <label for="" class="form-label">{{ campo.label }}</label>
+                          
+                                <input type="{{ campo.field.widget.input_type }}" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
+                              
+                              </p>
+                          
+                              <div class="col-12 help-text">{{ campo.errors }}</div>
+                          
+                            {% endfor %}
+
+                            <button name="" id="" class="btn btn-warning" type="submit">Registrar</button> <!-- Botón para enviar el formulario -->
+                            <div class="linkLogin">
+                                <div class="separate">
+                                    <hr class="hr">
+                                    <p>¿Ya tienes una cuenta?</p>
+                                    <hr class="hr">
+                                </div>
+                                <a href="{% url 'login' %}">Inicia Sesión</a>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -42,16 +42,6 @@ class Administrador(models.Model): #Se crea el modelo Administrador
             self.imagen.storage.delete(self.imagen.name)
         super().delete() #Se llama al método delete de la clase padre
 
-@receiver(post_save, sender=Usuario)
-def create_user_profileAdministrador(sender, instance, created, **kwargs):
-    if created:
-        Administrador.objects.create(user=instance)
-
-@receiver(post_save, sender=Usuario)
-def save_user_profileAdministrador(sender, instance, **kwargs):
-    instance.administradorUser.save()
-
-
 class Experto(models.Model): #Se crea el modelo Experto
     id_Experto = models.AutoField(primary_key=True) #Se crea el campo id que es la llave primaria y es un campo autoincrementable
     nombre = models.CharField(max_length=45, verbose_name='Nombre') #Se crea el campo nombre que es un campo de tipo cadena de caracteres
@@ -74,15 +64,6 @@ class Experto(models.Model): #Se crea el modelo Experto
         if defaultProfile[1] != 'defaultProfile.png':
             self.imagen.storage.delete(self.imagen.name)
         super().delete() #Se llama al método delete de la clase padre
-
-@receiver(post_save, sender=Usuario)
-def create_user_profileExperto(sender, instance, created, **kwargs):
-    if created:
-        Experto.objects.create(user=instance)
-
-@receiver(post_save, sender=Usuario)
-def save_user_profileExperto(sender, instance, **kwargs):
-    instance.expertoUser.save()
 
 class Tester(models.Model): #Se crea el modelo Tester
     id_Tester = models.AutoField(primary_key=True) #Se crea el campo id que es la llave primaria y es un campo autoincrementable
@@ -131,3 +112,12 @@ class Dataset(models.Model):
     def delete(self, using=None, keep_parents=False):
         shutil.rmtree(self.ruta.name)
         super().delete()
+
+class Cultivo(models.Model):
+    id_Cultivo = models.AutoField(primary_key=True)
+    nombreCultivo = models.CharField(max_length=45, unique=True, verbose_name='Nombre del Cultivo')
+    descripcionCultivo = models.TextField(max_length=200, verbose_name='Descripción del cultivo')
+
+    def __str__(self):
+        fila = self.nombreCultivo
+        return fila

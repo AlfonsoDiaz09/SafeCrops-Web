@@ -1,0 +1,56 @@
+{% extends "baseA.html" %}
+
+{% block titulo %} Lista de Cultivos {% endblock %}
+
+{% block contenido %} 
+
+<link rel="stylesheet" href="../static/css/index.css">
+
+    <div class="card">
+        <div class="card-header">
+            <div class="titleTypeUser">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <!--<img src="http://127.0.0.1:8000/imagenes/imagenes/cerdo2.jpg" alt="" width="300" height="300">
+                <h3>{{ user.is_staff }}mas</h3>-->
+                <h4 class="">Cultivos</h4>
+            </div>
+            <a name="" id="" class="btn btn-warning" href="{% url 'crearCultivo' %}" role="button"><i class="fa-solid fa-circle-plus"></i> Nuevo</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-primary">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Cultivo</th>
+                            <th scope="col">Despripción</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cultivo in cultivos %}
+                            <tr class="">
+                                <td>{{ cultivo.id_Cultivo }}</td>
+                                <td>{{ cultivo.nombreCultivo }}</td>
+                                <td>{{ cultivo.descripcionCultivo }}</td>
+                                <td>
+                                    <a name="" id="" class="btn btn-info" href="{% url 'editarCultivo' cultivo.id_Cultivo%}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarCultivo' cultivo.id_Cultivo%}" role="button"><i class="fa-solid fa-trash"></i></a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">No hay registros</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+        <div class="card-footer text-muted">
+            
+        </div>
+    </div>
+
+{% endblock %}

@@ -5,8 +5,8 @@ from django.conf import settings
 from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required 
-from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Usuario
-from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm, ChangePasswordForm, EnfermedadForm, DatasetForm
+from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Usuario, Cultivo
+from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm, ChangePasswordForm, EnfermedadForm, DatasetForm, CultivoForm
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
@@ -15,10 +15,6 @@ from django.views.generic import FormView
 from django.urls import reverse_lazy
 from .zip import Zip
 import mysql.connector
-#import mysql.connector
-
-###################################
-# Send Email
 
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -32,12 +28,15 @@ from django.core.mail import EmailMultiAlternatives
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 import uuid
-# from django.conf import settings
-# from django.core.mail import EmailMultiAlternatives
 
 # Create your views here.
 
+#*****************************************************************************************************#
+#**********               VALIDACIÓN DE TIPO DE USUARIO PARA PANEL PRINCIPAL                **********#
+#*****************************************************************************************************#
+
 def validation(request):
+
     administradores = Administrador.objects.all()
     expertos = Experto.objects.all()
     testers = Tester.objects.all()
@@ -77,157 +76,21 @@ def validation(request):
     else:
         fm = AuthenticationForm()
         
-    return render(request, 'registration/login.html', {'form': fm})
-'''
+    return render(request, 'registration/login.html', {'direccion' : 'Login','form': fm})
+
+
+#*****************************************************************************************************#
+#**********                         INGRESAR EMAIL PARA ENVIAR TOKEN                        **********#
+#*****************************************************************************************************#
+
 def ResetPassword(request):
-    form_class = ResetPasswordForm
-    template_name = 'registration/password_reset.html'
-    success_url = reverse_lazy(settings.LOGIN_URL)
-
-    @method_decorator(csrf_exempt)
-    def dispatch(self, *args, **kwargs):
-        return super(ResetPassword, self).dispatch(*args, **kwargs)
-    
-    def send_email_reset_pwd(self, user):
-
-        # subject = "Restablecer contraseña Safe Crops"
-        # template = get_template('registration/send_email_reset_pwd.html')
-
-        # content = template.render({'user': user})
-
-        # message = EmailMultiAlternatives(subject, 'Mensaje importante', settings.EMAIL_HOST_USER, [user.email])
-
-        # message.attach_alternative(content, 'text/html')
-        # message.send()
-        # print("Correo enviado correctamente")
-
-        mailServer = smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT)
-        print(mailServer.ehlo())
-        mailServer.starttls()
-        print(mailServer.ehlo())
-        mailServer.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
-        print("Conectado...")
-        email_to = "campeon2311@gmail.com"
-
-        mensaje = MIMEMultipart()
-        mensaje['From'] = settings.EMAIL_HOST_USER
-        mensaje['To'] = email_to
-        mensaje['Subject'] = "Tienes un correo de SafeCrops"
-
-        content = render_to_string('send_email_reset_pwd.html', {
-            'user': User.objects.get(pk=1)})
-        mensaje.attach(MIMEText(content, 'html'))
-
-        mailServer.sendmail(settings.EMAIL_HOST_USER, email_to, mensaje.as_string())
-
-        print("Correo enviado correctamente")
-
-    def post(self, request, *args, **kwargs):
-        # form = self.form_class(request.POST)
-        form = ResetPasswordForm(request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            data = self.send_email_reset_pwd(user)
-            return HttpResponseRedirect(self.success_url)
-        return render(request, self.template_name, {'form': form})
+    form_class = ResetPasswordForm(request.GET or None)
+    return render(request, 'registration/password_reset.html', {'direccion' : 'Restablecer contraseña', 'form': form_class})
 
 
-    return render(request, 'registration/password_reset.html', {'form': form_class})
-'''
-'''
-def ResetPassword(request):
-    form_class = ResetPasswordForm
-    template_name = 'registration/password_reset.html'
-    success_url = reverse_lazy(settings.REGISTRATION_REDIRECT_URL)
-
-    def send_email_reset_pwd(self, user):
-        data = {}
-        try:
-            URL = settings.DOMAIN if not settings.DEBUG else self.request.META['HTTP_HOST']
-            user.token = uuid.uuid4()
-            user.save()
-
-            mailServer = smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT)
-            mailServer.starttls()
-            mailServer.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
-
-            email_to = user.email
-            mensaje = MIMEMultipart()
-            mensaje['From'] = settings.EMAIL_HOST_USER
-            mensaje['To'] = email_to
-            mensaje['Subject'] = 'Reseteo de contraseña'
-
-            content = render_to_string('registration/send_email_reset_pwd.html', {
-                'user': user,
-                'link_resetpwd': 'http://{}/login/change/password/{}/'.format(URL, str(user.token)),
-                'link_home': 'http://{}'.format(URL)
-            })
-            mensaje.attach(MIMEText(content, 'html'))
-
-            mailServer.sendmail(settings.EMAIL_HOST_USER,
-                                email_to,
-                                mensaje.as_string())
-            print("Mensaje enviado")
-        except Exception as e:
-            data['error'] = str(e)
-        return data
-
-    def post(self, request, *args, **kwargs):
-        data = {}
-        try:
-            form = ResetPasswordForm(request.POST)  # self.get_form()
-            if form.is_valid():
-                user = form.get_user()
-                data = self.send_email_reset_pwd(user)
-            else:
-                data['error'] = form.errors
-        except Exception as e:
-            data['error'] = str(e)
-        return JsonResponse(data, safe=False)
-
-    def get_context_data(self, **kwargs):
-        context = get_context_data(**kwargs)
-        context['title'] = 'Reseteo de Contraseña'
-        return context
-    
-    return render(request, 'registration/password_reset.html', {'form': form_class})
-'''
-# FUNCIONA ENVIO DE CORREO
-'''
-def sendEmail(mail,request):
-    context={'mail':mail}
-    template = get_template('registration/send_email_reset_pwd.html')
-    content = template.render(context)
-    
-    email = EmailMultiAlternatives(
-        'Un correo de prueba',
-        'CodigoFacilito',
-        settings.EMAIL_HOST_USER,#Origen
-        [mail],#Destinatarios
-
-    )
-    email.attach_alternative(content,'text/html')
-    email.send()
-'''
-    
-# FUNCIONA ENVIO DE CORREO
-'''
-def ResetPassword(request):
-    form_class = ResetPasswordForm(request.POST or None)
-    usuarios = User.objects.all()
-
-    if request.method == 'POST':
-        
-        for user in usuarios:
-            if user.email == 'dcao201793@upemor.edu.mx':
-                print("Entro a query exists", user.email)
-                sendEmail(user.email,request)
-                messages.success(request, f'Correo enviado correctamente')
-
-    return render(request, 'registration/password_reset.html', {'form': form_class})
-'''
-
-#FUNCIONA ENVIO DE CORREO
+#*****************************************************************************************************#
+#**********              ENVIAR EMAIL CON TOKEN DE RECUPERACIÓN DE CONTRASEÑA               **********#
+#*****************************************************************************************************#
 
 def sendEmail(request):
     mail = request.GET.get('email')
@@ -246,9 +109,13 @@ def sendEmail(request):
             print("Prueba ", user.nombre)
             print("Token ", user.token)
             user.save()
+            #obtener una imagen que sera enviada en el correo
+            user_admin = User.objects.get(id=user.user_id)
             context={
-                'mail':mail, 
-                'user':user,
+                'mail':mail,
+                'imagen_profile': user.imagen,
+                'nombre':user.nombre,
+                'user':user_admin,
                 'link_resetpwd': 'http://{}/change_password{}'.format(URL, str(user.token)),
                 'link_home': 'http://{}'.format(URL)
                 }
@@ -256,8 +123,8 @@ def sendEmail(request):
             content = render_to_string('registration/send_email_reset_pwd.html', context)
             
             email = EmailMultiAlternatives(
-                'Un correo de prueba',
-                'CodigoFacilito',
+                'Recuperación de contraseña Safe Crops',
+                'SafeCrops',
                 settings.EMAIL_HOST_USER,#Origen
                 [mail],#Destinatarios
 
@@ -276,9 +143,11 @@ def sendEmail(request):
             print("Prueba ", user.nombre)
             print("Token ", user.token)
             user.save()
+            user_experto = User.objects.get(id=user.user_id)
             context={
                 'mail':mail, 
-                'user':user,
+                'nombre':user.nombre, 
+                'user':user_experto,
                 'link_resetpwd': 'http://{}/change_password{}'.format(URL, str(user.token)),
                 'link_home': 'http://{}'.format(URL)
                 }
@@ -286,8 +155,8 @@ def sendEmail(request):
             content = render_to_string('registration/send_email_reset_pwd.html', context)
             
             email = EmailMultiAlternatives(
-                'Un correo de prueba',
-                'CodigoFacilito',
+                'Recuperación de contraseña Safe Crops',
+                'SafeCrops',
                 settings.EMAIL_HOST_USER,#Origen
                 [mail],#Destinatarios
 
@@ -306,9 +175,11 @@ def sendEmail(request):
             print("Prueba ", user.nombre)
             print("Token ", user.token)
             user.save()
+            user_tester = User.objects.get(id=user.user_id)
             context={
                 'mail':mail, 
-                'user':user,
+                'nombre':user.nombre,
+                'user':user_tester,
                 'link_resetpwd': 'http://{}/change_password{}'.format(URL, str(user.token)),
                 'link_home': 'http://{}'.format(URL)
                 }
@@ -316,8 +187,8 @@ def sendEmail(request):
             content = render_to_string('registration/send_email_reset_pwd.html', context)
             
             email = EmailMultiAlternatives(
-                'Un correo de prueba',
-                'CodigoFacilito',
+                'Recuperación de contraseña Safe Crops',
+                'SafeCrops',
                 settings.EMAIL_HOST_USER,#Origen
                 [mail],#Destinatarios
 
@@ -331,65 +202,13 @@ def sendEmail(request):
         messages.error(request, f'El correo {mail} no existe en la base de datos')
     return redirect('passwordReset')
 
-def ResetPassword(request):
-    form_class = ResetPasswordForm(request.GET or None)
-    return render(request, 'registration/password_reset.html', {'form': form_class})
 
-'''
-def changePassword(request, token):
-    form_class = ChangePasswordForm(request.POST or None)
-    usuarios = User.objects.all()
-    
-    for user in usuarios:
-        if User.objects.filter(token=token).exists():
-            if request.method == 'POST':
-                form = ChangePasswordForm(request.POST)
-                if form.is_valid():
-                    user.set_password(form.cleaned_data['password1'])
-                    user.save()
-                    messages.success(request, f'Contraseña cambiada correctamente')
-                    return redirect('login/')
-            else:
-                form = ChangePasswordForm()
-            return render(request, 'registration/change_password.html', {'form': form_class})
-    return redirect('login/')
-'''
-def ChangePass(request, token):
-    form_class = ChangePasswordForm(request.POST or None)
-    usuariosAdmin = Administrador.objects.all()
-    usuariosExperto = Experto.objects.all()
-    usuariosTester = Tester.objects.all()
-    bandera = False
-    
-    for user in usuariosAdmin:
-        if User.objects.filter(token=token).exists():
-            bandera = True
-    for user in usuariosExperto:
-        if User.objects.filter(token=token).exists():
-            bandera = True
-    for user in usuariosTester:
-        if User.objects.filter(token=token).exists():
-            bandera = True
-    
-    if bandera == False:
-        messages.error(request, f'El token no existe en la base de datos')
-    elif bandera == True:
-        if request.method == 'POST':
-            form = ChangePasswordForm(request.POST)
-            if form.is_valid():
-                user.set_password(form.cleaned_data['password1'])
-                user.save()
-                messages.success(request, f'Contraseña cambiada correctamente')
-                return redirect('login/')
-            else:
-                form = ChangePasswordForm()
-            return render(request, 'registration/change_pwd.html', {'form': form_class})
+#*****************************************************************************************************#
+#**********                             GENERAR NUEVA CONTRASEÑA                            **********#
+#*****************************************************************************************************#
 
 def ChangePassword(request, token):
     form_class = ChangePasswordForm(request.POST or None)
-    usuariosAdmin = Administrador.objects.all()
-    usuariosExperto = Experto.objects.all()
-    usuariosTester = Tester.objects.all()
     bandera = False
     user = None
     
@@ -418,45 +237,23 @@ def ChangePassword(request, token):
                 return redirect('login/')
             else:
                 form = ChangePasswordForm()
-        return render(request, 'registration/change_pwd.html', {'form': form_class})
+        return render(request, 'registration/change_pwd.html', {'direccion' : 'Restablecer contraseña / Nueva contraseña', 'form': form_class})
 
 
 def user_profile(request):
     return render(request, 'usuarios/tester/inicioT.html')
 
-# función para cerrar sesión
-def salir(request):
-    logout(request)
-    return redirect('login/')
-
-#función para redireccionar a la página de inicio principal
-def inicio(request):
-    return render(request, 'paginas/inicio.html')
-
-#función para redireccionar a la página principal del administrador
-def inicioA(request):
-    return render(request, 'usuarios/administrador/inicioA.html')
-
-#función para redireccionar a la página principal del experto
-def inicioE(request):
-    return render(request, 'usuarios/experto/inicioE.html')
-
-#función para redireccionar a la página principal del tester
-def inicioT(request):
-    return render(request, 'usuarios/tester/inicioT.html')
-
 
 #*****************************************************************************************************#
-#*****************************************************************************************************#
-#**********                       GESTIÓN DE USUARIOS ADMINISTRADORES                       **********#
-#*****************************************************************************************************#
+#**********                      REGISTRO DE USUARIOS SIN SESIÓN ACTIVA                     **********#
 #*****************************************************************************************************#
 
-def administradores(request): #función para redireccionar a la página donde se enlista todos los administradores
-    administradores = Administrador.objects.all()
-    return render(request, 'usuarios/administrador/indexA.html', {'administradores': administradores})
+def registerUsers(request):
+    return render(request, 'registration/register.html', {'direccion': 'Registro'})
 
-def crearAdministrador(request): #función para crear un nuevo administrador
+def registerAdmin(request): #función para crear un nuevo administrador
+    text = "Registro / Administrador"
+    context = {'direccion': text}
     if request.method == 'POST':
         formularioUsuario = UsuarioForm(request.POST or None)
         formularioAdministrador = AdministradorForm(request.POST or None, request.FILES or None)
@@ -497,7 +294,201 @@ def crearAdministrador(request): #función para crear un nuevo administrador
         formularioAdministrador = AdministradorForm()
         #formularioUsuario = UsuarioForm(instance=request.user)
         #formularioAdministrador = AdministradorForm(instance=request.user.administradorUser)
-    return render(request, 'usuarios/administrador/crear.html', {'formularioUsuario': formularioUsuario, 'formularioAdministrador': formularioAdministrador})
+    return render(request, 'registration/registerAdmin.html', {'direccion' : 'Registro / Administrador','formularioUsuario': formularioUsuario, 'formularioAdministrador': formularioAdministrador})
+
+def registerExperto(request): #función para crear un nuevo éxperto
+    if request.method == 'POST':
+        formularioUsuario = UsuarioForm(request.POST or None)
+        formularioExperto = ExpertoForm(request.POST or None, request.FILES or None)
+        # Se valida que los formularios sean válidos
+        if formularioUsuario.is_valid() and formularioExperto.is_valid():
+            # Se crean variables para los datos necesarios para realizar las operaciones siguientes
+            nombre = formularioExperto.cleaned_data['nombre']
+            usuario = formularioUsuario.cleaned_data['username']
+
+            # Se guardan los formularios de usuario y administrador
+            formularioUsuario.save()
+            formularioExperto.save()
+
+            # Se crea una conexión a la base de datos
+            conection= mysql.connector.connect(user='root', database='id21050120_safecrops', host='localhost', port='3306', password='') #se conecta a la base de datos
+            
+            # Se crea una sentencia para obtener el id del último usuario registrado
+            last_id = conection.cursor()
+            last_id.execute("""SELECT id FROM auth_user ORDER BY id DESC LIMIT 1""")
+            id_usuario = last_id.fetchone()
+            id_usuario = int(id_usuario[0])
+            last_id.close()
+
+            last_id_experto = conection.cursor()
+            last_id_experto.execute("""SELECT id_Experto FROM appsafecrops_experto ORDER BY id_Experto DESC LIMIT 1""")
+            id_experto = last_id_experto.fetchone()
+            id_experto = int(id_experto[0])
+            last_id_experto.close()
+
+            # Se crea una sentencia para actualizar el id del usuario en la tabla de administradores
+            myquery=conection.cursor()
+            myquery.execute("""UPDATE appsafecrops_experto set user_id = %s WHERE id_Experto = %s""", (id_usuario, id_experto)) #se actualiza la ruta del dataset
+            conection.commit()
+            myquery.close()
+
+            # Se envia un mensaje de registro exitoso al template
+            messages.success(request, f'Experto(a) {nombre} con usuario {usuario} creado correctamente')
+            
+            # Se redirecciona a la página de la lista de administradores
+            return redirect('expertos')
+    else: # Si no se ha enviado el formulario
+        formularioUsuario = UsuarioForm()
+        formularioExperto = ExpertoForm()
+    return render(request, 'registration/registerExperto.html', {'direccion' : 'Registro / Experto', 'formularioUsuario': formularioUsuario, 'formularioExperto': formularioExperto})
+
+
+# función para cerrar sesión
+def salir(request):
+    logout(request)
+    return redirect('login/')
+
+#función para redireccionar a la página de inicio principal
+def inicio(request):
+    return render(request, 'paginas/inicio.html', {'direccion' : 'Inicio'})
+
+#función para traer los datos del usuario logueado
+def perfil(request):
+    #obtener el id del usuario logueado
+    id = request.user.id
+    #obtener el usuario logueado
+    usuario = User.objects.get(id=id)
+    #obtener el administrador logueado
+    administrador = Administrador.objects.get(user_id=usuario.id)
+    #obtener el nombre del administrador logueado
+    nombre = administrador.nombre
+    #obtener el apellido del administrador logueado
+    apellidoP = administrador.apellidoP
+    #obtener el correo del administrador logueado
+    correo = administrador.correo
+    #obtener la foto del administrador logueado
+    imagen = '/imagenes/'+str(administrador.imagen)
+
+    context = {
+               'nombre': nombre, 
+               'apellido': apellidoP, 
+               'correo': correo, 
+               'imagen': imagen
+              }
+    return context
+
+
+#función para redireccionar a la página principal del administrador
+def inicioA(request):
+
+    context = perfil(request)
+    context['direccion'] =  'Administrador'
+
+    return render(request, 'usuarios/administrador/inicioA.html', context)
+
+#función para redireccionar a la página principal del experto
+def inicioE(request):
+    #obtener el id del usuario logueado
+    id = request.user.id
+    #obtener el usuario logueado
+    usuario = User.objects.get(id=id)
+    #obtener el experto logueado
+    experto = Experto.objects.get(user_id=usuario.id)
+    #obtener el nombre del experto logueado
+    nombre = experto.nombre
+    #obtener el apellido del experto logueado
+    apellidoP = experto.apellidoP
+    #obtener el correo del experto logueado
+    correo = experto.correo
+    #obtener la foto del experto logueado
+    imagen = '/imagenes/'+str(experto.imagen)
+    print("Imagen ", imagen)
+
+    context = {'nombre': nombre, 'apellido': apellidoP, 'correo': correo, 'imagen': imagen}
+
+    return render(request, 'usuarios/experto/inicioE.html', context)
+
+#función para redireccionar a la página principal del tester
+def inicioT(request):
+    #obtener el id del usuario logueado
+    id = request.user.id
+    #obtener el usuario logueado
+    usuario = User.objects.get(id=id)
+    #obtener el tester logueado
+    tester = Tester.objects.get(user_id=usuario.id)
+    #obtener el nombre del tester logueado
+    nombre = tester.nombre
+    #obtener el apellido del tester logueado
+    apellidoP = tester.apellidoP
+    #obtener el correo del tester logueado
+    correo = tester.correo
+    #obtener la foto del tester logueado
+    imagen = '/imagenes/'+str(tester.imagen)
+    print("Imagen ", imagen)
+
+    context = {'nombre': nombre, 'apellido': apellidoP, 'correo': correo, 'imagen': imagen}
+
+    return render(request, 'usuarios/tester/inicioT.html', context)
+
+
+#*****************************************************************************************************#
+#**********                       GESTIÓN DE USUARIOS ADMINISTRADORES                       **********#
+#*****************************************************************************************************#
+
+def administradores(request): #función para redireccionar a la página donde se enlista todos los administradores
+    administradores = Administrador.objects.all()
+    context = perfil(request)
+    context['direccion'] =  'Administrador / Usuarios / Administradores'
+    context['administradores'] = administradores
+
+    return render(request, 'usuarios/administrador/indexA.html', context)
+
+def crearAdministrador(request): #función para crear un nuevo administrador
+    if request.method == 'POST':
+        formularioUsuario = UsuarioForm(request.POST or None)
+        formularioAdministrador = AdministradorForm(request.POST or None, request.FILES or None)
+        # Se valida que los formularios sean válidos
+        if formularioUsuario.is_valid() and formularioAdministrador.is_valid():
+            # Se crean variables para los datos necesarios para realizar las operaciones siguientes
+            id_administrador = formularioAdministrador.cleaned_data['id_Administrador']
+            nombre = formularioAdministrador.cleaned_data['nombre']
+            usuario = formularioUsuario.cleaned_data['username']
+
+            # Se guardan los formularios de usuario y administrador
+            formularioUsuario.save()
+            formularioAdministrador.save()
+
+            # Se crea una conexión a la base de datos
+            conection= mysql.connector.connect(user='root', database='id21050120_safecrops', host='localhost', port='3306', password='') #se conecta a la base de datos
+            
+            # Se crea una sentencia para obtener el id del último usuario registrado
+            last_id = conection.cursor()
+            last_id.execute("""SELECT id FROM auth_user ORDER BY id DESC LIMIT 1""")
+            id_usuario = last_id.fetchone()
+            id_usuario = int(id_usuario[0])
+            last_id.close()
+
+            # Se crea una sentencia para actualizar el id del usuario en la tabla de administradores
+            myquery=conection.cursor()
+            myquery.execute("""UPDATE appsafecrops_administrador set user_id = %s WHERE id_Administrador = %s""", (id_usuario, id_administrador)) #se actualiza la ruta del dataset
+            conection.commit()
+            myquery.close()
+
+            # Se envia un mensaje de registro exitoso al template
+            messages.success(request, f'Administrador(a) {nombre} con usuario {usuario} creado correctamente')
+            
+            # Se redirecciona a la página de la lista de administradores
+            return redirect('administradores')
+    else: # Si no se ha enviado el formulario
+        formularioUsuario = UsuarioForm()
+        formularioAdministrador = AdministradorForm()
+
+        context = perfil(request)
+        context['direccion'] =  'Administrador / Usuarios / Administradores / Registrar'
+        context['formularioUsuario'] = formularioUsuario
+        context['formularioAdministrador'] = formularioAdministrador
+
+    return render(request, 'usuarios/administrador/crear.html', context)
 
 def editarAdministrador(request, id_Administrador, user_id): #función para editar un administrador con parametros de matricula
     # Se obtienen los datos personales del administrador
@@ -536,8 +527,15 @@ def editarAdministrador(request, id_Administrador, user_id): #función para edit
 
             messages.success(request, f'Se ha modificado la información de administrador(a) {nombre} con usuario {username} correctamente')
             return redirect('administradores')
+    else: # Si no se ha enviado el formulario  
+        context = perfil(request)
+        context['direccion'] =  'Administrador / Usuarios / Administradores / Modificar'
+        context['formularioAdministrador'] = formularioAdministrador
+        context['formularioUsuario'] = formularioUsuario
+        context['administrador'] = administrador
+        context['usuario'] = usuario
          
-    return render(request, 'usuarios/administrador/editar.html', {'formularioAdministrador': formularioAdministrador, 'formularioUsuario':formularioUsuario, 'administrador': administrador, 'usuario': usuario})
+    return render(request, 'usuarios/administrador/editar.html', context)
 
 def eliminarAdministrador(request, id_Administrador): #función para eliminar un administrador con parametros de matricula
     administrador = Administrador.objects.get(id_Administrador=id_Administrador)
@@ -548,14 +546,17 @@ def eliminarAdministrador(request, id_Administrador): #función para eliminar un
 
 
 #*****************************************************************************************************#
-#*****************************************************************************************************#
 #**********                           GESTIÓN DE USUARIOS EXPERTOS                          **********#
-#*****************************************************************************************************#
 #*****************************************************************************************************#
 
 def expertos(request): #función para redireccionar a la página donde se enlista todos los expertos
     expertos = Experto.objects.all()
-    return render(request, 'usuarios/experto/indexE.html', {'expertos': expertos})
+
+    context = perfil(request)
+    context['direccion'] =  'Administrador / Usuarios / Expertos'
+    context['expertos'] = expertos
+
+    return render(request, 'usuarios/experto/indexE.html', context)
 
 def crearExperto(request): #función para crear un nuevo éxperto
     if request.method == 'POST':
@@ -601,7 +602,13 @@ def crearExperto(request): #función para crear un nuevo éxperto
     else: # Si no se ha enviado el formulario
         formularioUsuario = UsuarioForm()
         formularioExperto = ExpertoForm()
-    return render(request, 'usuarios/experto/crear.html', {'formularioUsuario': formularioUsuario, 'formularioExperto': formularioExperto})
+
+        context = perfil(request)
+        context['direccion'] =  'Administrador / Usuarios / Expertos / Regsitrar'
+        context['formularioUsuario'] = formularioUsuario
+        context['formularioExperto'] = formularioExperto
+
+    return render(request, 'usuarios/experto/crear.html', context)
 
 def editarExperto(request, id_Experto, user_id): #función para editar un administrador con parametros de matricula
     # Se obtienen los datos personales del administrador
@@ -640,8 +647,16 @@ def editarExperto(request, id_Experto, user_id): #función para editar un admini
 
             messages.success(request, f'Se ha modificado la información de experto(a) {nombre} con usuario {username} correctamente')
             return redirect('expertos')
+    
+    else: # Si no se ha enviado el formulario
+        context = perfil(request)
+        context['direccion'] =  'Administrador / Usuarios / Expertos / Modificar'
+        context['formularioExperto'] = formularioExperto
+        context['formularioUsuario'] = formularioUsuario
+        context['experto'] = experto
+        context['usuario'] = usuario
          
-    return render(request, 'usuarios/experto/editar.html', {'formularioExperto': formularioExperto, 'formularioUsuario':formularioUsuario, 'experto': experto, 'usuario': usuario})
+    return render(request, 'usuarios/experto/editar.html', context)
 
 def eliminarExperto(request, id_Experto):
     experto = Experto.objects.get(id_Experto=id_Experto)
@@ -652,14 +667,17 @@ def eliminarExperto(request, id_Experto):
 
 
 #*****************************************************************************************************#
-#*****************************************************************************************************#
 #**********                           GESTIÓN DE USUARIOS TESTERS                           **********#
-#*****************************************************************************************************#
 #*****************************************************************************************************#
 
 def testers(request): #función para redireccionar a la página donde se enlista todos los testers
     testers = Tester.objects.all()
-    return render(request, 'usuarios/tester/indexT.html', {'testers': testers})
+
+    context = perfil(request)
+    context['direccion'] =  'Administrador / Usuarios / Testers'
+    context['testers'] = testers
+
+    return render(request, 'usuarios/tester/indexT.html', context)
 
 def crearTester(request): #función para crear un nuevo éxperto
     if request.method == 'POST':
@@ -705,7 +723,13 @@ def crearTester(request): #función para crear un nuevo éxperto
     else: # Si no se ha enviado el formulario
         formularioUsuario = UsuarioForm()
         formularioTester = TesterForm()
-    return render(request, 'usuarios/tester/crear.html', {'formularioUsuario': formularioUsuario, 'formularioTester': formularioTester})
+
+        context = perfil(request)
+        context['direccion'] =  'Administrador / Usuarios / Testers / Registrar'
+        context['formularioUsuario'] = formularioUsuario
+        context['formularioTester'] = formularioTester
+
+    return render(request, 'usuarios/tester/crear.html', context)
 
 def editarTester(request, id_Tester, user_id): #función para editar un administrador con parametros de matricula
     # Se obtienen los datos personales del administrador
@@ -744,8 +768,15 @@ def editarTester(request, id_Tester, user_id): #función para editar un administ
 
             messages.success(request, f'Se ha modificado la información de tester {nombre} con usuario {username} correctamente')
             return redirect('testers')
+    else: # Si no se ha enviado el formulario
+        context = perfil(request)
+        context['direccion'] =  'Administrador / Usuarios / Testers / Modificar'
+        context['formularioTester'] = formularioTester
+        context['formularioUsuario'] = formularioUsuario
+        context['tester'] = tester
+        context['usuario'] = usuario
          
-    return render(request, 'usuarios/tester/editar.html', {'formularioTester': formularioTester, 'formularioUsuario':formularioUsuario, 'tester': tester, 'usuario': usuario})
+    return render(request, 'usuarios/tester/editar.html', context)
 
 def eliminarTester(request, id_Tester): #función para eliminar un tester con parametros de matricula
     tester = Tester.objects.get(id_Tester=id_Tester) #se obtiene el tester con la matricula
@@ -756,14 +787,17 @@ def eliminarTester(request, id_Tester): #función para eliminar un tester con pa
 
 
 #*****************************************************************************************************#
-#*****************************************************************************************************#
 #**********                          GESTIÓN DE PERFIL DE USUARIOS                          **********#
-#*****************************************************************************************************#
 #*****************************************************************************************************#
 
 def usuarios(request): #función para redireccionar a la página donde se enlista todos los usuarios
     usuarios = User.objects.all()
-    return render(request, 'usuarios/usuario/indexU.html', {'usuarios': usuarios})
+
+    context = perfil(request)
+    context['direccion'] =  'Administrador / Usuarios'
+    context['usuarios'] = usuarios
+    
+    return render(request, 'usuarios/usuario/indexU.html', context)
 
 def eliminarUsuario(request, id):
     usuario = User.objects.get(id=id)
@@ -772,14 +806,17 @@ def eliminarUsuario(request, id):
 
 
 #*****************************************************************************************************#
-#*****************************************************************************************************#
 #**********                             GESTIÓN DE ENFERMEDADES                             **********#
-#*****************************************************************************************************#
 #*****************************************************************************************************#
 
 def enfermedades(request): #función para redireccionar a la página donde se enlista todas las enfermedades
     enfermedades = Enfermedad.objects.all()
-    return render(request, 'enfermedades/indexE.html', {'enfermedades': enfermedades})
+
+    context = perfil(request)
+    context['direccion'] =  'Administrador / Enfermedades'
+    context['enfermedades'] = enfermedades
+
+    return render(request, 'enfermedades/indexE.html', context)
 
 def crearEnfermedad(request):
     formulario = EnfermedadForm(request.POST or None)
@@ -788,17 +825,30 @@ def crearEnfermedad(request):
         messages.success(request, f'Enfermedad {nombre} creada correctamente')
         formulario.save()
         return redirect('enfermedades')
-    return render(request, 'enfermedades/crear.html', {'formulario': formulario})
+    
+    context = perfil(request)
+    context['direccion'] =  'Administrador / Enfermedades / Registrar'
+    context['formulario'] = formulario
+
+    return render(request, 'enfermedades/crear.html', context)
 
 def editarEnfermedad(request, id_Enfermedad):
     enfermedad = Enfermedad.objects.get(id_Enfermedad=id_Enfermedad)
+    cultivo = Cultivo.objects.all()
     formulario = EnfermedadForm(request.POST or None, instance=enfermedad)
     if formulario.is_valid():
         nombre = formulario.cleaned_data['nombreEnfermedad']
         messages.success(request, f'Enfermedad {nombre} modificada correctamente')
         formulario.save()
         return redirect('enfermedades')
-    return render(request, 'enfermedades/editar.html', {'formulario': formulario, 'enfermedad': enfermedad})
+    
+    context = perfil(request)
+    context['direccion'] =  'Administrador / Enfermedades / Modificar'
+    context['formulario'] = formulario
+    context['enfermedad'] = enfermedad
+    context['cultivos'] = cultivo
+
+    return render(request, 'enfermedades/editar.html', context)
 
 def eliminarEnfermedad(request, id_Enfermedad):
     enfermedad = Enfermedad.objects.get(id_Enfermedad=id_Enfermedad)
@@ -807,14 +857,17 @@ def eliminarEnfermedad(request, id_Enfermedad):
 
 
 #*****************************************************************************************************#
-#*****************************************************************************************************#
 #**********                               GESTIÓN DE DATASETS                               **********#
-#*****************************************************************************************************#
 #*****************************************************************************************************#
 
 def datasets(request): #función para redireccionar a la página donde se enlista todos los datasets
     datasets = Dataset.objects.all()
-    return render(request, 'datasets/indexD.html', {'datasets': datasets})
+
+    context = perfil(request)
+    context['direccion'] =  'Administrador / Datasets'
+    context['datasets'] = datasets
+
+    return render(request, 'datasets/indexD.html', context)
 
 def crearDataset(request):
     if request.method == 'POST':
@@ -830,13 +883,25 @@ def crearDataset(request):
             return redirect('datasets')
     else:
         formulario = DatasetForm()
-    return render(request, 'datasets/crear.html', {'formulario': formulario})
+
+        context = perfil(request)
+        context['direccion'] =  'Administrador / Datasets / Registrar'
+        context['formulario'] = formulario
+
+    return render(request, 'datasets/crear.html', context)
 
 def verDataset(request, id_Dataset):
     dataset = Dataset.objects.get(id_Dataset=id_Dataset)
+    nombre = dataset.nombreDataset
     rutaDataset = '/datasets/'+dataset.ruta.name+'/entrenamiento/'
     dirsTrain = os.listdir(dataset.ruta.name+'/entrenamiento')
-    return render(request, 'datasets/ver.html', {'imagenesEntrenamiento': dirsTrain, 'dataset': rutaDataset})
+
+    context = perfil(request)
+    context['direccion'] =  'Administrador / Datasets / '+nombre
+    context['imagenesEntrenamiento'] = dirsTrain
+    context['dataset'] = rutaDataset
+
+    return render(request, 'datasets/ver.html', context)
 
 def editarDataset(request, id_Dataset):
     dataset = Dataset.objects.get(id_Dataset=id_Dataset)
@@ -846,9 +911,67 @@ def editarDataset(request, id_Dataset):
         messages.success(request, f'Dataset {nombre} modificado correctamente')
         formulario.save()
         return redirect('datasets')
-    return render(request, 'datasets/editar.html', {'formulario': formulario, 'dataset': dataset})
+    
+    context = perfil(request)
+    context['direccion'] =  'Administrador / Datasets / Modificar'
+    context['formulario'] = formulario
+    context['dataset'] = dataset
+
+    return render(request, 'datasets/editar.html', context)
 
 def eliminarDataset(request, id_Dataset):
     dataset = Dataset.objects.get(id_Dataset=id_Dataset)
     dataset.delete()
     return redirect('datasets')
+
+
+#*****************************************************************************************************#
+#**********                               GESTIÓN DE CULTIVOS                               **********#
+#*****************************************************************************************************#
+
+def cultivos(request): #función para redireccionar a la página donde se enlista todos los cultivos
+    cultivos = Cultivo.objects.all()
+
+    context = perfil(request)
+    context['direccion'] =  'Administrador / Cultivos'
+    context['cultivos'] = cultivos
+
+    return render(request, 'cultivos/indexC.html', context)
+
+def crearCultivo(request):
+    formulario = CultivoForm(request.POST or None)
+    if formulario.is_valid():
+        nombre = formulario.cleaned_data['nombreCultivo']
+        messages.success(request, f'Cultivo {nombre} creado correctamente')
+        formulario.save()
+        return redirect('cultivos')
+    
+    context = perfil(request)
+    context['direccion'] =  'Administrador / Cultivos / Registrar'
+    context['formulario'] = formulario
+
+    return render(request, 'cultivos/crear.html', context)
+
+def editarCultivo(request, id_Cultivo):
+    cultivo = Cultivo.objects.get(id_Cultivo=id_Cultivo)
+    formulario = CultivoForm(request.POST or None, instance=cultivo)
+    if formulario.is_valid():
+        nombre = formulario.cleaned_data['nombreCultivo']
+        messages.success(request, f'Cultivo {nombre} modificado correctamente')
+        formulario.save()
+        return redirect('cultivos')
+    
+    context = perfil(request)
+    context['direccion'] =  'Administrador / Cultivos / Modificar'
+    context['formulario'] = formulario
+    context['cultivo'] = cultivo
+
+    return render(request, 'cultivos/editar.html', context)
+
+def eliminarCultivo(request, id_Cultivo):
+    cultivo = Cultivo.objects.get(id_Cultivo=id_Cultivo)
+    cultivo.delete()
+    return redirect('cultivos')
+
+
+
