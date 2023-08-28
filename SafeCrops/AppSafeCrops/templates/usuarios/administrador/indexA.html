@@ -22,9 +22,7 @@
                     <thead>
                         <tr>
                             <th scope="col">ID</th>
-                            <th scope="col">Nombre</th>
-                            <th scope="col">ApellidoP</th>
-                            <th scope="col">ApellidoM</th>
+                            <th scope="col">Nombre Completo</th>
                             <th scope="col">FechaNac</th>
                             <th scope="col">Correo</th>
                             <th scope="col">Foto</th>
@@ -37,9 +35,7 @@
                         {% for administrador in administradores %}
                             <tr class="">
                                 <td>{{ administrador.id_Administrador }}</td>
-                                <td>{{ administrador.nombre }}</td>
-                                <td>{{ administrador.apellidoP }}</td>
-                                <td>{{ administrador.apellidoM }}</td>
+                                <td>{{ administrador.nombre }} {{ administrador.apellidoP }} {{ administrador.apellidoM }}</td>
                                 <td>{{ administrador.fechaNac|date:'Y-m-d' }}</td>
                                 <td>{{ administrador.correo }}</td>
                                 <td>

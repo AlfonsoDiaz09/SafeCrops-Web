@@ -56,6 +56,9 @@ urlpatterns = [
     path('dataset/ver<int:id_Dataset>', login_required(views.verDataset), name='verDataset'), #ver dataset
     path('dataset/editar<int:id_Dataset>', login_required(views.editarDataset), name='editarDataset'), #editar dataset
     path('eliminarDataset/<int:id_Dataset>', login_required(views.eliminarDataset), name='eliminarDataset'), #eliminar dataset
+    path('activarDataset/<int:id_Dataset>', login_required(views.activarDataset), name='activarDataset'), #mostrar dataset
+    path('desactivarDataset/<int:id_Dataset>', login_required(views.desactivarDataset), name='desactivarDataset'), #ocultar dataset
+    path('eliminarImagen/<int:id_Dataset>,<str:imagen>', login_required(views.eliminarImagen), name='eliminarImagen'), #eliminar imagen de dataset
 
     path('cultivos', login_required(views.cultivos), name='cultivos'), #consulta de cultivos
     path('cultivo/crear', login_required(views.crearCultivo), name='crearCultivo'), #crear cultivo

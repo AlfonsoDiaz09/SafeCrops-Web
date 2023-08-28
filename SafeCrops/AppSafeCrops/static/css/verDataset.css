@@ -1,0 +1,113 @@
+.card{
+    overflow-y: scroll;
+}
+
+.card__ver_dataset{
+    display: flex;
+}
+
+.card__ver_dataset .card-header{
+    width: 100%;
+}
+
+.card__ver_dataset .card:nth-child(1){
+    width: 78%;
+}
+
+.card__ver_dataset .card:nth-child(2){
+    width: 18%;
+    height: 86vh;
+    position: fixed;
+    right: 0;
+}
+
+.card-body__ver_dataset{
+    position: relative;
+    text-align: center;
+}
+
+.card-body__ver_dataset > h2{
+    font-size: 1.5em;
+    font-weight: 600;
+    margin-top: 1em;
+}
+
+.card-body__ver_dataset > img{
+    width: 7em;
+    height: 7em;
+}
+
+.card_num_img{
+    display: inline-block;
+    margin-top: 1em;
+    align-items: center;
+    padding: 0.4em 1em;
+    border-radius: 10px;
+    color: #03a86e;
+    border: 2px solid #03a86e;
+    box-shadow: 0 0 10px rgba(3, 156, 118, 0.656);
+}
+
+.card_num_img > .txt_span:nth-child(2){
+    margin-left: 0.5em;
+}
+
+.card_num_img > .txt_span:nth-child(3){
+    border-radius: 30px;
+    padding: 0.2em 0.7em;
+    background-color: #057d53;
+    color: white;
+    margin-left: 0.3em;
+}
+
+.card_split{
+    height: 5em;
+    margin-top: 1.5em;
+    border: 1px solid gray;
+    border-radius: 10px;
+}
+
+.card_split:nth-child(1){
+    background-color: #de5640;
+    border: none;
+    color: white;
+}
+
+.card_split:nth-child(2){
+    background-color: #85057b;
+    border: none;
+    color: white;
+}
+
+.card_split:nth-child(1) .text:nth-child(1) .txt_span:nth-child(2){
+    background-color: #70059e;
+    border: none;
+    color: white;
+    border-radius: 30px;
+    padding: 0.1em 0.5em;
+}
+
+.card_split:nth-child(2) .text:nth-child(1) .txt_span:nth-child(2){
+    background-color: #059e9e;
+    border: none;
+    color: white;
+    border-radius: 30px;
+    padding: 0.1em 0.5em;
+}
+
+.card_split .text:nth-child(1){
+    width: 100%;
+    display: inline-flex;
+    justify-content: center;
+    padding-top: 0.6em;
+    gap: 1em;
+}
+
+.card_split .text:nth-child(1) .txt_span:nth-child(1){
+    font-size: 1em;
+}
+
+.card_split .text:nth-child(2) .txt_span:nth-child(1){
+    font-size: 1.5em;
+    font-weight: 600;
+}

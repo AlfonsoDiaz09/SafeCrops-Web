@@ -31,7 +31,7 @@
                     </a>
                     <a href="#" class="iconCollapse" id="iconCollapse">
                         <li>
-                            <i class="fa-solid fa-user-gear"></i>
+                            <i class="fa-solid fa-users"></i>
                             <span class="nav__span" style="margin-right: -1em;">Usuarios</span>
                             <i class="fa-solid fa-chevron-right" id="row_collapse"></i>
                         </li>
@@ -45,13 +45,13 @@
                         </a>
                         <a href="{% url 'expertos' %}" class="{% active 'expertos' %}">
                             <li>
-                                <i class="fa-solid fa-user-gear"></i>
+                                <i class="fa-solid fa-user-check"></i>
                                 <span class="nav__span">Expertos</span>
                             </li>
                         </a>
                         <a href="{% url 'testers' %}" class="{% active 'testers' %}">
                             <li>
-                                <i class="fa-solid fa-user-gear"></i>
+                                <i class="fa-solid fa-user-large"></i>
                                 <span class="nav__span">Testers</span>
                             </li>
                         </a>
@@ -59,25 +59,25 @@
                     </div>
                     <a href="{% url 'cultivos' %}" class="{% active 'cultivos' %}">
                         <li>
-                            <i class="fa-solid fa-file-pdf"></i>
+                            <i class="fa-solid fa-seedling"></i>
                             <span class="nav__span">Cultivos</span>
                         </li>
                     </a>
                     <a href="{% url 'enfermedades' %}" class="{% active 'enfermedades' %}">
                         <li>
-                            <i class="fa-solid fa-file-pdf"></i>
+                            <i class="fa-solid fa-viruses"></i>
                             <span class="nav__span">Enfermedades</span>
                         </li>
                     </a>
                     <a href="{% url 'datasets' %}" class="{% active 'datasets' %}">
                         <li>
-                            <i class="fa-solid fa-chalkboard-user"></i>
+                            <i class="fa-solid fa-folder-open"></i>
                             <span class="nav__span">Datasets</span>
                         </li>
                     </a>
                     <a href="#">
                         <li>
-                            <i class="fa-solid fa-graduation-cap"></i>
+                            <i class="fa-solid fa-file-contract"></i>
                             <span class="nav__span">Modelos</span>
                         </li>
                     </a>
@@ -145,6 +145,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous"></script>
     <script src="{% static 'js/app.js' %}"></script>
     <script src="{% static 'js/delete.js' %}"></script>
+    <script src="{% static 'js/deleteTemporaly.js' %}"></script>
     <!-- Sweet alert 2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{% static 'js/utils/notificationSweet2.js' %}"></script>

@@ -1,6 +1,7 @@
 from typing import Any, Dict
 from django import forms
 from django.contrib.auth.hashers import make_password
+from django.core.validators import FileExtensionValidator
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Cultivo
@@ -48,23 +49,6 @@ class UsuarioForm(UserCreationForm, forms.ModelForm): # Formulario para el model
         fields = ['username', 'password1', 'password2'] # Se definen los campos que se van a mostrar en el formulario
 
 
-'''
-class ResetPasswordForm(forms.Form): # Formulario para restablecer la contraseña
-    email = forms.CharField(label='Correo electronico', widget=forms.EmailInput(attrs={'class':'form-control'})) # Se define el campo email para mandar instrucciones
-    class Meta:
-        fields = ['email']
-
-    def clean(self):
-        cleaned = super.clean()
-        if not User.objects.filter(username=cleaned['username']).exists():
-            raise forms.ValidationError('El usuario no existe')
-        return cleaned
-    
-    def get_user(self):
-        username = self.cleaned_data.get('username')
-        return User.objects.get(username=username)
-'''
-
 class ResetPasswordForm(forms.Form):
     email = forms.CharField(widget=forms.TextInput(attrs={
         'autocomplete': 'on',
@@ -89,6 +73,8 @@ class EnfermedadForm(forms.ModelForm):
         fields = '__all__'
 
 class DatasetForm(forms.ModelForm):
+    ruta = forms.FileField(validators=[FileExtensionValidator(allowed_extensions=['zip'])])
+
     class Meta:
         model = Dataset
         fields = '__all__'

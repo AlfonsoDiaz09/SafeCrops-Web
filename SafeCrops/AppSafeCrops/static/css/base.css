@@ -2,6 +2,7 @@
     padding: 0;
     margin: 0;
     list-style: none;
+    user-select: none;
 }
 
 ::-webkit-scrollbar{
@@ -228,10 +229,18 @@ nav{
 .card-header{
     background-color: #059D26;
     color: #fff;
+    display: flex;
+    align-items: center;
 }
 
 .card-header a{
     color: #1c064e;
+}
+
+.card-header .btn__return{
+    color: #FAFF0D;
+    font-size: 1.5em;
+    margin-right: 0.5em;
 }
 
 .panel_container{
@@ -299,4 +308,3 @@ nav{
     margin-top: 10vh;
     padding-bottom: 1em;
 }
-

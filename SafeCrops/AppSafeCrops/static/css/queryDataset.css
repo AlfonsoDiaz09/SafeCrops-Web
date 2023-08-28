@@ -1,0 +1,72 @@
+.container__img{
+    max-width: 13.5%;
+    min-width: 13.5%;
+    position: relative;
+    display: inline-block;
+    padding: 1em 0.3em;
+}
+
+.container__img > .btn__eliminar > a{
+    text-decoration: none;
+    background-color: #de5640;
+    color: white;
+    border: 5px solid #ffffff;
+    border-radius: 50%;
+    padding: 0.8em;
+    font-size: 0.8em;
+    cursor: pointer;
+    transition: all 0.5s;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 98;
+    opacity: 0;
+}
+
+.container__img:hover > .btn__eliminar > a{
+    opacity: 1;
+}
+
+.container__img > .btn__eliminar a:hover{
+    background-color: #ffb731;
+}
+
+.container__img > div > img{
+    width: 100px;
+    height: 100px;
+    border-radius: 10px;
+}
+
+.container__img > div:nth-child(2){
+    position: relative;
+}
+
+.container__img > div:nth-child(2) > span{
+    position: absolute;
+    font-size: 0.8em;
+    font-weight: 600;
+    color: #ffffff;
+    bottom: 0;
+    right: 0;
+    padding: 0.3em 0.5em;
+    border-radius: 30px;
+}
+
+.container__img .span__train{
+    background-color: #85057b;
+}
+
+.container__img .span__validate{
+    background-color: #089fdf;
+}
+
+.container__img > .div__name{
+    white-space: nowrap; 
+    width: 100%; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.8em;
+    font-weight: 400;
+    margin-top: 0.5em;
+    text-align: center;
+}

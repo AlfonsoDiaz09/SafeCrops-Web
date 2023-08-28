@@ -1,14 +1,14 @@
 (function(){
-    const btnDelete = document.querySelectorAll('.btnDelete');
+    const btnDeleteDataset = document.querySelectorAll('.btnDeleteDataset');
 
-    btnDelete.forEach(btn => {
+    btnDeleteDataset.forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             console.log(e.target.href);
             
             Swal.fire({
-                title: '¿Estás seguro de eliminar este registro?',
-                text: "¡No podrás revertir esto!",
+                title: '¿Estás seguro de eliminar este registro de forma temporal?',
+                text: "¡Podrás restaurarlo más adelante!",
                 showCancelButton: true,
                 confirmButtonText: 'Eliminar',
                 confirmButtonColor: '#d33',

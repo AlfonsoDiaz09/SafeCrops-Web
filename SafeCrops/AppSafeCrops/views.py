@@ -1,6 +1,7 @@
 
 from base64 import urlsafe_b64decode
 import os
+import shutil
 from django.conf import settings
 from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.http import HttpResponse, JsonResponse
@@ -377,12 +378,48 @@ def perfil(request):
               }
     return context
 
+#función para contar los usuarios registrados y retornarlos
+def contarUsuarios():
+    num_usuarios = User.objects.all().count()
+    return num_usuarios
+
+#función para contar los cultivos registrados y retornarlos
+def contarCultivos():
+    num_cultivos = Cultivo.objects.all().count()
+    return num_cultivos
+
+#función para contar las enfermedades registradas y retornarlas
+def contarEnfermedades():
+    num_enfermedades = Enfermedad.objects.all().count()
+    return num_enfermedades
+
+#función para contar los dataset registrados y retornarlos
+def contarDatasets():
+    num_datasets = Dataset.objects.all().count()
+    return num_datasets
+
+#función para contar los modelos registrados y retornarlos
+# def contarModelos():
+#     num_modelos = Modelo.objects.all().count()
+#     return num_modelos
+
+#función para contar los reportes registrados y retornarlos
+# def contarReportes():
+#     num_reportes = Reporte.objects.all().count()
+#     return num_reportes
+
 
 #función para redireccionar a la página principal del administrador
 def inicioA(request):
 
     context = perfil(request)
     context['direccion'] =  'Administrador'
+    context['num_usuarios'] = contarUsuarios()
+    context['num_cultivos'] = contarCultivos()
+    context['num_enfermedades'] = contarEnfermedades()
+    context['num_datasets'] = contarDatasets()
+    # context['num_modelos'] = contarModelos()
+    # context['num_reportes'] = contarReportes()
 
     return render(request, 'usuarios/administrador/inicioA.html', context)
 
@@ -435,7 +472,7 @@ def inicioT(request):
 #**********                       GESTIÓN DE USUARIOS ADMINISTRADORES                       **********#
 #*****************************************************************************************************#
 
-def administradores(request): #función para redireccionar a la página donde se enlista todos los administradores
+def administradores(request): #función para redireccionar a la página donde se enlista todos los administradores    
     administradores = Administrador.objects.all()
     context = perfil(request)
     context['direccion'] =  'Administrador / Usuarios / Administradores'
@@ -444,6 +481,7 @@ def administradores(request): #función para redireccionar a la página donde se
     return render(request, 'usuarios/administrador/indexA.html', context)
 
 def crearAdministrador(request): #función para crear un nuevo administrador
+    
     if request.method == 'POST':
         formularioUsuario = UsuarioForm(request.POST or None)
         formularioAdministrador = AdministradorForm(request.POST or None, request.FILES or None)
@@ -480,6 +518,7 @@ def crearAdministrador(request): #función para crear un nuevo administrador
             # Se redirecciona a la página de la lista de administradores
             return redirect('administradores')
     else: # Si no se ha enviado el formulario
+        URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
         formularioUsuario = UsuarioForm()
         formularioAdministrador = AdministradorForm()
 
@@ -487,10 +526,13 @@ def crearAdministrador(request): #función para crear un nuevo administrador
         context['direccion'] =  'Administrador / Usuarios / Administradores / Registrar'
         context['formularioUsuario'] = formularioUsuario
         context['formularioAdministrador'] = formularioAdministrador
+        context['regresar'] = 'http://{}/{}'.format(URL, 'administradores') 
 
     return render(request, 'usuarios/administrador/crear.html', context)
 
 def editarAdministrador(request, id_Administrador, user_id): #función para editar un administrador con parametros de matricula
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+    
     # Se obtienen los datos personales del administrador
     administrador = Administrador.objects.get(id_Administrador=id_Administrador)
     formularioAdministrador = AdministradorForm(request.POST or None, request.FILES or None, instance=administrador)
@@ -534,6 +576,7 @@ def editarAdministrador(request, id_Administrador, user_id): #función para edit
         context['formularioUsuario'] = formularioUsuario
         context['administrador'] = administrador
         context['usuario'] = usuario
+        context['regresar'] = 'http://{}/{}'.format(URL, 'administradores') 
          
     return render(request, 'usuarios/administrador/editar.html', context)
 
@@ -559,6 +602,8 @@ def expertos(request): #función para redireccionar a la página donde se enlist
     return render(request, 'usuarios/experto/indexE.html', context)
 
 def crearExperto(request): #función para crear un nuevo éxperto
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
     if request.method == 'POST':
         formularioUsuario = UsuarioForm(request.POST or None)
         formularioExperto = ExpertoForm(request.POST or None, request.FILES or None)
@@ -607,10 +652,13 @@ def crearExperto(request): #función para crear un nuevo éxperto
         context['direccion'] =  'Administrador / Usuarios / Expertos / Regsitrar'
         context['formularioUsuario'] = formularioUsuario
         context['formularioExperto'] = formularioExperto
+        context['regresar'] = 'http://{}/{}'.format(URL, 'expertos') 
 
     return render(request, 'usuarios/experto/crear.html', context)
 
 def editarExperto(request, id_Experto, user_id): #función para editar un administrador con parametros de matricula
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+    
     # Se obtienen los datos personales del administrador
     experto = Experto.objects.get(id_Experto=id_Experto)
     formularioExperto = ExpertoForm(request.POST or None, request.FILES or None, instance=experto)
@@ -655,6 +703,7 @@ def editarExperto(request, id_Experto, user_id): #función para editar un admini
         context['formularioUsuario'] = formularioUsuario
         context['experto'] = experto
         context['usuario'] = usuario
+        context['regresar'] = 'http://{}/{}'.format(URL, 'expertos') 
          
     return render(request, 'usuarios/experto/editar.html', context)
 
@@ -680,6 +729,8 @@ def testers(request): #función para redireccionar a la página donde se enlista
     return render(request, 'usuarios/tester/indexT.html', context)
 
 def crearTester(request): #función para crear un nuevo éxperto
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
     if request.method == 'POST':
         formularioUsuario = UsuarioForm(request.POST or None)
         formularioTester = TesterForm(request.POST or None, request.FILES or None)
@@ -728,10 +779,13 @@ def crearTester(request): #función para crear un nuevo éxperto
         context['direccion'] =  'Administrador / Usuarios / Testers / Registrar'
         context['formularioUsuario'] = formularioUsuario
         context['formularioTester'] = formularioTester
+        context['regresar'] = 'http://{}/{}'.format(URL, 'testers') 
 
     return render(request, 'usuarios/tester/crear.html', context)
 
 def editarTester(request, id_Tester, user_id): #función para editar un administrador con parametros de matricula
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+    
     # Se obtienen los datos personales del administrador
     tester = Tester.objects.get(id_Tester=id_Tester)
     formularioTester = TesterForm(request.POST or None, request.FILES or None, instance=tester)
@@ -775,6 +829,7 @@ def editarTester(request, id_Tester, user_id): #función para editar un administ
         context['formularioUsuario'] = formularioUsuario
         context['tester'] = tester
         context['usuario'] = usuario
+        context['regresar'] = 'http://{}/{}'.format(URL, 'testers') 
          
     return render(request, 'usuarios/tester/editar.html', context)
 
@@ -819,6 +874,8 @@ def enfermedades(request): #función para redireccionar a la página donde se en
     return render(request, 'enfermedades/indexE.html', context)
 
 def crearEnfermedad(request):
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
     formulario = EnfermedadForm(request.POST or None)
     if formulario.is_valid():
         nombre = formulario.cleaned_data['nombreEnfermedad']
@@ -829,10 +886,13 @@ def crearEnfermedad(request):
     context = perfil(request)
     context['direccion'] =  'Administrador / Enfermedades / Registrar'
     context['formulario'] = formulario
+    context['regresar'] = 'http://{}/{}'.format(URL, 'enfermedades') 
 
     return render(request, 'enfermedades/crear.html', context)
 
 def editarEnfermedad(request, id_Enfermedad):
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
     enfermedad = Enfermedad.objects.get(id_Enfermedad=id_Enfermedad)
     cultivo = Cultivo.objects.all()
     formulario = EnfermedadForm(request.POST or None, instance=enfermedad)
@@ -847,6 +907,7 @@ def editarEnfermedad(request, id_Enfermedad):
     context['formulario'] = formulario
     context['enfermedad'] = enfermedad
     context['cultivos'] = cultivo
+    context['regresar'] = 'http://{}/{}'.format(URL, 'enfermedades') 
 
     return render(request, 'enfermedades/editar.html', context)
 
@@ -863,6 +924,14 @@ def eliminarEnfermedad(request, id_Enfermedad):
 def datasets(request): #función para redireccionar a la página donde se enlista todos los datasets
     datasets = Dataset.objects.all()
 
+    estadoDataset = request.GET.get('estadoDataset')
+    if estadoDataset == 'Todos' or estadoDataset == None:
+        datasets = Dataset.objects.all()
+    elif estadoDataset == 'Activo':
+        datasets = Dataset.objects.filter(estadoDataset='Activo')
+    elif estadoDataset == 'Inactivo':
+        datasets = Dataset.objects.filter(estadoDataset='Inactivo')
+
     context = perfil(request)
     context['direccion'] =  'Administrador / Datasets'
     context['datasets'] = datasets
@@ -870,6 +939,8 @@ def datasets(request): #función para redireccionar a la página donde se enlist
     return render(request, 'datasets/indexD.html', context)
 
 def crearDataset(request):
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
     if request.method == 'POST':
         formulario = DatasetForm(request.POST, request.FILES)
         if formulario.is_valid():
@@ -881,41 +952,91 @@ def crearDataset(request):
             Zip.descomprimir(str(formulario.instance.ruta.name), rutaName, tipo, nombreD, formatoImagen)
             messages.success(request, f'Dataset {nombreD} creado correctamente')
             return redirect('datasets')
+        else:
+            messages.error(request, 'Error al crear el dataset.')
+            formulario = DatasetForm()
+
+            context = perfil(request)
+            context['direccion'] =  'Administrador / Datasets / Registrar'
+            context['formulario'] = formulario
+            context['regresar'] = 'http://{}/{}'.format(URL, 'datasets')
     else:
         formulario = DatasetForm()
 
         context = perfil(request)
         context['direccion'] =  'Administrador / Datasets / Registrar'
         context['formulario'] = formulario
+        context['regresar'] = 'http://{}/{}'.format(URL, 'datasets')
 
     return render(request, 'datasets/crear.html', context)
 
 def verDataset(request, id_Dataset):
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
     dataset = Dataset.objects.get(id_Dataset=id_Dataset)
     nombre = dataset.nombreDataset
-    rutaDataset = '/datasets/'+dataset.ruta.name+'/entrenamiento/'
+    rutaDatasetTrain = '/datasets/'+dataset.ruta.name+'/entrenamiento/'
     dirsTrain = os.listdir(dataset.ruta.name+'/entrenamiento')
+    rutaDatasetValidate = '/datasets/'+dataset.ruta.name+'/validacion/'
+    dirsValidate = os.listdir(dataset.ruta.name+'/validacion')
+
+    n_img_total = len(dirsTrain) + len(dirsValidate)
 
     context = perfil(request)
     context['direccion'] =  'Administrador / Datasets / '+nombre
     context['imagenesEntrenamiento'] = dirsTrain
-    context['dataset'] = rutaDataset
+    context['imagenesValidacion'] = dirsValidate
+    context['id_Dataset'] = id_Dataset
+    context['datasetTrain'] = rutaDatasetTrain
+    context['datasetValidate'] = rutaDatasetValidate
+    context['dataset_info'] = dataset
+    context['numImagenes'] = n_img_total
+    context['numTrain'] = len(dirsTrain)
+    context['numValidate'] = len(dirsValidate)
+    context['regresar'] = 'http://{}/{}'.format(URL, 'datasets') 
 
     return render(request, 'datasets/ver.html', context)
 
 def editarDataset(request, id_Dataset):
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
     dataset = Dataset.objects.get(id_Dataset=id_Dataset)
     formulario = DatasetForm(request.POST or None, request.FILES or None, instance=dataset)
+
+    # Se recuperan los datos antes de modificar el dataset
+    rutaAnterior = dataset.ruta.name
+    numImgTotal = dataset.numImgTotal
+    numImgEntrenamiento = dataset.numImgEntrenamiento
+    numImgValidacion = dataset.numImgValidacion
+
+    # Se valida que el formulario sea válido
     if formulario.is_valid():
-        nombre = formulario.cleaned_data['nombreDataset']
-        messages.success(request, f'Dataset {nombre} modificado correctamente')
+        # Se guardan los datos del formulario
         formulario.save()
+        
+        # Se obtienen los datos del formulario
+        tipo = formulario.cleaned_data['tipoDataset']
+        nombreD = formulario.cleaned_data['nombreDataset']
+        formatoImagen = formulario.cleaned_data['formatoImg']
+        rutaName = formulario.cleaned_data['ruta'].name
+        ruta_split = rutaName.split('.')
+        if len(ruta_split) > 1:
+            shutil.rmtree(rutaAnterior) #se elimina la carpeta del dataset anterior
+            Zip.descomprimir(str(formulario.instance.ruta.name), rutaName, tipo, nombreD, formatoImagen) #se descomprime el nuevo dataset
+        else:
+            dataset.ruta = rutaAnterior
+            dataset.numImgTotal = numImgTotal
+            dataset.numImgEntrenamiento = numImgEntrenamiento
+            dataset.numImgValidacion = numImgValidacion
+            dataset.save()
+        messages.success(request, f'Dataset {nombreD} modificado correctamente')
         return redirect('datasets')
     
     context = perfil(request)
     context['direccion'] =  'Administrador / Datasets / Modificar'
     context['formulario'] = formulario
     context['dataset'] = dataset
+    context['regresar'] = 'http://{}/{}'.format(URL, 'datasets') 
 
     return render(request, 'datasets/editar.html', context)
 
@@ -924,6 +1045,61 @@ def eliminarDataset(request, id_Dataset):
     dataset.delete()
     return redirect('datasets')
 
+def activarDataset(request, id_Dataset):
+    dataset = Dataset.objects.get(id_Dataset=id_Dataset)
+    dataset.estadoDataset = 'Activo'
+    dataset.save()
+    messages.success(request, f'Dataset {dataset.nombreDataset} activado correctamente')
+    return redirect('datasets')
+
+def desactivarDataset(request, id_Dataset):
+    dataset = Dataset.objects.get(id_Dataset=id_Dataset)
+    dataset.estadoDataset = 'Inactivo'
+    dataset.save()
+    return redirect('datasets')
+
+def eliminarImagen(request, id_Dataset, imagen):
+    dataset = Dataset.objects.get(id_Dataset=id_Dataset)
+    nombre = dataset.nombreDataset
+    ruta = dataset.ruta.name
+    if os.path.exists(ruta+'/entrenamiento/'+imagen):
+        os.remove(ruta+'/entrenamiento/'+imagen)
+
+        num_imagenes = contarImagenes(request, id_Dataset)
+
+        # Se crea una conexión a la base de datos
+        conection= mysql.connector.connect(user='root', database='id21050120_safecrops', host='localhost', port='3306', password='') #se conecta a la base de datos
+
+        # Se crea una sentencia para actualizar el número de imagenes en la tabla de datasets
+        myquery=conection.cursor()
+        myquery.execute("""UPDATE appsafecrops_dataset set numImgTotal = %s, numImgEntrenamiento = %s WHERE id_Dataset = %s""", (num_imagenes[0], num_imagenes[1], id_Dataset)) #se actualiza la ruta del dataset
+        conection.commit()
+        myquery.close()
+
+    elif os.path.exists(ruta+'/validacion/'+imagen):
+        os.remove(ruta+'/validacion/'+imagen)
+
+        num_imagenes = contarImagenes(request, id_Dataset)
+
+        # Se crea una conexión a la base de datos
+        conection= mysql.connector.connect(user='root', database='id21050120_safecrops', host='localhost', port='3306', password='') #se conecta a la base de datos
+
+        # Se crea una sentencia para actualizar el número de imagenes en la tabla de datasets
+        myquery=conection.cursor()
+        myquery.execute("""UPDATE appsafecrops_dataset set numImgTotal = %s, numImgValidacion = %s WHERE id_Dataset = %s""", (num_imagenes[0], num_imagenes[2], id_Dataset)) #se actualiza la ruta del dataset
+        conection.commit()
+        myquery.close()
+
+    return redirect('verDataset', id_Dataset)
+
+def contarImagenes(request, id_Dataset):
+    dataset = Dataset.objects.get(id_Dataset=id_Dataset)
+    ruta = dataset.ruta.name
+    dirsTrain = os.listdir(ruta+'/entrenamiento')
+    dirsValidate = os.listdir(ruta+'/validacion')
+    n_img_total = len(dirsTrain) + len(dirsValidate)
+    num_imagenes = [n_img_total, len(dirsTrain), len(dirsValidate)]
+    return num_imagenes
 
 #*****************************************************************************************************#
 #**********                               GESTIÓN DE CULTIVOS                               **********#
@@ -939,6 +1115,8 @@ def cultivos(request): #función para redireccionar a la página donde se enlist
     return render(request, 'cultivos/indexC.html', context)
 
 def crearCultivo(request):
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
     formulario = CultivoForm(request.POST or None)
     if formulario.is_valid():
         nombre = formulario.cleaned_data['nombreCultivo']
@@ -949,10 +1127,13 @@ def crearCultivo(request):
     context = perfil(request)
     context['direccion'] =  'Administrador / Cultivos / Registrar'
     context['formulario'] = formulario
+    context['regresar'] = 'http://{}/{}'.format(URL, 'cultivos') 
 
     return render(request, 'cultivos/crear.html', context)
 
 def editarCultivo(request, id_Cultivo):
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
     cultivo = Cultivo.objects.get(id_Cultivo=id_Cultivo)
     formulario = CultivoForm(request.POST or None, instance=cultivo)
     if formulario.is_valid():
@@ -965,6 +1146,7 @@ def editarCultivo(request, id_Cultivo):
     context['direccion'] =  'Administrador / Cultivos / Modificar'
     context['formulario'] = formulario
     context['cultivo'] = cultivo
+    context['regresar'] = 'http://{}/{}'.format(URL, 'cultivos') 
 
     return render(request, 'cultivos/editar.html', context)
 

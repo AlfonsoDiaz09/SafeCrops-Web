@@ -92,7 +92,7 @@ class Enfermedad(models.Model):
     nombreEnfermedad = models.CharField(max_length=45, unique=True, verbose_name='Nombre de la Enfermedad')
     cultivoEnfermedad = models.CharField(max_length=45, verbose_name='Cultivo en el que se presenta la enfermedad')
     descripcionEnfermedad = models.TextField(max_length=200, verbose_name='Descripción de la enfermedad')
-    curaEnfermedad = models.TextField(max_length=200, verbose_name='Cura de la enfermedad')
+    curaEnfermedad = models.TextField(max_length=200, verbose_name='Tratamiento de la enfermedad')
 
 class Dataset(models.Model):
     id_Dataset = models.AutoField(primary_key=True)
@@ -104,6 +104,7 @@ class Dataset(models.Model):
     segmentacion_SAM = models.CharField(max_length=5, verbose_name='Segmentación SAM')
     formatoImg = models.CharField(max_length=10, verbose_name='Formato de las imágenes')
     tipoDataset = models.CharField(max_length=45, verbose_name='Tipo de dataset')
+    estadoDataset = models.CharField(max_length=10, verbose_name='Estado del dataset', default='Activo')
 
     def __str__(self):
         fila = self.nombreDataset

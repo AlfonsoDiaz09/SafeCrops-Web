@@ -11,49 +11,60 @@
             <div class="col">
                 <div class="card card1">
                     <div class="card-body">
-                        <p class="card-title">10</p>
+                        <p class="card-title">{{ num_usuarios }}</p>
                         <h5 class="card-text">Usuarios</h5>
                     </div>
-                    <i class="fa-solid fa-user-gear"></i>
+                    <i class="fa-solid fa-users"></i>
+                </div>
+            </div>
+        </a>
+        <a href="{% url 'cultivos' %}">
+            <div class="col">
+                <div class="card card2">
+                    <div class="card-body">
+                        <p class="card-title">{{ num_cultivos }}</p>
+                        <h5 class="card-text">Cultivos</h5>
+                    </div>
+                    <i class="fa-solid fa-seedling"></i>
                 </div>
             </div>
         </a>
         <a href="{% url 'enfermedades' %}">
             <div class="col">
-                <div class="card card4">
+                <div class="card card3">
                     <div class="card-body">
-                        <p class="card-title">12</p>
+                        <p class="card-title">{{ num_enfermedades }}</p>
                         <h5 class="card-text">Enfermedades</h5>
                     </div>
-                    <i class="fa-solid fa-file-pdf"></i>
+                    <i class="fa-solid fa-viruses"></i>
                 </div>
             </div>
         </a>
         <a href="{% url 'datasets' %}">
             <div class="col">
-                <div class="card card2">
+                <div class="card card4">
                     <div class="card-body">
-                        <p class="card-title">22</p>
+                        <p class="card-title">{{ num_datasets }}</p>
                         <h5 class="card-text">Datasets</h5>
                     </div>
-                    <i class="fa-solid fa-chalkboard-user"></i>
+                    <i class="fa-solid fa-folder-open"></i>
                 </div>
             </div>
         </a>
         <a href="#">
             <div class="col">
-                <div class="card card3">
+                <div class="card card5">
                     <div class="card-body">
                         <p class="card-title">15</p>
                         <h5 class="card-text">Modelos</h5>
                     </div>
-                    <i class="fa-solid fa-graduation-cap"></i>
+                    <i class="fa-solid fa-file-contract"></i>
                 </div>
             </div>
         </a>
         <a href="#">
             <div class="col">
-                <div class="card card4">
+                <div class="card card6">
                     <div class="card-body">
                         <p class="card-title">19</p>
                         <h5 class="card-text">Reportes</h5>
