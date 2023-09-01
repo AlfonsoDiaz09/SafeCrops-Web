@@ -237,7 +237,7 @@ nav{
     color: #1c064e;
 }
 
-.card-header .btn__return{
+.card-header > .btn__return{
     color: #FAFF0D;
     font-size: 1.5em;
     margin-right: 0.5em;

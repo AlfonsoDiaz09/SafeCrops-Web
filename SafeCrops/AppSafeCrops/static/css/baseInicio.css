@@ -188,7 +188,7 @@
 .fieldset input:focus{
     outline: none;
     border-bottom: 2px solid #FF9E00;
-    /*animation: borderBottom 1s 1;*/
+    /* animation: borderBottom 1s forwards; */
 }
 @keyframes borderBottom{
     0%{

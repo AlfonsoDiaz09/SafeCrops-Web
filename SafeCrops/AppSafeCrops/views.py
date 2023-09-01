@@ -6,8 +6,8 @@ from django.conf import settings
 from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required 
-from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Usuario, Cultivo
-from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm, ChangePasswordForm, EnfermedadForm, DatasetForm, CultivoForm
+from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Usuario, Cultivo, Modelo
+from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm, ChangePasswordForm, EnfermedadForm, DatasetForm, CultivoForm, ModeloForm
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
@@ -32,6 +32,7 @@ import uuid
 
 # Create your views here.
 
+
 #*****************************************************************************************************#
 #**********               VALIDACIÓN DE TIPO DE USUARIO PARA PANEL PRINCIPAL                **********#
 #*****************************************************************************************************#
@@ -52,6 +53,14 @@ def validation(request):
         idExperto.append(experto.user_id)
     for tester in testers:
         idTester.append(tester.user_id)
+
+    if request.user.is_authenticated:
+        if request.user.id in idAdministrador or request.user.is_superuser:
+            return HttpResponseRedirect('/Panel_administrador')
+        elif request.user.id in idExperto:
+            return HttpResponseRedirect('/Panel_experto')
+        elif request.user.id in idTester:
+            return HttpResponseRedirect('/Panel_tester')
 
     if request.method == 'POST':
         fm = AuthenticationForm(request=request, data=request.POST)
@@ -250,9 +259,55 @@ def user_profile(request):
 #*****************************************************************************************************#
 
 def registerUsers(request):
+    administradores = Administrador.objects.all()
+    expertos = Experto.objects.all()
+    testers = Tester.objects.all()
+
+    idAdministrador = []
+    idExperto = []
+    idTester = []
+
+    for administrador in administradores:
+        idAdministrador.append(administrador.user_id)
+    for experto in expertos:
+        idExperto.append(experto.user_id)
+    for tester in testers:
+        idTester.append(tester.user_id)
+
+    if request.user.is_authenticated:
+        if request.user.id in idAdministrador or request.user.is_superuser:
+            return HttpResponseRedirect('/Panel_administrador')
+        elif request.user.id in idExperto:
+            return HttpResponseRedirect('/Panel_experto')
+        elif request.user.id in idTester:
+            return HttpResponseRedirect('/Panel_tester')
+        
     return render(request, 'registration/register.html', {'direccion': 'Registro'})
 
 def registerAdmin(request): #función para crear un nuevo administrador
+    administradores = Administrador.objects.all()
+    expertos = Experto.objects.all()
+    testers = Tester.objects.all()
+
+    idAdministrador = []
+    idExperto = []
+    idTester = []
+
+    for administrador in administradores:
+        idAdministrador.append(administrador.user_id)
+    for experto in expertos:
+        idExperto.append(experto.user_id)
+    for tester in testers:
+        idTester.append(tester.user_id)
+
+    if request.user.is_authenticated:
+        if request.user.id in idAdministrador or request.user.is_superuser:
+            return HttpResponseRedirect('/Panel_administrador')
+        elif request.user.id in idExperto:
+            return HttpResponseRedirect('/Panel_experto')
+        elif request.user.id in idTester:
+            return HttpResponseRedirect('/Panel_tester')
+
     text = "Registro / Administrador"
     context = {'direccion': text}
     if request.method == 'POST':
@@ -297,7 +352,30 @@ def registerAdmin(request): #función para crear un nuevo administrador
         #formularioAdministrador = AdministradorForm(instance=request.user.administradorUser)
     return render(request, 'registration/registerAdmin.html', {'direccion' : 'Registro / Administrador','formularioUsuario': formularioUsuario, 'formularioAdministrador': formularioAdministrador})
 
-def registerExperto(request): #función para crear un nuevo éxperto
+def registerExperto(request): #función para crear un nuevo experto
+    administradores = Administrador.objects.all()
+    expertos = Experto.objects.all()
+    testers = Tester.objects.all()
+
+    idAdministrador = []
+    idExperto = []
+    idTester = []
+
+    for administrador in administradores:
+        idAdministrador.append(administrador.user_id)
+    for experto in expertos:
+        idExperto.append(experto.user_id)
+    for tester in testers:
+        idTester.append(tester.user_id)
+
+    if request.user.is_authenticated:
+        if request.user.id in idAdministrador or request.user.is_superuser:
+            return HttpResponseRedirect('/Panel_administrador')
+        elif request.user.id in idExperto:
+            return HttpResponseRedirect('/Panel_experto')
+        elif request.user.id in idTester:
+            return HttpResponseRedirect('/Panel_tester')
+
     if request.method == 'POST':
         formularioUsuario = UsuarioForm(request.POST or None)
         formularioExperto = ExpertoForm(request.POST or None, request.FILES or None)
@@ -351,6 +429,29 @@ def salir(request):
 
 #función para redireccionar a la página de inicio principal
 def inicio(request):
+    administradores = Administrador.objects.all()
+    expertos = Experto.objects.all()
+    testers = Tester.objects.all()
+
+    idAdministrador = []
+    idExperto = []
+    idTester = []
+
+    for administrador in administradores:
+        idAdministrador.append(administrador.user_id)
+    for experto in expertos:
+        idExperto.append(experto.user_id)
+    for tester in testers:
+        idTester.append(tester.user_id)
+
+    if request.user.is_authenticated:
+        if request.user.id in idAdministrador or request.user.is_superuser:
+            return HttpResponseRedirect('/Panel_administrador')
+        elif request.user.id in idExperto:
+            return HttpResponseRedirect('/Panel_experto')
+        elif request.user.id in idTester:
+            return HttpResponseRedirect('/Panel_tester')
+        
     return render(request, 'paginas/inicio.html', {'direccion' : 'Inicio'})
 
 #función para traer los datos del usuario logueado
@@ -399,9 +500,9 @@ def contarDatasets():
     return num_datasets
 
 #función para contar los modelos registrados y retornarlos
-# def contarModelos():
-#     num_modelos = Modelo.objects.all().count()
-#     return num_modelos
+def contarModelos():
+    num_modelos = Modelo.objects.all().count()
+    return num_modelos
 
 #función para contar los reportes registrados y retornarlos
 # def contarReportes():
@@ -418,7 +519,7 @@ def inicioA(request):
     context['num_cultivos'] = contarCultivos()
     context['num_enfermedades'] = contarEnfermedades()
     context['num_datasets'] = contarDatasets()
-    # context['num_modelos'] = contarModelos()
+    context['num_modelos'] = contarModelos()
     # context['num_reportes'] = contarReportes()
 
     return render(request, 'usuarios/administrador/inicioA.html', context)
@@ -472,11 +573,13 @@ def inicioT(request):
 #**********                       GESTIÓN DE USUARIOS ADMINISTRADORES                       **********#
 #*****************************************************************************************************#
 
-def administradores(request): #función para redireccionar a la página donde se enlista todos los administradores    
+def administradores(request): #función para redireccionar a la página donde se enlista todos los administradores 
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']   
     administradores = Administrador.objects.all()
     context = perfil(request)
     context['direccion'] =  'Administrador / Usuarios / Administradores'
     context['administradores'] = administradores
+    context['regresar'] = 'http://{}/{}'.format(URL, 'Panel_administrador')
 
     return render(request, 'usuarios/administrador/indexA.html', context)
 
@@ -593,11 +696,14 @@ def eliminarAdministrador(request, id_Administrador): #función para eliminar un
 #*****************************************************************************************************#
 
 def expertos(request): #función para redireccionar a la página donde se enlista todos los expertos
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
     expertos = Experto.objects.all()
 
     context = perfil(request)
     context['direccion'] =  'Administrador / Usuarios / Expertos'
     context['expertos'] = expertos
+    context['regresar'] = 'http://{}/{}'.format(URL, 'Panel_administrador')
 
     return render(request, 'usuarios/experto/indexE.html', context)
 
@@ -720,11 +826,14 @@ def eliminarExperto(request, id_Experto):
 #*****************************************************************************************************#
 
 def testers(request): #función para redireccionar a la página donde se enlista todos los testers
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
     testers = Tester.objects.all()
 
     context = perfil(request)
     context['direccion'] =  'Administrador / Usuarios / Testers'
     context['testers'] = testers
+    context['regresar'] = 'http://{}/{}'.format(URL, 'Panel_administrador')
 
     return render(request, 'usuarios/tester/indexT.html', context)
 
@@ -865,11 +974,14 @@ def eliminarUsuario(request, id):
 #*****************************************************************************************************#
 
 def enfermedades(request): #función para redireccionar a la página donde se enlista todas las enfermedades
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
     enfermedades = Enfermedad.objects.all()
 
     context = perfil(request)
     context['direccion'] =  'Administrador / Enfermedades'
     context['enfermedades'] = enfermedades
+    context['regresar'] = 'http://{}/{}'.format(URL, 'Panel_administrador')
 
     return render(request, 'enfermedades/indexE.html', context)
 
@@ -922,6 +1034,8 @@ def eliminarEnfermedad(request, id_Enfermedad):
 #*****************************************************************************************************#
 
 def datasets(request): #función para redireccionar a la página donde se enlista todos los datasets
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
     datasets = Dataset.objects.all()
 
     estadoDataset = request.GET.get('estadoDataset')
@@ -935,6 +1049,7 @@ def datasets(request): #función para redireccionar a la página donde se enlist
     context = perfil(request)
     context['direccion'] =  'Administrador / Datasets'
     context['datasets'] = datasets
+    context['regresar'] = 'http://{}/{}'.format(URL, 'Panel_administrador')
 
     return render(request, 'datasets/indexD.html', context)
 
@@ -1156,4 +1271,68 @@ def eliminarCultivo(request, id_Cultivo):
     return redirect('cultivos')
 
 
+#*****************************************************************************************************#
+#**********                               GESTIÓN DE MODELOS                                **********#
+#*****************************************************************************************************#
 
+def modelos(request): #función para redireccionar a la página donde se enlista todos los modelos
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
+    modelos = Modelo.objects.all()
+
+    context = perfil(request)
+    context['direccion'] =  'Administrador / Modelos'
+    context['modelos'] = modelos
+    context['regresar'] = 'http://{}/{}'.format(URL, 'Panel_administrador')
+
+    return render(request, 'modelos/indexM.html', context)
+
+def crearModelo(request):
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
+    if request.method == 'POST':
+        formulario = ModeloForm(request.POST, request.FILES)
+        if formulario.is_valid():
+            formulario.save()
+            messages.success(request, f'Modelo creado correctamente')
+            return redirect('modelos')
+        else:
+            messages.error(request, 'Error al crear el modelo.')
+            formulario = ModeloForm()
+
+            context = perfil(request)
+            context['direccion'] =  'Administrador / Modelos / Registrar'
+            context['formulario'] = formulario
+            context['regresar'] = 'http://{}/{}'.format(URL, 'modelos')
+    else:
+        formulario = ModeloForm()
+
+        context = perfil(request)
+        context['direccion'] =  'Administrador / Modelos / Registrar'
+        context['formulario'] = formulario
+        context['regresar'] = 'http://{}/{}'.format(URL, 'modelos')
+
+    return render(request, 'modelos/crear.html', context)
+
+def editarModelo(request, id_Modelo):
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
+    modelo = Modelo.objects.get(id_Modelo=id_Modelo)
+    formulario = ModeloForm(request.POST or None, request.FILES or None, instance=modelo)
+    if formulario.is_valid():
+        messages.success(request, f'Modelo modificado correctamente')
+        formulario.save()
+        return redirect('modelos')
+    
+    context = perfil(request)
+    context['direccion'] =  'Administrador / Modelos / Modificar'
+    context['formulario'] = formulario
+    context['modelo'] = modelo
+    context['regresar'] = 'http://{}/{}'.format(URL, 'modelos') 
+
+    return render(request, 'modelos/editar.html', context)
+
+def eliminarModelo(request, id_Modelo):
+    modelo = Modelo.objects.get(id_Modelo=id_Modelo)
+    modelo.delete()
+    return redirect('modelos')

@@ -65,4 +65,9 @@ urlpatterns = [
     path('cultivo/editar<int:id_Cultivo>', login_required(views.editarCultivo), name='editarCultivo'), #editar cultivo
     path('eliminarCultivo/<int:id_Cultivo>', login_required(views.eliminarCultivo), name='eliminarCultivo'), #eliminar cultivo
 
+    path('modelos', login_required(views.modelos), name='modelos'), #consulta de modelos
+    path('modelo/crear', login_required(views.crearModelo), name='crearModelo'), #crear modelo
+    path('modelo/editar<int:id_Modelo>', login_required(views.editarModelo), name='editarModelo'), #editar modelo
+    path('eliminarModelo/<int:id_Modelo>', login_required(views.eliminarModelo), name='eliminarModelo'), #eliminar modelo
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.MEDIA_URL_DATASET, document_root=settings.MEDIA_ROOT)

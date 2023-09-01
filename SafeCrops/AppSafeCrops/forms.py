@@ -4,7 +4,7 @@ from django.contrib.auth.hashers import make_password
 from django.core.validators import FileExtensionValidator
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Cultivo
+from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Cultivo, Modelo
 
 '''
 Se crea los formularios a partir de los campos que se encuentran en los modelos o creando 
@@ -82,4 +82,9 @@ class DatasetForm(forms.ModelForm):
 class CultivoForm(forms.ModelForm):
     class Meta:
         model = Cultivo
+        fields = '__all__'
+
+class ModeloForm(forms.ModelForm):
+    class Meta:
+        model = Modelo
         fields = '__all__'

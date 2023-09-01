@@ -11,9 +11,9 @@
             <div class="title__header__index">
                 <a href="{{ regresar }}" class="btn__return"><i class="fa-solid fa-chevron-left"></i></a>
                 <i class="fa-solid fa-graduation-cap"></i>
-                <h4 class="">Cultivos</h4>
+                <h4 class="">Modelos</h4>
             </div>
-            <a name="" id="" class="btn btn-warning" href="{% url 'crearCultivo' %}" role="button"><i class="fa-solid fa-circle-plus"></i> Nuevo</a>
+            <a name="" id="" class="btn btn-warning" href="{% url 'crearModelo' %}" role="button"><i class="fa-solid fa-circle-plus"></i> Nuevo</a>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -21,37 +21,35 @@
                     <thead>
                         <tr>
                             <th scope="col">ID</th>
-                            <th scope="col">Cultivo</th>
-                            <th scope="col">Descripción</th>
+                            <th scope="col">Arquitectura</th>
                             <th scope="col">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for cultivo in cultivos %}
+                        {% for modelo in modelos %}
                             <tr class="">
-                                <td>{{ cultivo.id_Cultivo }}</td>
-                                <td>{{ cultivo.nombreCultivo }}</td>
-                                <td>{{ cultivo.descripcionCultivo }}</td>
+                                <td>{{ modelo.id_Modelo }}</td>
+                                <td>{{ modelo.arquitecturaModelo }}</td>
                                 <td>
                                     <div class="tooltip__div">
                                         <div class="tooltip">
                                             <span class="tooltip__text">Editar</span>
                                             <i class="fa-solid fa-sort-down"></i>
                                         </div>
-                                        <a name="" id="" class="btn btn-info" href="{% url 'editarCultivo' cultivo.id_Cultivo%}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
+                                        <a name="" id="" class="btn btn-info" href="{% url 'editarModelo' modelo.id_Modelo%}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
                                     </div>
                                     <div class="tooltip__div">
                                         <div class="tooltip">
                                             <span class="tooltip__text">Eliminar</span>
                                             <i class="fa-solid fa-sort-down"></i>
                                         </div>
-                                        <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarCultivo' cultivo.id_Cultivo%}" role="button"><i class="fa-solid fa-trash"></i></a>
+                                        <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarModelo' modelo.id_Modelo%}" role="button"><i class="fa-solid fa-trash"></i></a>
                                     </div>
                                 </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="4">No hay registros</td>
+                                <td colspan="3">No hay registros</td>
                             </tr>
                         {% endfor %}
                     </tbody>

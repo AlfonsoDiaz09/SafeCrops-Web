@@ -8,7 +8,8 @@
 
     <div class="card">
         <div class="card-header">
-            <div class="titleTypeUser">
+            <div class="title__header__index">
+                <a href="{{ regresar }}" class="btn__return"><i class="fa-solid fa-chevron-left"></i></a>
                 <i class="fa-solid fa-user-gear"></i>
                 <h4 class="">Expertos</h4>
             </div>
@@ -29,7 +30,7 @@
                             <th scope="col">Foto</th>
                             <th scope="col">Tipo</th>
                             <th scope="col">Usuario</th>
-                            <th scope="col">Acciones</th>
+                            <th scope="col" class="col-md-2">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -48,8 +49,20 @@
                                 <td>{{ experto.userType }}</td>
                                 <td>{{ experto.user.username }}</td>
                                 <td>
-                                    <a name="" id="" class="btn btn-info" href="{% url 'editarE' experto.id_Experto experto.user_id %}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
-                                    <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarE' experto.id_Experto%}" role="button"><i class="fa-solid fa-trash"></i></a>
+                                    <div class="tooltip__div">
+                                        <div class="tooltip">
+                                            <span class="tooltip__text">Editar</span>
+                                            <i class="fa-solid fa-sort-down"></i>
+                                        </div>
+                                        <a name="" id="" class="btn btn-info" href="{% url 'editarE' experto.id_Experto experto.user_id %}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    </div>
+                                    <div class="tooltip__div">
+                                        <div class="tooltip">
+                                            <span class="tooltip__text">Eliminar</span>
+                                            <i class="fa-solid fa-sort-down"></i>
+                                        </div>
+                                        <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarE' experto.id_Experto%}" role="button"><i class="fa-solid fa-trash"></i></a>
+                                    </div>
                                 </td>
                             </tr>
                             {% empty %}

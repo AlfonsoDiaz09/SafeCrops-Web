@@ -8,10 +8,9 @@
 
     <div class="card">
         <div class="card-header">
-            <div class="titleTypeUser">
+            <div class="title__header__index">
+                <a href="{{ regresar }}" class="btn__return"><i class="fa-solid fa-chevron-left"></i></a>
                 <i class="fa-solid fa-graduation-cap"></i>
-                <!--<img src="http://127.0.0.1:8000/imagenes/imagenes/cerdo2.jpg" alt="" width="300" height="300">
-                <h3>{{ user.is_staff }}mas</h3>-->
                 <h4 class="">Administradores</h4>
             </div>
             <a name="" id="" class="btn btn-warning" href="{% url 'crearA' %}" role="button"><i class="fa-solid fa-circle-plus"></i> Nuevo</a>
@@ -28,7 +27,7 @@
                             <th scope="col">Foto</th>
                             <th scope="col">Tipo</th>
                             <th scope="col">Usuario</th>
-                            <th scope="col">Acciones</th>
+                            <th scope="col" class="col-md-2">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,8 +43,20 @@
                                 <td>{{ administrador.userType }}</td>
                                 <td>{{ administrador.user.username }}</td>
                                 <td>
-                                    <a name="" id="" class="btn btn-info" href="{% url 'editarA' administrador.id_Administrador administrador.user_id %}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
-                                    <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarA' administrador.id_Administrador%}" role="button"><i class="fa-solid fa-trash"></i></a>
+                                    <div class="tooltip__div">
+                                        <div class="tooltip">
+                                            <span class="tooltip__text">Editar</span>
+                                            <i class="fa-solid fa-sort-down"></i>
+                                        </div>
+                                        <a name="" id="" class="btn btn-info" href="{% url 'editarA' administrador.id_Administrador administrador.user_id %}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    </div>
+                                    <div class="tooltip__div">
+                                        <div class="tooltip">
+                                            <span class="tooltip__text">Eliminar</span>
+                                            <i class="fa-solid fa-sort-down"></i>
+                                        </div>
+                                        <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarA' administrador.id_Administrador%}" role="button"><i class="fa-solid fa-trash"></i></a>
+                                    </div>
                                 </td>
                             </tr>
                             {% empty %}

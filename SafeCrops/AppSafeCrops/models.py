@@ -122,3 +122,18 @@ class Cultivo(models.Model):
     def __str__(self):
         fila = self.nombreCultivo
         return fila
+    
+class Modelo(models.Model):
+    id_Modelo = models.AutoField(primary_key=True)
+    nombreModelo = models.CharField(max_length=45, unique=True, verbose_name='Nombre del Modelo')
+    pesosModelo = models.FileField(max_length=100, upload_to='modelos/', verbose_name='Ruta de los Pesos')
+    tipoModelo = models.CharField(max_length=45, verbose_name='Tipo de Modelo')
+    estadoModelo = models.CharField(max_length=10, verbose_name='Estado del modelo', default='Activo')
+
+    def __str__(self):
+        fila = self.nombreModelo
+        return fila
+
+    def delete(self, using=None, keep_parents=False):
+        shutil.rmtree(self.ruta.name)
+        super().delete()
