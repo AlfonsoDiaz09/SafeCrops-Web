@@ -5,6 +5,7 @@ import shutil
 from django.conf import settings
 from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.http import HttpResponse, JsonResponse
+from django.utils import timezone
 from django.contrib.auth.decorators import login_required 
 from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Usuario, Cultivo, Modelo
 from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm, ChangePasswordForm, EnfermedadForm, DatasetForm, CultivoForm, ModeloForm
@@ -512,6 +513,29 @@ def contarModelos():
 
 #función para redireccionar a la página principal del administrador
 def inicioA(request):
+    '''
+    # Obtener la marca de tiempo de la última actividad
+    last_activity_str = request.session.get('last_activity')
+
+    if last_activity_str:
+        # Convertir la cadena de texto en un objeto datetime
+        last_activity = timezone.datetime.strptime(last_activity_str, '%Y-%m-%d %H:%M:%S.%f%z')
+
+        # Comparar con el tiempo actual
+        time_since_last_activity = timezone.now() - last_activity
+
+        if time_since_last_activity.total_seconds() > settings.SESSION_COOKIE_IDLE_TIMEOUT:
+            # La sesión ha expirado debido a la inactividad
+            request.session.flush()
+            return HttpResponse('Tu sesión ha expirado debido a la inactividad.')
+
+    # Obtener la hora actual como un objeto datetime y convertirla a cadena de texto
+    current_time = timezone.now()
+    current_time_str = current_time.strftime('%Y-%m-%d %H:%M:%S.%f%z')
+
+    # Actualizar la marca de tiempo de la última actividad en cada solicitud
+    request.session['last_activity'] = current_time_str
+    '''
 
     context = perfil(request)
     context['direccion'] =  'Administrador'
@@ -1336,3 +1360,6 @@ def eliminarModelo(request, id_Modelo):
     modelo = Modelo.objects.get(id_Modelo=id_Modelo)
     modelo.delete()
     return redirect('modelos')
+
+def crearModeloTransformer(request):
+    return

@@ -15,7 +15,7 @@ from pathlib import Path
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = "safecrops.netlify.app"
 
 
 # Quick-start development settings - unsuitable for production
@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
 ]
 
 ROOT_URLCONF = 'SafeCrops.urls'
@@ -151,3 +152,12 @@ EMAIL_HOST_USER = 'djangosafecrops@gmail.com'
 EMAIL_HOST_PASSWORD = 'sqdlznehyinrpgtr'
 EMAIL_USE_TLS = True
 DOMAIN = ''
+
+# Configuración de sesiones
+SESSION_ENGINE = 'django.contrib.sessions.backends.db' # Almacena las sesiones en la base de datos
+SESSION_COOKIE_NAME = 'session_cookie' # Nombre de la cookie de sesión
+SESSION_COOKIE_AGE = 3600 # Duración de la sesión en segundos (1 hora)
+SESSION_SAVE_EVERY_REQUEST = True # Actualizar la última actividad en cada solicitud
+
+# Tiempo de inactividad para expirar la sesión (en segundos)
+SESSION_COOKIE_IDLE_TIMEOUT = 30 # 30 segundos de inactividad antes de la expiración
