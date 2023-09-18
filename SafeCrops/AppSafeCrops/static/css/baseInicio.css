@@ -272,3 +272,29 @@
     border: none;
     opacity: 1;
 }
+
+@media screen and (max-width:768px) {
+    .card_login, .card_register{        
+        flex-direction: column;
+        margin-top: 1rem;
+    }
+    .card_logo{
+        display: none;
+    }
+    .formLogin, .formRegister{
+        width: 100%;
+    }
+    .legend{
+        margin-left: 30px;
+        margin-top: -30px;
+    }
+    .fieldset{
+        margin: 0;
+        padding: 40px 0px 30px 0px;
+    }
+    .userRegister{
+        width: 100%;
+        gap: 1rem;
+        flex-direction: column;
+    }
+}

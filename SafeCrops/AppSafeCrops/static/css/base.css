@@ -308,3 +308,15 @@ nav{
     margin-top: 10vh;
     padding-bottom: 1em;
 }
+
+@media screen and (max-width:768px) {
+    .before_header{
+        width: 100%;
+    }
+    .w-18{
+        width: 100%;
+    }
+    .w-6_5{
+        display: none;
+    }
+}

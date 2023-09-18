@@ -84,7 +84,7 @@ path_weight = HOME+"/weights"
 path_data = HOME+"/data"
 
 current_directory()
-install()
+#install()
 import wget
 
 if not os.path.exists(path_weight):
@@ -126,171 +126,184 @@ print("Device:", DEVICE)
 MODEL_TYPE = "vit_h"
 
 from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
-sam = sam_model_registry[MODEL_TYPE](checkpoint=CHECKPOINT_PATH).to(device=DEVICE)
+sam = sam_model_registry[MODEL_TYPE](checkpoint=CHECKPOINT_PATH).to(device=DEVICE).train()
+########################################
+#sam2 = sam_model_registry[MODEL_TYPE](checkpoint=CHECKPOINT_PATH).to(device=DEVICE)
 
-#Generar máscaras automáticamente
-# mask_generator = SamAutomaticMaskGenerator(sam)
-
-# IMAGE_NAME = "dog.jpeg"
-# IMAGE_PATH = os.path.join(HOME, "data", IMAGE_NAME)
-
-#Generar mascaras con el modelo SAM
-# import cv2
-# import supervision as sv
-# import numpy as np
-
-# image_bgr = cv2.imread(IMAGE_PATH)
-# print(image_bgr)
-# image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
-
-# sam_result = mask_generator.generate(image_rgb)
-
-# print("RESULTS: ",sam_result[0].keys())
-
-# Visualizar los resultados con supervision
-# mask_annotator = sv.MaskAnnotator()
-
-# detections = sv.Detections.from_sam(sam_result = sam_result)
-
-# annotated_image = mask_annotator.annotate(scene = image_bgr.copy(), detections = detections)
-
-# sv.plot_images_grid(
-#     images = [image_bgr, annotated_image],
-#     grid_size = (1, 2),
-#     titles = ["Original", "Segmentation"]
-# )
-
-# Interacción con los resultados de la segmentación
-# masks = [
-#     mask['segmentation'] for mask in sorted(sam_result, key=lambda x: x['area'], reverse=True)
-# ]
-
-# sv.plot_images_grid(
-#     images = masks,
-#     grid_size = (2, int(len(masks)/2)),
-#     size = (16, 16)
-# )
-
-# Generar segmentación con cuadro delimitador
-import cv2
-import supervision as sv
-import numpy as np
+def generar_segmentacion_cuadro_delimitador():
+    # Generar segmentación con cuadro delimitador
+    import cv2
+    import supervision as sv
+    import numpy as np
 
 
-mask_predictor = SamPredictor(sam)
+    mask_predictor = SamPredictor(sam)
 
-IMAGE_NAME = "planta.jpg"
-IMAGE_PATH = os.path.join(HOME, "data", IMAGE_NAME)
+    IMAGE_NAME = "planta_prueba_campo.jpg"
+    IMAGE_PATH = os.path.join(HOME, "data", IMAGE_NAME)
 
-# Draw box
-import base64 # Codificar imagen en base64 para mostrarla en el notebook de Jupyter Lab o Jupyter Notebook
+    # Draw box
 
-def encode_image(filepath):
-    with open(filepath, "rb") as f:
-        image_bytes = f.read()
-    encoded = str(base64.b64encode(image_bytes), 'utf-8')
-    return "data:image/jpeg;base64," + encoded
+    def drawing_bbox(imagen):
+        bbox = []
+        imagen_copia = imagen.copy()
 
-# from jupyter_bbox_widget import BboxWidget
+        def drawing_rectangle(event, x, y, flags, params):
+            nonlocal bbox
 
-# widget = BboxWidget()
-# widget.image = encode_image(IMAGE_PATH)
-# widget
-# widget.bboxes
+            if event == cv2.EVENT_LBUTTONDOWN:
+                bbox = [(x, y)]
+            
+            elif event == cv2.EVENT_LBUTTONUP:
+                bbox.append((x, y))
+                cv2.rectangle(imagen_copia, bbox[0], bbox[1], (0, 255, 0), 2)
+                cv2.imshow('Imagen', imagen_copia)
 
-def drawing_bbox(imagen):
-    bbox = []
-    imagen_copia = imagen.copy()
+        cv2.namedWindow('Imagen', cv2.WINDOW_NORMAL)
+        cv2.setMouseCallback('Imagen', drawing_rectangle)
 
-    def drawing_rectangle(event, x, y, flags, params):
-        nonlocal bbox
-
-        if event == cv2.EVENT_LBUTTONDOWN:
-            bbox = [(x, y)]
-        
-        elif event == cv2.EVENT_LBUTTONUP:
-            bbox.append((x, y))
-            cv2.rectangle(imagen_copia, bbox[0], bbox[1], (0, 255, 0), 2)
+        while True:
             cv2.imshow('Imagen', imagen_copia)
+            key = cv2.waitKey(1) & 0xFF
 
-    cv2.namedWindow('Imagen', cv2.WINDOW_NORMAL)
-    cv2.setMouseCallback('Imagen', drawing_rectangle)
+            if key == ord('r'): # Reiniciar
+                imagen_copia = imagen.copy()
+                bbox = []
 
-    while True:
-        cv2.imshow('Imagen', imagen_copia)
-        key = cv2.waitKey(1) & 0xFF
+            if key == ord('q'): # Salir
+                break
+            
+            elif key == ord('c'): # Continuar
+                break
 
-        if key == ord('r'): # Reiniciar
-            imagen_copia = imagen.copy()
-            bbox = []
-
-        if key == ord('q'): # Salir
-            break
+        cv2.destroyAllWindows()
         
-        elif key == ord('c'): # Continuar
-            break
+        if len(bbox) == 2:
+            return bbox[0], bbox[1]
+        else:
+            print("No se ha seleccionado ningún cuadro delimitador")
+            return None
 
-    cv2.destroyAllWindows()
-    
-    if len(bbox) == 2:
-        return bbox[0], bbox[1]
-    else:
-        print("No se ha seleccionado ningún cuadro delimitador")
-        return None
+    imagen = cv2.imread(IMAGE_PATH)
+    print("IMAGEEEEN ",imagen)
+    coordenadas = drawing_bbox(imagen)
 
-imagen = cv2.imread(IMAGE_PATH)
-print("IMAGEEEEN ",imagen)
-coordenadas = drawing_bbox(imagen)
+    print("Coordenadas del cuadro delimitador:")
+    print(coordenadas)
 
-print("Coordenadas del cuadro delimitador:")
-print(coordenadas)
+    box = np.array([
+        coordenadas[0][0],
+        coordenadas[0][1],
+        coordenadas[1][0],
+        coordenadas[1][1]
+    ])
 
-box = np.array([
-    coordenadas[0][0],
-    coordenadas[0][1],
-    coordenadas[1][0],
-    coordenadas[1][1]
-])
+    image_bgr = cv2.imread(IMAGE_PATH)
+    image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
 
-image_bgr = cv2.imread(IMAGE_PATH)
-image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
+    mask_predictor.set_image(image_rgb)
 
-mask_predictor.set_image(image_rgb)
+    masks, scores, logits = mask_predictor.predict(
+        box=box,
+        multimask_output=False #Estado inicial en True
+    )
 
-masks, scores, logits = mask_predictor.predict(
-    box=box,
-    multimask_output=True
-)
+    # Visualizar los resultados con supervision
+    box_annotator = sv.BoxAnnotator(color=sv.Color.red())
+    mask_annotator = sv.MaskAnnotator(color=sv.Color.red())
 
-# Visualizar los resultados con supervision
-box_annotator = sv.BoxAnnotator(color=sv.Color.red())
-mask_annotator = sv.MaskAnnotator(color=sv.Color.red())
+    detections = sv.Detections(
+        xyxy = sv.mask_to_xyxy(masks=masks),
+        mask = masks,
+    )
+    detections = detections[detections.area == np.max(detections.area)]
 
-detections = sv.Detections(
-    xyxy = sv.mask_to_xyxy(masks=masks),
-    mask = masks,
-)
-detections = detections[detections.area == np.max(detections.area)]
+    source_image = box_annotator.annotate(scene=image_bgr.copy(), detections=detections, skip_label=True)
+    segmented_image = mask_annotator.annotate(scene=image_bgr.copy(), detections=detections)
 
-source_image = box_annotator.annotate(scene=image_bgr.copy(), detections=detections, skip_label=True)
-segmented_image = mask_annotator.annotate(scene=image_bgr.copy(), detections=detections)
+    sv.plot_images_grid(
+        images = [source_image, segmented_image],
+        grid_size = (1, 2),
+        titles = ["Original", "Segmentation"]
+    )
 
-sv.plot_images_grid(
-    images = [source_image, segmented_image],
-    grid_size = (1, 2),
-    titles = ["Original", "Segmentation"]
-)
+    sv.plot_images_grid(
+        images=masks,
+        grid_size=(1, 4),
+        size=(16, 4)
+    )
 
-sv.plot_images_grid(
-    images=masks,
-    grid_size=(1, 4),
-    size=(16, 4)
-)
+    print("Todo correcto")
+    path_save_model = HOME+"/weights"
+    cd(path_save_model)
+    print("Directorio actual:", os.getcwd())
 
-print("Todo correcto")
-path_save_model = HOME+"/weights"
-cd(path_save_model)
-print("Directorio actual:", os.getcwd())
+    # Save the fine-tuned model
+    torch.save(sam.state_dict(), 'fine_tuned_sam.pth')
+    print("Success")
 
-# Save the fine-tuned model
-torch.save(sam.state_dict(), 'fine_tuned_sam.pth')
+#generar_segmentacion_cuadro_delimitador()
+
+def generar_segmentacion_automatica():
+    #Generar máscaras automáticamente
+    mask_generator = SamAutomaticMaskGenerator(sam)
+
+    IMAGE_NAME = "planta_prueba_campo.jpg"
+    IMAGE_PATH = os.path.join(HOME, "data", IMAGE_NAME)
+
+    #Generar mascaras con el modelo SAM
+    import cv2
+    import supervision as sv
+    import numpy as np
+
+    image_bgr = cv2.imread(IMAGE_PATH)
+    print(image_bgr)
+    image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
+
+    sam_result = mask_generator.generate(image_rgb)
+
+    # print("RESULTS: ",sam_result[1].keys())
+    # i=0
+    # for k in sam_result[i].keys():
+    #     print("valor de sam:result ", sam_result[i])
+    #     print("valor de K ", k)
+    #     i += 1
+
+    #Visualizar los resultados con supervision
+    box_annotator = sv.BoxAnnotator(color=sv.Color.red())
+    mask_annotator = sv.MaskAnnotator()
+
+    detections = sv.Detections.from_sam(sam_result = sam_result)
+    detections = detections[detections.area == np.max(detections.area)]
+
+    source_image = box_annotator.annotate(scene=image_bgr.copy(), detections=detections, skip_label=True)
+    annotated_image = mask_annotator.annotate(scene = image_bgr.copy(), detections = detections)
+
+    sv.plot_images_grid(
+        images = [source_image, annotated_image],
+        grid_size = (1, 2),
+        titles = ["Original", "Segmentation"]
+    )
+
+    # Ordenar la lista de mayor area a menor area de las mascaras guardadas en sam_result
+    sorted_sam_result = sorted(sam_result, key=lambda x: x['area'], reverse=True)
+
+    # Declarar lista que guardara las mascaras (en este caso la de mayor tamaño solamente)
+    masks = []
+
+    # Recorrer ciclo for de las mascaras para obtener la segmentación de la máscara principal
+    for mask in sorted_sam_result:
+        masks.append(mask['segmentation'])
+        break
+
+    sv.plot_images_grid(
+        images = masks,
+        grid_size = (1, 2),
+        size = (16, 4)
+    )
+
+    print("Success automatic")
+
+import tensorflow as tf
+#print("GPUs disponibles:", len(tf.config.experimental.list_physical_devices('GPU')))
+generar_segmentacion_automatica()
