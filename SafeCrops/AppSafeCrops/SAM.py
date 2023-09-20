@@ -1,59 +1,94 @@
 # https://github.com/alexFocus92/youtube_projects/blob/main/how_to_segment_anything_with_sam.ipynb
 
-
 import os
 import sys
 import pip
 import subprocess
+import wget
+import torch
+import cv2
+import supervision as sv
+import matplotlib as plt
+import matplotlib.pyplot as plt
+import numpy as np
+from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
 
 
+HOME = os.getcwd() # Directorio principal
+print("Directorio principal: ", HOME)
 
-HOME = os.getcwd() # Directorio actual
+path_weight = HOME+"/weights" # Directorio para guardar los pesos del modelo SAM
+path_data = HOME+"/data" # Directorio para guardar las imágenes de prueba para segmentar
 
-# Función para mostrar el directorio actual
-def current_directory():
-    print("HOME:", HOME)
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+MODEL_TYPE = "vit_h"
 
-# Función para instalar paquetes con try except
+print("Device: ", DEVICE)
 
+# Función para instalar paquetes necesarios
 def install():
     try:
         subprocess.call([sys.executable, "-m", ".\DJSafeCrops\Scripts"+"/activate"]) #Activar entorno virtual
         subprocess.call([sys.executable, "-m", "pip", "install", "git+https://github.com/facebookresearch/segment-anything.git"]) #Instalar numpy con pip
-        subprocess.call([sys.executable, "-m", "pip", "install", "numpy"]) #Instalar numpy con pip
-        subprocess.call([sys.executable, "-m", "pip", "install", "wget"])
-        subprocess.call([sys.executable, "-m", "pip", "install", "torch"])
-        subprocess.call([sys.executable, "-m", "pip", "install", "torchvision"])
+        subprocess.call([sys.executable, "-m", "pip", "install", "numpy==1.24.3"]) #Instalar numpy con pip
+        subprocess.call([sys.executable, "-m", "pip", "install", "wget==3.2"])
+        subprocess.call([sys.executable, "-m", "pip", "install", "torch==2.0.1"])
+        subprocess.call([sys.executable, "-m", "pip", "install", "torchvision==0.15.2"])
         subprocess.call([sys.executable, "-m", "pip", "install", "opencv-python==4.7.0.72"])
-        subprocess.call([sys.executable, "-m", "pip", "install", "matplotlib"])
-        subprocess.call([sys.executable, "-m", "pip", "install", "supervision"])
+        subprocess.call([sys.executable, "-m", "pip", "install", "matplotlib==3.7.2"])
+        subprocess.call([sys.executable, "-m", "pip", "install", "supervision==0.14.0"])
     except:
         print("Error al instalar el paquete")
 
-
-# Función para crear directorios con try except
-def create_directory_weight(path_weight):
-    try:
-        os.mkdir(HOME+"/weights")
-    except:
-        print("Error al crear el directorio")
-
-# Función para cambiar de directorio de pesos con try except
+# Función para cambiar de directorio con try except
 def cd(path):
     try:
         os.chdir(path)
-        
+        print("Directorio actual: ", os.getcwd())
     except:
         print("Error al cambiar de directorio")
 
-# Función para crear directorio de datos con try except
-def create_directory_data(path_data):
-    try:
-        os.mkdir(HOME+"/data")
-    except:
-        print("Error al crear el directorio")
+# Función para crear directorio de pesos
+def create_weight_directory():
+    if not os.path.exists(path_weight):
+        try:
+            os.mkdir(path_weight)
+            print("El directorio weight ha sido creado correctamente")
+        except:
+            print("Error al crear el directorio de weights.!!!!")
+    else:
+        print("El directorio de weights ya existe")
 
-# Función para descargar los datos de ejemplo
+# Función para descargar los pesos predeterminados de SAM
+def download_sam_weights():
+    if not os.path.exists("sam_vit_h_4b8939.pth"):
+        wget.download('https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth')
+    else:
+        print("El archivo sam_vit_h_4b8939.pth ya se encuentra descargado")
+
+# Función para seleccionar el archivo de checkpoints (pesos) a utilizar
+def select_checkpoint():
+    if os.path.exists("fine_tuned_sam.pth"): # Validar si existe el archivo de pesos propio para utilizarlo
+        CHECKPOINT_PATH = os.path.join(HOME, "weights", "fine_tuned_sam.pth")
+    else: # Si no, utlizar el de SAM por defecto
+        CHECKPOINT_PATH = os.path.join(HOME, "weights", "sam_vit_h_4b8939.pth")
+
+    print(CHECKPOINT_PATH, "; exist:", os.path.isfile(CHECKPOINT_PATH))
+    
+    return CHECKPOINT_PATH
+
+# Función para crear directorio de datos
+def create_data_directory():
+    if not os.path.exists(path_data):
+        try:
+            os.mkdir(path_data)
+            print("El directorio data ha sido creado correctamente")
+        except:
+            print("Error al crear el directorio de data.!!!")
+    else:
+        print("El directorio de data ya existe")
+
+# Función para descargar los datos (imágenes para segmentar) de ejemplo
 def download_example_data():
     try:
         if not os.path.exists("dog.jpeg"):
@@ -78,68 +113,12 @@ def download_example_data():
     except:
         print("Error al descargar los datos de ejemplo")
 
-
-# Llamada a las funciones
-path_weight = HOME+"/weights"
-path_data = HOME+"/data"
-
-current_directory()
-#install()
-import wget
-
-if not os.path.exists(path_weight):
-    create_directory_weight(path_weight)
-else:
-    print("El directorio ya existe")
-
-cd(path_weight)
-print("Directorio actual:", os.getcwd())
-
-if not os.path.exists("sam_vit_h_4b8939.pth"):
-    wget.download('https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth')
-else:
-    print("El archivo ya se encuentra descargado")
-
-
-if os.path.exists("fine_tuned_sam.pth"):
-    CHECKPOINT_PATH = os.path.join(HOME, "weights", "fine_tuned_sam.pth")
-else:
-    CHECKPOINT_PATH = os.path.join(HOME, "weights", "sam_vit_h_4b8939.pth")
-
-print(CHECKPOINT_PATH, "; exist:", os.path.isfile(CHECKPOINT_PATH))
-
-if not os.path.exists(path_data):
-    create_directory_data(path_data)
-else:
-    print("El directorio ya existe")
-
-cd(path_data)
-print("Directorio actual:", os.getcwd())
-
-download_example_data()
-
-# Cargar el modelo
-import torch
-
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print("Device:", DEVICE)
-MODEL_TYPE = "vit_h"
-
-from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
-sam = sam_model_registry[MODEL_TYPE](checkpoint=CHECKPOINT_PATH).to(device=DEVICE).train()
-########################################
-#sam2 = sam_model_registry[MODEL_TYPE](checkpoint=CHECKPOINT_PATH).to(device=DEVICE)
-
+# Función para generar segmentación con cuadro delimitador
 def generar_segmentacion_cuadro_delimitador():
-    # Generar segmentación con cuadro delimitador
-    import cv2
-    import supervision as sv
-    import numpy as np
-
-
+    
     mask_predictor = SamPredictor(sam)
 
-    IMAGE_NAME = "planta_prueba_campo.jpg"
+    IMAGE_NAME = "planta_prueba_campo3.jpg"
     IMAGE_PATH = os.path.join(HOME, "data", IMAGE_NAME)
 
     # Draw box
@@ -185,11 +164,10 @@ def generar_segmentacion_cuadro_delimitador():
             return None
 
     imagen = cv2.imread(IMAGE_PATH)
-    print("IMAGEEEEN ",imagen)
+    print("Mostrando imagen... ")
     coordenadas = drawing_bbox(imagen)
 
-    print("Coordenadas del cuadro delimitador:")
-    print(coordenadas)
+    print("Coordenadas del bbox obtenidas")
 
     box = np.array([
         coordenadas[0][0],
@@ -240,34 +218,56 @@ def generar_segmentacion_cuadro_delimitador():
 
     # Save the fine-tuned model
     torch.save(sam.state_dict(), 'fine_tuned_sam.pth')
-    print("Success")
+    
+    print("¡Segmentación con bbox exitosa!")
 
-#generar_segmentacion_cuadro_delimitador()
-
+# Función para generar segmentación (máscaras) automáticamente
 def generar_segmentacion_automatica():
-    #Generar máscaras automáticamente
     mask_generator = SamAutomaticMaskGenerator(sam)
 
-    IMAGE_NAME = "planta_prueba_campo.jpg"
+    datasetName = "New Plant Diseases Dataset(Augmented)"
+    dir = (HOME+"/SafeCrops/datasets/"+datasetName+"/train/")
+
+    diseaseContent = os.listdir(dir)
+
+    # Código para crear el diccionario que contiene las enfermedades del dataset
+    diseaseDataset = []
+    imageDataset = []
+
+
+    for disease in diseaseContent:
+        if os.path.isdir(os.path.join(dir, disease)):
+            diseaseDataset.append(disease)
+
+    print(diseaseDataset)
+
+    # Código para crear el diccionario para las imágenes del dataset
+    i=0
+    for x in diseaseDataset:
+        
+        images = []
+        dirImg = (HOME+"/SafeCrops/datasets/"+datasetName+"/train/"+diseaseDataset[i]+"/")
+        imageContent = os.listdir(dirImg)
+
+        for image in imageContent:
+            if os.path.isfile(os.path.join(dirImg, image)):
+                images.append(image)
+        
+        imageDataset.append(images)
+        i += 1
+
+    print(imageDataset[0])
+    print(imageDataset[1])
+
+    IMAGE_NAME = "planta_prueba_campo3.jpg"
     IMAGE_PATH = os.path.join(HOME, "data", IMAGE_NAME)
 
     #Generar mascaras con el modelo SAM
-    import cv2
-    import supervision as sv
-    import numpy as np
-
+    
     image_bgr = cv2.imread(IMAGE_PATH)
-    print(image_bgr)
     image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
 
     sam_result = mask_generator.generate(image_rgb)
-
-    # print("RESULTS: ",sam_result[1].keys())
-    # i=0
-    # for k in sam_result[i].keys():
-    #     print("valor de sam:result ", sam_result[i])
-    #     print("valor de K ", k)
-    #     i += 1
 
     #Visualizar los resultados con supervision
     box_annotator = sv.BoxAnnotator(color=sv.Color.red())
@@ -302,8 +302,37 @@ def generar_segmentacion_automatica():
         size = (16, 4)
     )
 
-    print("Success automatic")
+    segmentation_mask = masks[0]
+    binary_mask = np.where(segmentation_mask > 0.5, 1, 0)
 
-import tensorflow as tf
-#print("GPUs disponibles:", len(tf.config.experimental.list_physical_devices('GPU')))
-generar_segmentacion_automatica()
+    white_background = np.ones_like(image_rgb) * 255
+
+    new_image = white_background * (1 - binary_mask[..., np.newaxis]) + image_rgb * binary_mask[..., np.newaxis]
+    new_image = new_image.astype(np.uint8)
+    plt.imshow(new_image)
+    plt.axis('off')
+    plt.show()
+    plt.imsave('new_1.png',new_image)
+
+    print("¡Segmentación automática exitosa!")
+
+
+#  #  #  #  #  #  #  #  #  #  #
+#   Llamada a las funciones   #
+#  #  #  #  #  #  #  #  #  #  #
+
+#install() #Instalar los paquetes necesarios para la segmentación con SAM
+#create_weight_directory() # Validar si existe el directorio para guardar los pesos
+cd(path_weight) # Ingresar a la ruta de weights
+#download_sam_weights() # Validar si eya exiten los pesos predeterminados de SAM
+checkpoint = select_checkpoint() # Seleccionar que archivo de checkpoints (pesos) se utilizará para segmentar
+#create_data_directory() # Validar si existe el directorio para guardar las imágenes de prueba 
+cd(path_data) # Ingresar a la ruta de data
+#download_example_data() # Descargar las imagenes de prueba
+cd(HOME+"/SafeCrops/imagenes")
+# Cargar el modelo
+sam = sam_model_registry[MODEL_TYPE](checkpoint=checkpoint).to(device=DEVICE).train()
+#generar_segmentacion_cuadro_delimitador() # Segmentar dibujando un cuadro delimitador de forma manual
+generar_segmentacion_automatica() # Segmentar de forma automática tomando la figura con mayor area dentro de la imagen
+
+
