@@ -7,8 +7,8 @@ from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required 
-from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Usuario, Cultivo, Modelo
-from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm, ChangePasswordForm, EnfermedadForm, DatasetForm, CultivoForm, ModeloForm
+from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Usuario, Cultivo, Modelo_YOLOv7
+from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm, ChangePasswordForm, EnfermedadForm, DatasetForm, CultivoForm, Modelo_YOLOv7_Form
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
@@ -502,7 +502,7 @@ def contarDatasets():
 
 #función para contar los modelos registrados y retornarlos
 def contarModelos():
-    num_modelos = Modelo.objects.all().count()
+    num_modelos = Modelo_YOLOv7.objects.all().count()
     return num_modelos
 
 #función para contar los reportes registrados y retornarlos
@@ -513,30 +513,6 @@ def contarModelos():
 
 #función para redireccionar a la página principal del administrador
 def inicioA(request):
-    '''
-    # Obtener la marca de tiempo de la última actividad
-    last_activity_str = request.session.get('last_activity')
-
-    if last_activity_str:
-        # Convertir la cadena de texto en un objeto datetime
-        last_activity = timezone.datetime.strptime(last_activity_str, '%Y-%m-%d %H:%M:%S.%f%z')
-
-        # Comparar con el tiempo actual
-        time_since_last_activity = timezone.now() - last_activity
-
-        if time_since_last_activity.total_seconds() > settings.SESSION_COOKIE_IDLE_TIMEOUT:
-            # La sesión ha expirado debido a la inactividad
-            request.session.flush()
-            return HttpResponse('Tu sesión ha expirado debido a la inactividad.')
-
-    # Obtener la hora actual como un objeto datetime y convertirla a cadena de texto
-    current_time = timezone.now()
-    current_time_str = current_time.strftime('%Y-%m-%d %H:%M:%S.%f%z')
-
-    # Actualizar la marca de tiempo de la última actividad en cada solicitud
-    request.session['last_activity'] = current_time_str
-    '''
-
     context = perfil(request)
     context['direccion'] =  'Administrador'
     context['num_usuarios'] = contarUsuarios()
@@ -1302,7 +1278,7 @@ def eliminarCultivo(request, id_Cultivo):
 def modelos(request): #función para redireccionar a la página donde se enlista todos los modelos
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
 
-    modelos = Modelo.objects.all()
+    modelos = Modelo_YOLOv7.objects.all()
 
     context = perfil(request)
     context['direccion'] =  'Administrador / Modelos'
@@ -1311,25 +1287,52 @@ def modelos(request): #función para redireccionar a la página donde se enlista
 
     return render(request, 'modelos/indexM.html', context)
 
-def crearModelo(request):
+def seleccionarArquitectura(request):
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
 
     if request.method == 'POST':
-        formulario = ModeloForm(request.POST, request.FILES)
+        formulario = Modelo_YOLOv7_Form(request.POST, request.FILES)
         if formulario.is_valid():
             formulario.save()
             messages.success(request, f'Modelo creado correctamente')
             return redirect('modelos')
         else:
             messages.error(request, 'Error al crear el modelo.')
-            formulario = ModeloForm()
+            formulario = Modelo_YOLOv7_Form()
+
+            context = perfil(request)
+            context['direccion'] =  'Administrador / Modelos / Arquitectura'
+            context['formulario'] = formulario
+            context['regresar'] = 'http://{}/{}'.format(URL, 'modelos')
+    else:
+        formulario = Modelo_YOLOv7_Form()
+
+        context = perfil(request)
+        context['direccion'] =  'Administrador / Modelos / Arquitectura'
+        context['formulario'] = formulario
+        context['regresar'] = 'http://{}/{}'.format(URL, 'modelos')
+
+    return render(request, 'modelos/seleccionarArquitectura.html', context)
+
+def crearModelo_YOLOv7(request):
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
+    if request.method == 'POST':
+        formulario = Modelo_YOLOv7_Form(request.POST, request.FILES)
+        if formulario.is_valid():
+            formulario.save()
+            messages.success(request, f'Modelo creado correctamente')
+            return redirect('modelos')
+        else:
+            messages.error(request, 'Error al crear el modelo.')
+            formulario = Modelo_YOLOv7_Form()
 
             context = perfil(request)
             context['direccion'] =  'Administrador / Modelos / Registrar'
             context['formulario'] = formulario
-            context['regresar'] = 'http://{}/{}'.format(URL, 'modelos')
+            context['regresar'] = 'http://{}/{}'.format(URL, 'seleccionarArquitectura')
     else:
-        formulario = ModeloForm()
+        formulario = Modelo_YOLOv7_Form()
 
         context = perfil(request)
         context['direccion'] =  'Administrador / Modelos / Registrar'
@@ -1338,11 +1341,11 @@ def crearModelo(request):
 
     return render(request, 'modelos/crear.html', context)
 
-def editarModelo(request, id_Modelo):
+def editarModelo_YOLOv7(request, id_Modelo):
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
 
-    modelo = Modelo.objects.get(id_Modelo=id_Modelo)
-    formulario = ModeloForm(request.POST or None, request.FILES or None, instance=modelo)
+    modelo = Modelo_YOLOv7.objects.get(id_Modelo=id_Modelo)
+    formulario = Modelo_YOLOv7_Form(request.POST or None, request.FILES or None, instance=modelo)
     if formulario.is_valid():
         messages.success(request, f'Modelo modificado correctamente')
         formulario.save()
@@ -1356,8 +1359,8 @@ def editarModelo(request, id_Modelo):
 
     return render(request, 'modelos/editar.html', context)
 
-def eliminarModelo(request, id_Modelo):
-    modelo = Modelo.objects.get(id_Modelo=id_Modelo)
+def eliminarModelo_YOLOv7(request, id_Modelo):
+    modelo = Modelo_YOLOv7.objects.get(id_Modelo=id_Modelo)
     modelo.delete()
     return redirect('modelos')
 

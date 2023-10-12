@@ -3,6 +3,7 @@
     margin: 0;
     list-style: none;
     user-select: none;
+    box-sizing: border-box;
 }
 
 ::-webkit-scrollbar{
@@ -44,6 +45,7 @@ header{
 
 .w-18{
     width: 16%;
+    min-width: 13.5em;
     transition: all 0.5s;
 }
 

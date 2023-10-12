@@ -1,0 +1,79 @@
+{% extends "baseA.html" %}
+
+{% block titulo %} Agregar nuevo Modelo {% endblock %}
+
+{% block contenido %}
+    <link rel="stylesheet" href="../static/css/base.css">
+    <link rel="stylesheet" href="../static/css/seleccionarArquitectura.css">
+
+    <div class="card">
+        <div class="card-header">
+            <a href="{{ regresar }}" class="btn__return"><i class="fa-solid fa-circle-arrow-left"></i></a>
+            Seleccionar una arquitectura
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Arquitectura</h4>
+            <h6>Selecciona la arquitectura a entrenar</h6>
+            <div class="select_arquitectura">
+                <div class="arquitectura" id="btn_yolov3">
+                    <h6>YOLO v3</h6>
+                </div>
+                <div class="arquitectura" id="btn_yolov5">
+                    <h6>YOLO v5</h6>
+                </div>
+                <div class="arquitectura" id="btn_yolov7">
+                    <h6>YOLO v7</h6>
+                </div>
+                <div class="arquitectura" id="btn_transformer">
+                    <h6>Transformers</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card form_arquitectura" id="formulario_yolov3">
+        <div class="card-header">
+            Registrar un modelo YOLO v3
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Datos del modelo YOLO v3</h4>
+
+            {% include 'modelos/form.html' %}
+        </div>
+    </div>
+
+    <div class="card form_arquitectura" id="formulario_yolov5">
+        <div class="card-header">
+            Registrar un modelo YOLO v5
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Datos del modelo YOLO v5</h4>
+
+            {% include 'modelos/form.html' %}
+        </div>
+    </div>
+
+    <div class="card form_arquitectura" id="formulario_yolov7">
+        <div class="card-header">
+            Registrar un modelo YOLO v7
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Datos del modelo YOLO v7</h4>
+
+            {% include 'modelos/form.html' %}
+        </div>
+    </div>
+
+    <div class="card form_arquitectura" id="formulario_transformer">
+        <div class="card-header">
+            Registrar un modelo Transformer
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Datos del modelo Transformer</h4>
+
+            {% include 'modelos/form.html' %}
+        </div>
+    </div>
+
+    <script src="../../static/js/seleccionarArquitectura.js"></script>
+{% endblock %}

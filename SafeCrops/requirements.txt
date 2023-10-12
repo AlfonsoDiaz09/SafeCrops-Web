@@ -1,0 +1,21 @@
+# Usage: pip install -r requeriemnts.txt
+
+# Base ---------------------------------------------------
+Django==4.2.3
+mysql-connector-python==8.1.0
+cmake==3.27.2
+PyMySQL==1.1.0
+Pillow==9.5.0
+numpy==1.24.3
+torch==2.0.1
+torchvision==0.15.2
+opencv-python==4.7.0.72
+matplotlib==3.7.2
+supervision==0.14.0
+
+# Sistema Operativo --------------------------------------
+wget==3.2
+
+# Segmentación SAM ---------------------------------------
+git+https://github.com/facebookresearch/segment-anything.git
+#segment-anything==1.0

@@ -1,0 +1,52 @@
+*{
+    margin: 0;
+    box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6{
+    margin: 0;
+}
+
+.select_arquitectura{
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    position: relative;
+    margin-top: 1em;
+}
+
+.arquitectura{
+    width: 20%;
+    height: 4em;
+    position: relative;
+    border: 2px solid #FF9E00;
+    border-radius: 25px;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FF9E00;
+    transition: all 0.5s;
+}
+
+.arquitectura:hover{
+    background-color: #FF9E00;
+    color: #fff;
+    cursor: pointer;
+}
+
+.arquitectura_activa{
+    background-color: #FF9E00;
+    color: #fff;
+}
+
+.form_arquitectura{
+    display: none;
+}
+
+.mostrar{
+    display: flex;
+    margin-top: 1em;
+}
+

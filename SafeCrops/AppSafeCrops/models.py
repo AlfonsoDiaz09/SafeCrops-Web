@@ -10,6 +10,8 @@ import shutil
 
 # Create your models here.
 
+ARQUITECTURAS = [('propia', 'Propia'), ('yolov3', 'YOLOv3'), ('yolov5', 'YOLOv5'), ('yolov7','YOLOv7'), ('transformers', 'Transformers')]
+
 class Usuario(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, default=1, related_name='usuario') #Se crea el campo user que es una relación uno a uno con el modelo User de django
     token = models.UUIDField(primary_key=False, editable=False, null=True, blank=True) #Se crea el campo token que es de tipo UUIDField
@@ -123,15 +125,15 @@ class Cultivo(models.Model):
         fila = self.nombreCultivo
         return fila
     
-class Modelo(models.Model):
-    id_Modelo = models.AutoField(primary_key=True)
-    nombreModelo = models.CharField(max_length=45, unique=True, verbose_name='Nombre del Modelo')
-    pesosModelo = models.FileField(max_length=100, upload_to='modelos/', verbose_name='Ruta de los Pesos')
-    tipoModelo = models.CharField(max_length=45, verbose_name='Tipo de Modelo')
-    estadoModelo = models.CharField(max_length=10, verbose_name='Estado del modelo', default='Activo')
+class Modelo_YOLOv7(models.Model):
+    id_Modelo_y7 = models.AutoField(primary_key=True)
+    nombreModelo_y7 = models.CharField(max_length=45, unique=True, verbose_name='Nombre del Modelo')
+    pesosModelo_y7 = models.FileField(max_length=100, upload_to='modelos/yolov7/', verbose_name='Ruta de Pesos', help_text="Selecciona un archivo de pesos correcto", )
+    epocas_y7 = models.IntegerField(verbose_name="Número de épocas", help_text="Selecciona un valor entre 1 y 6")
+    batch_size_y7 = models.IntegerField(verbose_name="Batch Size", help_text="Selecciona un valor mayor a 2")
 
     def __str__(self):
-        fila = self.nombreModelo
+        fila = self.nombreModelo_y7
         return fila
 
     def delete(self, using=None, keep_parents=False):

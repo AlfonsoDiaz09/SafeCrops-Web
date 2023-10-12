@@ -13,7 +13,7 @@
                 <i class="fa-solid fa-graduation-cap"></i>
                 <h4 class="">Modelos</h4>
             </div>
-            <a name="" id="" class="btn btn-warning" href="{% url 'crearModelo' %}" role="button"><i class="fa-solid fa-circle-plus"></i> Nuevo</a>
+            <a name="" id="" class="btn btn-warning" href="{% url 'seleccionarArquitectura' %}" role="button"><i class="fa-solid fa-circle-plus"></i> Nuevo</a>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -21,35 +21,41 @@
                     <thead>
                         <tr>
                             <th scope="col">ID</th>
-                            <th scope="col">Arquitectura</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Ruta Pesos</th>
+                            <th scope="col"># Epocas</th>
+                            <th scope="col">Batch Size</th>
                             <th scope="col">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for modelo in modelos %}
                             <tr class="">
-                                <td>{{ modelo.id_Modelo }}</td>
-                                <td>{{ modelo.arquitecturaModelo }}</td>
+                                <td>{{ modelo.id_Modelo_y7 }}</td>
+                                <td>{{ modelo.nombreModelo_y7 }}</td>
+                                <td>{{ modelo.pesosModelo_y7 }}</td>
+                                <td>{{ modelo.epocas_y7 }}</td>
+                                <td>{{ modelo.batch_size_y7 }}</td>
                                 <td>
                                     <div class="tooltip__div">
                                         <div class="tooltip">
                                             <span class="tooltip__text">Editar</span>
                                             <i class="fa-solid fa-sort-down"></i>
                                         </div>
-                                        <a name="" id="" class="btn btn-info" href="{% url 'editarModelo' modelo.id_Modelo%}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
+                                        <a name="" id="" class="btn btn-info" href="{% url 'editarModelo_YOLOv7' modelo.id_Modelo_y7%}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
                                     </div>
                                     <div class="tooltip__div">
                                         <div class="tooltip">
                                             <span class="tooltip__text">Eliminar</span>
                                             <i class="fa-solid fa-sort-down"></i>
                                         </div>
-                                        <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarModelo' modelo.id_Modelo%}" role="button"><i class="fa-solid fa-trash"></i></a>
+                                        <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarModelo_YOLOv7' modelo.id_Modelo_y7%}" role="button"><i class="fa-solid fa-trash"></i></a>
                                     </div>
                                 </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="3">No hay registros</td>
+                                <td colspan="6">No hay registros</td>
                             </tr>
                         {% endfor %}
                     </tbody>

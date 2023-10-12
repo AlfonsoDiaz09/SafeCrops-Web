@@ -46,7 +46,8 @@ def cd(path):
         os.chdir(path)
         print("Directorio actual: ", os.getcwd())
     except:
-        print("Error al cambiar de directorio")
+        print("Error al cambiar de directorio ", path)
+
 
 # Función para crear directorio de pesos
 def create_weight_directory():
@@ -115,206 +116,201 @@ def download_example_data():
 
 # Función para generar segmentación con cuadro delimitador
 def generar_segmentacion_cuadro_delimitador():
-    
+
     mask_predictor = SamPredictor(sam)
 
-    IMAGE_NAME = "planta_prueba_campo3.jpg"
-    IMAGE_PATH = os.path.join(HOME, "data", IMAGE_NAME)
+    plants_img = []
 
-    # Draw box
+    dir = (HOME+"/data/campo/")
+    imageContent = os.listdir(dir)
+    for image in imageContent: # ciclo para imagenes
+        if os.path.isfile(os.path.join(dir, image)):
+            plants_img.append(image)
+    print("Diccionario imagenes... ", plants_img)
 
-    def drawing_bbox(imagen):
-        bbox = []
-        imagen_copia = imagen.copy()
-
-        def drawing_rectangle(event, x, y, flags, params):
-            nonlocal bbox
-
-            if event == cv2.EVENT_LBUTTONDOWN:
-                bbox = [(x, y)]
-            
-            elif event == cv2.EVENT_LBUTTONUP:
-                bbox.append((x, y))
-                cv2.rectangle(imagen_copia, bbox[0], bbox[1], (0, 255, 0), 2)
-                cv2.imshow('Imagen', imagen_copia)
-
-        cv2.namedWindow('Imagen', cv2.WINDOW_NORMAL)
-        cv2.setMouseCallback('Imagen', drawing_rectangle)
-
-        while True:
-            cv2.imshow('Imagen', imagen_copia)
-            key = cv2.waitKey(1) & 0xFF
-
-            if key == ord('r'): # Reiniciar
-                imagen_copia = imagen.copy()
-                bbox = []
-
-            if key == ord('q'): # Salir
-                break
-            
-            elif key == ord('c'): # Continuar
-                break
-
-        cv2.destroyAllWindows()
+    for nombre_planta in plants_img:
         
-        if len(bbox) == 2:
-            return bbox[0], bbox[1]
-        else:
-            print("No se ha seleccionado ningún cuadro delimitador")
-            return None
+        IMAGE_NAME = nombre_planta
+        IMAGE_PATH = os.path.join(dir, IMAGE_NAME)
 
-    imagen = cv2.imread(IMAGE_PATH)
-    print("Mostrando imagen... ")
-    coordenadas = drawing_bbox(imagen)
+        # Draw box
+        def drawing_bbox(imagen):
+            bbox = []
+            imagen_copia = imagen.copy()
 
-    print("Coordenadas del bbox obtenidas")
+            def drawing_rectangle(event, x, y, flags, params):
+                nonlocal bbox
 
-    box = np.array([
-        coordenadas[0][0],
-        coordenadas[0][1],
-        coordenadas[1][0],
-        coordenadas[1][1]
-    ])
+                if event == cv2.EVENT_LBUTTONDOWN:
+                    bbox = [(x, y)]
+                
+                elif event == cv2.EVENT_LBUTTONUP:
+                    bbox.append((x, y))
+                    cv2.rectangle(imagen_copia, bbox[0], bbox[1], (0, 255, 0), 2)
+                    cv2.imshow('Imagen', imagen_copia)
 
-    image_bgr = cv2.imread(IMAGE_PATH)
-    image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
+            cv2.namedWindow('Imagen', cv2.WINDOW_NORMAL)
+            cv2.setMouseCallback('Imagen', drawing_rectangle)
 
-    mask_predictor.set_image(image_rgb)
+            while True:
+                cv2.imshow('Imagen', imagen_copia)
+                key = cv2.waitKey(1) & 0xFF
 
-    masks, scores, logits = mask_predictor.predict(
-        box=box,
-        multimask_output=False #Estado inicial en True
-    )
+                if key == ord('r'): # Reiniciar
+                    imagen_copia = imagen.copy()
+                    bbox = []
 
-    # Visualizar los resultados con supervision
-    box_annotator = sv.BoxAnnotator(color=sv.Color.red())
-    mask_annotator = sv.MaskAnnotator(color=sv.Color.red())
+                if key == ord('q'): # Salir
+                    break
+                
+                elif key == ord('c'): # Continuar
+                    break
 
-    detections = sv.Detections(
-        xyxy = sv.mask_to_xyxy(masks=masks),
-        mask = masks,
-    )
-    detections = detections[detections.area == np.max(detections.area)]
+            cv2.destroyAllWindows()
+            
+            if len(bbox) == 2:
+                return bbox[0], bbox[1]
+            else:
+                print("No se ha seleccionado ningún cuadro delimitador")
+                return None
 
-    source_image = box_annotator.annotate(scene=image_bgr.copy(), detections=detections, skip_label=True)
-    segmented_image = mask_annotator.annotate(scene=image_bgr.copy(), detections=detections)
+        imagen = cv2.imread(IMAGE_PATH)
+        print("Mostrando imagen... ")
+        coordenadas = drawing_bbox(imagen)
 
-    sv.plot_images_grid(
-        images = [source_image, segmented_image],
-        grid_size = (1, 2),
-        titles = ["Original", "Segmentation"]
-    )
+        print("Coordenadas del bbox obtenidas")
 
-    sv.plot_images_grid(
-        images=masks,
-        grid_size=(1, 4),
-        size=(16, 4)
-    )
+        box = np.array([
+            coordenadas[0][0], # xmin
+            coordenadas[0][1], # y min
+            coordenadas[1][0], # x max
+            coordenadas[1][1]  # y max
+        ])
 
-    print("Todo correcto")
-    path_save_model = HOME+"/weights"
-    cd(path_save_model)
-    print("Directorio actual:", os.getcwd())
+        image_bgr = cv2.imread(IMAGE_PATH)
+        image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
 
-    # Save the fine-tuned model
-    torch.save(sam.state_dict(), 'fine_tuned_sam.pth')
+        mask_predictor.set_image(image_rgb)
+
+        masks, scores, logits = mask_predictor.predict(
+            box=box,
+            multimask_output=False #Estado inicial en True
+        )
+
+        # Visualizar los resultados con supervision
+        box_annotator = sv.BoxAnnotator(color=sv.Color.red())
+        mask_annotator = sv.MaskAnnotator(color=sv.Color.red())
+
+        detections = sv.Detections(
+            xyxy = sv.mask_to_xyxy(masks=masks),
+            mask = masks,
+        )
+        detections = detections[detections.area == np.max(detections.area)]
+
+        source_image = box_annotator.annotate(scene=image_bgr.copy(), detections=detections, skip_label=True)
+        segmented_image = mask_annotator.annotate(scene=image_bgr.copy(), detections=detections)
+
+        sv.plot_images_grid(
+            images = [source_image, segmented_image],
+            grid_size = (1, 2),
+            titles = ["Original", "Segmentation"]
+        )
+
+        sv.plot_images_grid(
+            images=masks,
+            grid_size=(1, 4),
+            size=(16, 4)
+        )
+
+        print("Todo correcto")
+        path_save_model = HOME+"/weights"
+        cd(path_save_model)
+        print("Directorio actual:", os.getcwd())
+
+        # Save the fine-tuned model
+        torch.save(sam.state_dict(), 'fine_tuned_sam.pth')
     
-    print("¡Segmentación con bbox exitosa!")
+        print("¡Segmentación con bbox exitosa!")
+        
+        
 
 # Función para generar segmentación (máscaras) automáticamente
 def generar_segmentacion_automatica():
     mask_generator = SamAutomaticMaskGenerator(sam)
 
-    datasetName = "New Plant Diseases Dataset(Augmented)"
+    datasetName = "DataPrueba"
     dir = (HOME+"/SafeCrops/datasets/"+datasetName+"/train/")
 
     diseaseContent = os.listdir(dir)
 
     # Código para crear el diccionario que contiene las enfermedades del dataset
-    diseaseDataset = []
-    imageDataset = []
+    diccionarioDataset = {}
 
-
-    for disease in diseaseContent:
-        if os.path.isdir(os.path.join(dir, disease)):
-            diseaseDataset.append(disease)
-
-    print(diseaseDataset)
-
-    # Código para crear el diccionario para las imágenes del dataset
-    i=0
-    for x in diseaseDataset:
-        
+    for disease in diseaseContent: # ciclo para enfermedades
         images = []
-        dirImg = (HOME+"/SafeCrops/datasets/"+datasetName+"/train/"+diseaseDataset[i]+"/")
+        dirImg = (dir+disease+"/")
         imageContent = os.listdir(dirImg)
+        if os.path.isdir(os.path.join(dir, disease)):
+            for image in imageContent: # ciclo para imagenes
+                if os.path.isfile(os.path.join(dirImg, image)):
+                    images.append(image)
+            diccionarioDataset[disease] = images
 
-        for image in imageContent:
-            if os.path.isfile(os.path.join(dirImg, image)):
-                images.append(image)
-        
-        imageDataset.append(images)
-        i += 1
+    print(diccionarioDataset)
 
-    print(imageDataset[0])
-    print(imageDataset[1])
+    for diseaseName in diccionarioDataset:
 
-    IMAGE_NAME = "planta_prueba_campo3.jpg"
-    IMAGE_PATH = os.path.join(HOME, "data", IMAGE_NAME)
+        diseases = diccionarioDataset[diseaseName]
 
-    #Generar mascaras con el modelo SAM
-    
-    image_bgr = cv2.imread(IMAGE_PATH)
-    image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
+        # Nuevo directorio segmentado
+        datasetNameSAM = datasetName+"_SAM"
+        dirSAM = (HOME+"/SafeCrops/datasets/"+datasetNameSAM+"/train/"+diseaseName)
 
-    sam_result = mask_generator.generate(image_rgb)
+        if os.path.exists(dirSAM):
+            cd(dirSAM)
+        else:
+            os.makedirs(dirSAM)
+            cd(dirSAM)
 
-    #Visualizar los resultados con supervision
-    box_annotator = sv.BoxAnnotator(color=sv.Color.red())
-    mask_annotator = sv.MaskAnnotator()
 
-    detections = sv.Detections.from_sam(sam_result = sam_result)
-    detections = detections[detections.area == np.max(detections.area)]
+        for image in diseases:
+            #print(image)
+            IMAGE_NAME = image
+            IMAGE_PATH = os.path.join(dir,diseaseName,IMAGE_NAME)
 
-    source_image = box_annotator.annotate(scene=image_bgr.copy(), detections=detections, skip_label=True)
-    annotated_image = mask_annotator.annotate(scene = image_bgr.copy(), detections = detections)
+            #Generar mascaras con el modelo SAM
+            
+            image_bgr = cv2.imread(IMAGE_PATH)
+            image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
 
-    sv.plot_images_grid(
-        images = [source_image, annotated_image],
-        grid_size = (1, 2),
-        titles = ["Original", "Segmentation"]
-    )
+            sam_result = mask_generator.generate(image_rgb)
 
-    # Ordenar la lista de mayor area a menor area de las mascaras guardadas en sam_result
-    sorted_sam_result = sorted(sam_result, key=lambda x: x['area'], reverse=True)
+            detections = sv.Detections.from_sam(sam_result = sam_result)
+            detections = detections[detections.area == np.max(detections.area)]
 
-    # Declarar lista que guardara las mascaras (en este caso la de mayor tamaño solamente)
-    masks = []
+            # Ordenar la lista de mayor area a menor area de las mascaras guardadas en sam_result
+            sorted_sam_result = sorted(sam_result, key=lambda x: x['area'], reverse=True)
 
-    # Recorrer ciclo for de las mascaras para obtener la segmentación de la máscara principal
-    for mask in sorted_sam_result:
-        masks.append(mask['segmentation'])
-        break
+            # Declarar lista que guardara las mascaras (en este caso la de mayor tamaño solamente)
+            masks = []
 
-    sv.plot_images_grid(
-        images = masks,
-        grid_size = (1, 2),
-        size = (16, 4)
-    )
+            # Recorrer ciclo for de las mascaras para obtener la segmentación de la máscara principal
+            for mask in sorted_sam_result:
+                masks.append(mask['segmentation'])
+                break
 
-    segmentation_mask = masks[0]
-    binary_mask = np.where(segmentation_mask > 0.5, 1, 0)
+            segmentation_mask = masks[0]
+            binary_mask = np.where(segmentation_mask > 0.5, 1, 0)
 
-    white_background = np.ones_like(image_rgb) * 255
+            white_background = np.ones_like(image_rgb) * 255
 
-    new_image = white_background * (1 - binary_mask[..., np.newaxis]) + image_rgb * binary_mask[..., np.newaxis]
-    new_image = new_image.astype(np.uint8)
-    plt.imshow(new_image)
-    plt.axis('off')
-    plt.show()
-    plt.imsave('new_1.png',new_image)
+            new_image = white_background * (1 - binary_mask[..., np.newaxis]) + image_rgb * binary_mask[..., np.newaxis]
+            new_image = new_image.astype(np.uint8)
+            plt.axis('off')
 
-    print("¡Segmentación automática exitosa!")
+            plt.imsave(image,new_image)
+
+            print("¡Segmentación automática exitosa! - " + diseaseName)
 
 
 #  #  #  #  #  #  #  #  #  #  #
@@ -322,17 +318,17 @@ def generar_segmentacion_automatica():
 #  #  #  #  #  #  #  #  #  #  #
 
 #install() #Instalar los paquetes necesarios para la segmentación con SAM
-#create_weight_directory() # Validar si existe el directorio para guardar los pesos
+create_weight_directory() # Validar si existe el directorio para guardar los pesos
 cd(path_weight) # Ingresar a la ruta de weights
-#download_sam_weights() # Validar si eya exiten los pesos predeterminados de SAM
+download_sam_weights() # Validar si eya exiten los pesos predeterminados de SAM
 checkpoint = select_checkpoint() # Seleccionar que archivo de checkpoints (pesos) se utilizará para segmentar
-#create_data_directory() # Validar si existe el directorio para guardar las imágenes de prueba 
+create_data_directory() # Validar si existe el directorio para guardar las imágenes de prueba 
 cd(path_data) # Ingresar a la ruta de data
-#download_example_data() # Descargar las imagenes de prueba
+download_example_data() # Descargar las imagenes de prueba
 cd(HOME+"/SafeCrops/imagenes")
 # Cargar el modelo
 sam = sam_model_registry[MODEL_TYPE](checkpoint=checkpoint).to(device=DEVICE).train()
-#generar_segmentacion_cuadro_delimitador() # Segmentar dibujando un cuadro delimitador de forma manual
+generar_segmentacion_cuadro_delimitador() # Segmentar dibujando un cuadro delimitador de forma manual
 generar_segmentacion_automatica() # Segmentar de forma automática tomando la figura con mayor area dentro de la imagen
 
 

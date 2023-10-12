@@ -1,12 +1,12 @@
 function logout_redirect(){
-    // Realzia un solicitud AJAX para cerrar la sesión en el servidor
-    fetch('logout/', {method : 'GET'})
+    // Realiza un solicitud AJAX para cerrar la sesión en el servidor
+    fetch('http://127.0.0.1:8000/logout/', {method : 'GET'})
     .then(response => {
         if(response.ok){
             // Redireccionar al usuario al inicio de sesión
             window.location.href = '/login';
         }else{
-            console.error('Nose pudo cerrar la sesión');
+            console.error('No se pudo cerrar la sesión');
         }
     })
     .catch(error => {

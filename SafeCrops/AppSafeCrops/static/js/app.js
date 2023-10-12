@@ -73,7 +73,6 @@
 
       btnCollapse.addEventListener('click', (e) => {
           const nameClass = document.getElementById("userCollapse").className;
-          console.log(nameClass);
           if(nameClass == "displayNone"){
             const collapse = document.getElementById("userCollapse");
             const collapseIcon = document.getElementById("row_collapse");

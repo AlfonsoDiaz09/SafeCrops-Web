@@ -4,7 +4,7 @@ from django.contrib.auth.hashers import make_password
 from django.core.validators import FileExtensionValidator
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Cultivo, Modelo
+from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Cultivo, Modelo_YOLOv7
 
 '''
 Se crea los formularios a partir de los campos que se encuentran en los modelos o creando 
@@ -84,7 +84,9 @@ class CultivoForm(forms.ModelForm):
         model = Cultivo
         fields = '__all__'
 
-class ModeloForm(forms.ModelForm):
+class Modelo_YOLOv7_Form(forms.ModelForm):
+    datasetModelo_y7 = forms.ModelChoiceField(queryset=Dataset.objects.all().order_by('-id_Dataset'), label="Dataset", widget=forms.Select(attrs={'class':'form-select'}), required=True) # Se crea un campo de tipo ModelChoiceField
+
     class Meta:
-        model = Modelo
-        fields = '__all__'
+        model = Modelo_YOLOv7
+        fields = ['nombreModelo_y7', 'datasetModelo_y7', 'pesosModelo_y7', 'epocas_y7', 'batch_size_y7']
