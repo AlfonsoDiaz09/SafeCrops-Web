@@ -1,0 +1,59 @@
+<link rel="stylesheet" href="../static/css/base.css">
+
+<form enctype="multipart/form-data" method="post">
+  {% csrf_token %} <!-- Token de seguridad -->
+  {% for campo in formulario %} <!-- Recorremos los campos del formulario -->
+
+    <div class="mb-3"> 
+
+      {% if campo.name != 'numImgTotal' and campo.name != 'numImgEntrenamiento' and campo.name != 'numImgValidacion' and campo.name != 'estadoDataset'  %}
+        
+        <label for="" class="form-label">{{ campo.label }}</label>
+
+      {% endif %}
+
+      {% if campo.name != 'numImgTotal' and campo.name != 'numImgEntrenamiento' and campo.name != 'numImgValidacion' %}
+
+        {% if campo.name == 'segmentacion_SAM' %} <!-- Si el campo es segmenatación SAM -->
+
+            <select name="segmentacion_SAM" id="" class="form-select" >
+              <option value="" selected>------- SELECCIONE -------</option>
+              <option value="Si">Si segmentar</option>
+              <option value="No">No segmentar</option>
+            </select>
+
+          {% elif campo.name == 'formatoImg' %}
+          
+            <select name="formatoImg" id="" class="form-select" >
+              <option value="" selected>------- SELECCIONE -------</option>
+              <option value="jpg">JPG</option>
+              <option value="jpeg">JPEG</option>
+              <option value="png">PNG</option>
+              <option value="webp">WEBP</option>
+            </select>
+
+          {% elif campo.name == 'estadoDataset' %}
+
+            <input type="hidden" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="Activo" /> 
+
+          {% elif campo.name == 'ruta' %}
+
+            <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value=""  accept=".zip" /> 
+
+          {% else %}
+
+            <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" /> 
+          
+        {% endif %}
+
+      {% endif %}
+
+    </div>
+
+    <div class="col-12 help-text">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
+
+  {% endfor %}
+
+  <input name="" id="" class="btn btn-success" type="submit" value="Enviar información"> <!-- Botón para enviar el formulario -->
+  <a name="" id="" class="btn btn-primary" href="{% url 'datasets' %}" role="button">Cancelar</a> <!-- Botón para cancelar el formulario -->
+</form>
