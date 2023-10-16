@@ -1,10 +1,13 @@
 <link rel="stylesheet" href="../static/css/base.css">
+<link rel="stylesheet" href="../static/css/validationForm.css">
+<link rel="stylesheet" href="../static/css/loadingAnimation.css">
 
-<form enctype="multipart/form-data" method="post">
+<form enctype="multipart/form-data" method="post" id="formulario">
   {% csrf_token %} <!-- Token de seguridad -->
+
   {% for campo in formulario %} <!-- Recorremos los campos del formulario -->
 
-    <div class="mb-3"> 
+    <div class="mb-3 formulario__grupo" id="grupo__{{ campo.name }}"> 
 
       {% if campo.name != 'numImgTotal' and campo.name != 'numImgEntrenamiento' and campo.name != 'numImgValidacion' and campo.name != 'estadoDataset'  %}
         
@@ -16,7 +19,7 @@
 
         {% if campo.name == 'segmentacion_SAM' %} <!-- Si el campo es segmenatación SAM -->
 
-            <select name="segmentacion_SAM" id="" class="form-select" >
+            <select name="segmentacion_SAM" id="" class="form-select formulario__select" >
               <option value="" selected>------- SELECCIONE -------</option>
               <option value="Si">Si segmentar</option>
               <option value="No">No segmentar</option>
@@ -24,7 +27,7 @@
 
           {% elif campo.name == 'formatoImg' %}
           
-            <select name="formatoImg" id="" class="form-select" >
+            <select name="formatoImg" id="" class="form-select formulario__select" >
               <option value="" selected>------- SELECCIONE -------</option>
               <option value="jpg">JPG</option>
               <option value="jpeg">JPEG</option>
@@ -38,11 +41,11 @@
 
           {% elif campo.name == 'ruta' %}
 
-            <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value=""  accept=".zip" /> 
+            <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value=""  accept=".zip" /> 
 
           {% else %}
 
-            <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" /> 
+            <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" /> 
           
         {% endif %}
 
@@ -50,10 +53,29 @@
 
     </div>
 
-    <div class="col-12 help-text">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
+    <div class="col-12 help-text" id="help-text-{{ campo.name }}">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
 
   {% endfor %}
+
+  <div class="mb-3 formulario__grupo" id="grupo__dentro_carpeta"> 
+
+    <label for="" class="form-label">El dataset se encuentra dentro de una carpeta</label>
+
+    <select name="dentro_carpeta" id="" class="form-select formulario__select">
+      <option value="" selected>------- SELECCIONE -------</option>
+      <option value="Si">Si, las enfermedades están dentro de una carpeta</option>
+      <option value="No">No, sólo son las carpetas con las enfermedades</option>
+    </select>
+
+  </div>
+
+  <div class="col-12 help-text" id="help-text-dentro_carpeta">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
 
   <input name="" id="" class="btn btn-success" type="submit" value="Enviar información"> <!-- Botón para enviar el formulario -->
   <a name="" id="" class="btn btn-primary" href="{% url 'datasets' %}" role="button">Cancelar</a> <!-- Botón para cancelar el formulario -->
 </form>
+
+<script type="module" src="../../static/js/validationForm/validation.js"></script>
+
+
+

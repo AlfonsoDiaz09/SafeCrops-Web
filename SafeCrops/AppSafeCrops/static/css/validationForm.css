@@ -1,0 +1,34 @@
+.form-control:focus{
+    box-shadow: none;
+    border: 1px solid #ced4da;
+}
+
+.formulario__grupo-correcto .formulario__validacion-estado{
+    color: #1ed12d;
+    opacity: 1;
+}
+
+.formulario__grupo-correcto .formulario__input, 
+.formulario__grupo-correcto .formulario__select{
+    border: 3px solid #1ed12d;
+}
+
+.formulario__grupo-incorrecto .formulario__label{
+    color: #bb2929;
+}
+
+.formulario__grupo-incorrecto .formulario__validacion-estado{
+    color: #bb2929;
+    opacity: 1;
+}
+
+.formulario__grupo-incorrecto .formulario__input,
+.formulario__grupo-incorrecto .formulario__select{
+    border: 3px solid #bb2929;
+}
+
+.help-text{
+    color: #bb2929;
+    margin-bottom: 10px;
+    padding-left: 2em;
+}
