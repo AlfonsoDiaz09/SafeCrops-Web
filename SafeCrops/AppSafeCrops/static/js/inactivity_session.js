@@ -20,12 +20,13 @@ let logoutTimer;
 // Función para reiniciar el temporizador de cierre de sesión
 function resetLogoutTimer(){
     clearTimeout(logoutTimer);
-    logoutTimer = setTimeout(logout_redirect, 30000); // 30 segundos de inactividad (30000 milisegundos)
+    logoutTimer = setTimeout(logout_redirect, 60000*15); // 15 min de inactividad (60,000 mls = 1 min)
 }
 
 // Registrar eventos para detectar la actividad del usuario
 document.addEventListener('mousemove', resetLogoutTimer);
 document.addEventListener('keypress', resetLogoutTimer);
+document.addEventListener('load', resetLogoutTimer);
 
 // Iniciar temporizador de cierre de sesión al cargar la página
 resetLogoutTimer();

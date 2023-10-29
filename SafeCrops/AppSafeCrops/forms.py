@@ -4,12 +4,26 @@ from django.contrib.auth.hashers import make_password
 from django.core.validators import FileExtensionValidator
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Cultivo, Modelo_YOLOv7
+from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Cultivo, Modelo_YOLOv7, Modelo_Transformer
 
 '''
 Se crea los formularios a partir de los campos que se encuentran en los modelos o creando 
 nuevos campos haciendo uso de los widgets de django
 '''
+
+Batch_Size = (
+    ('', '------ SELECCIONE ------'),
+    (512, 512),
+    (256, 256),
+    (128, 128),
+    (64, 64),
+    (32, 32),
+    (16, 16),
+    (8, 8),
+    (4, 4),
+    (2, 2),
+    (1, 1),
+)
 
 class TempUsuario(forms.ModelChoiceField): # Se crea una clase para el campo de tipo ModelChoiceField
     def label_from_instance(self, obj): # Se define el método label_from_instance
@@ -17,7 +31,7 @@ class TempUsuario(forms.ModelChoiceField): # Se crea una clase para el campo de 
 
 
 class AdministradorForm(forms.ModelForm, forms.Form):  # Formulario para el modelo Administrador
-    #user = TempUsuario(queryset=User.objects.all().order_by('-id'), label=None, widget=forms.Select(attrs={'class':'form-select'}), required=True) # Se crea un campo de tipo ModelChoiceField
+    #user = TempUsuario(queryset=User.objects.all().order_by('-id'), label=None, widget=forms.Select(attrs={'class':'form-select'})) # Se crea un campo de tipo ModelChoiceField
 
     class Meta: # Se define la clase Meta
         model = Administrador # Se define el modelo
@@ -25,7 +39,7 @@ class AdministradorForm(forms.ModelForm, forms.Form):  # Formulario para el mode
 
 
 class ExpertoForm(forms.ModelForm, forms.Form): # Formulario para el modelo Experto
-    #user = TempUsuario(queryset=User.objects.all().order_by('-id'), label=None, widget=forms.Select(attrs={'class':'form-select'}), required=True) # Se crea un campo de tipo ModelChoiceField
+    #user = TempUsuario(queryset=User.objects.all().order_by('-id'), label=None, widget=forms.Select(attrs={'class':'form-select'})) # Se crea un campo de tipo ModelChoiceField
 
     class Meta: # Se define la clase Meta 
         model = Experto # Se define el modelo
@@ -33,7 +47,7 @@ class ExpertoForm(forms.ModelForm, forms.Form): # Formulario para el modelo Expe
 
 
 class TesterForm(forms.ModelForm): # Formulario para el modelo Tester
-    #user = TempUsuario(queryset=User.objects.all().order_by('-id'), label=None, widget=forms.Select(attrs={'class':'form-select'}), required=True) # Se crea un campo de tipo ModelChoiceField
+    #user = TempUsuario(queryset=User.objects.all().order_by('-id'), label=None, widget=forms.Select(attrs={'class':'form-select'})) # Se crea un campo de tipo ModelChoiceField
 
     class Meta: # Se define la clase Meta
         model = Tester # Se define el modelo
@@ -66,7 +80,7 @@ class ChangePasswordForm(forms.Form):
     }))
 
 class EnfermedadForm(forms.ModelForm):
-    cultivoEnfermedad = forms.ModelChoiceField(queryset=Cultivo.objects.all().order_by('-id_Cultivo'), label=None, widget=forms.Select(attrs={'class':'form-select'}), required=True) # Se crea un campo de tipo ModelChoiceField
+    cultivoEnfermedad = forms.ModelChoiceField(queryset=Cultivo.objects.all().order_by('-id_Cultivo'), label=None, widget=forms.Select(attrs={'class':'form-select formulario__select'}), empty_label='------ SELECCIONE ------') # Se crea un campo de tipo ModelChoiceField
     
     class Meta:
         model = Enfermedad
@@ -85,8 +99,16 @@ class CultivoForm(forms.ModelForm):
         fields = '__all__'
 
 class Modelo_YOLOv7_Form(forms.ModelForm):
-    datasetModelo_y7 = forms.ModelChoiceField(queryset=Dataset.objects.all().order_by('-id_Dataset'), label="Dataset", widget=forms.Select(attrs={'class':'form-select'}), required=True) # Se crea un campo de tipo ModelChoiceField
+    datasetModelo_y7 = forms.ModelChoiceField(queryset=Dataset.objects.all().order_by('-id_Dataset'), label="Dataset", widget=forms.Select(attrs={'class':'form-select'})) # Se crea un campo de tipo ModelChoiceField
 
     class Meta:
         model = Modelo_YOLOv7
         fields = ['nombreModelo_y7', 'datasetModelo_y7', 'pesosModelo_y7', 'epocas_y7', 'batch_size_y7']
+
+class Modelo_Transformer_Form(forms.ModelForm):
+    datasetModelo_transformer = forms.ModelChoiceField(queryset=Dataset.objects.all().order_by('-id_Dataset'), label="Dataset", widget=forms.Select(attrs={'class':'form-select formulario__select'}), empty_label='------ SELECCIONE ------') # Se crea un campo de tipo ModelChoiceField
+    batch_size_transformer = forms.ChoiceField(choices=Batch_Size, widget=forms.Select(attrs={'class':'form-select formulario__select'}))
+
+    class Meta:
+        model = Modelo_Transformer
+        fields = ['nombreModelo_transformer', 'datasetModelo_transformer', 'pesosModelo_transformer', 'epocas_transformer', 'batch_size_transformer']

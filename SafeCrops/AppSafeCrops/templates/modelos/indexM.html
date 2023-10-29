@@ -1,6 +1,6 @@
 {% extends "baseA.html" %}
 
-{% block titulo %} Lista de Cultivos {% endblock %}
+{% block titulo %} Lista de Modelos {% endblock %}
 
 {% block contenido %} 
 
@@ -21,19 +21,23 @@
                     <thead>
                         <tr>
                             <th scope="col">ID</th>
+                            <th scope="col">Modelo</th>
                             <th scope="col">Nombre</th>
                             <th scope="col">Ruta Pesos</th>
+                            <th scope="col">Dataset</th>
                             <th scope="col"># Epocas</th>
                             <th scope="col">Batch Size</th>
                             <th scope="col">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for modelo in modelos %}
+                        {% for modelo in modelosYOLOv7 %}
                             <tr class="">
                                 <td>{{ modelo.id_Modelo_y7 }}</td>
+                                <td>YOLOv7</td>
                                 <td>{{ modelo.nombreModelo_y7 }}</td>
                                 <td>{{ modelo.pesosModelo_y7 }}</td>
+                                <td></td>
                                 <td>{{ modelo.epocas_y7 }}</td>
                                 <td>{{ modelo.batch_size_y7 }}</td>
                                 <td>
@@ -50,6 +54,37 @@
                                             <i class="fa-solid fa-sort-down"></i>
                                         </div>
                                         <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarModelo_YOLOv7' modelo.id_Modelo_y7%}" role="button"><i class="fa-solid fa-trash"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6">No hay registros</td>
+                            </tr>
+                        {% endfor %}
+                        {% for modelo in modelosTransformer %}
+                            <tr class="">
+                                <td>{{ modelo.id_Modelo_transformer }}</td>
+                                <td>Transformer</td>
+                                <td>{{ modelo.nombreModelo_transformer }}</td>
+                                <td>{{ modelo.pesosModelo_transformer }}</td>
+                                <td>{{ modelo.datasetModelo_transformer.nombreDataset }}</td>
+                                <td>{{ modelo.epocas_transformer }}</td>
+                                <td>{{ modelo.batch_size_transformer }}</td>
+                                <td>
+                                    <div class="tooltip__div">
+                                        <div class="tooltip">
+                                            <span class="tooltip__text">Editar</span>
+                                            <i class="fa-solid fa-sort-down"></i>
+                                        </div>
+                                        <a name="" id="" class="btn btn-info" href="{% url 'editarModelo_YOLOv7' modelo.id_Modelo_transformer%}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    </div>
+                                    <div class="tooltip__div">
+                                        <div class="tooltip">
+                                            <span class="tooltip__text">Eliminar</span>
+                                            <i class="fa-solid fa-sort-down"></i>
+                                        </div>
+                                        <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarModelo_YOLOv7' modelo.id_Modelo_transformer%}" role="button"><i class="fa-solid fa-trash"></i></a>
                                     </div>
                                 </td>
                             </tr>

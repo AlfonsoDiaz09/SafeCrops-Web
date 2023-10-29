@@ -2,33 +2,33 @@
 <link rel="stylesheet" href="../static/css/validationForm.css">
 <link rel="stylesheet" href="../static/css/loadingAnimation.css">
 
-<form enctype="multipart/form-data" method="post" id="formulario">
+<form enctype="multipart/form-data" method="post" id="formulario__crear-dataset" data-formulario>
   {% csrf_token %} <!-- Token de seguridad -->
 
   {% for campo in formulario %} <!-- Recorremos los campos del formulario -->
 
     <div class="mb-3 formulario__grupo" id="grupo__{{ campo.name }}"> 
 
-      {% if campo.name != 'numImgTotal' and campo.name != 'numImgEntrenamiento' and campo.name != 'numImgValidacion' and campo.name != 'estadoDataset'  %}
+      {% if campo.name != 'numImgTotal' and campo.name != 'numImgEntrenamiento' and campo.name != 'numImgValidacion' and campo.name != 'estadoDataset' and campo.name != 'numImgPrueba' and campo.name != 'numClases' %}
         
         <label for="" class="form-label">{{ campo.label }}</label>
 
       {% endif %}
 
-      {% if campo.name != 'numImgTotal' and campo.name != 'numImgEntrenamiento' and campo.name != 'numImgValidacion' %}
+      {% if campo.name != 'numImgTotal' and campo.name != 'numImgEntrenamiento' and campo.name != 'numImgValidacion' and campo.name != 'numImgPrueba' and campo.name != 'numClases' %}
 
         {% if campo.name == 'segmentacion_SAM' %} <!-- Si el campo es segmenatación SAM -->
 
             <select name="segmentacion_SAM" id="" class="form-select formulario__select" >
-              <option value="" selected>------- SELECCIONE -------</option>
+              <option value="" selected>------ SELECCIONE ------</option>
               <option value="Si">Si segmentar</option>
               <option value="No">No segmentar</option>
             </select>
 
           {% elif campo.name == 'formatoImg' %}
-          
+
             <select name="formatoImg" id="" class="form-select formulario__select" >
-              <option value="" selected>------- SELECCIONE -------</option>
+              <option value="" selected>------ SELECCIONE ------</option>
               <option value="jpg">JPG</option>
               <option value="jpeg">JPEG</option>
               <option value="png">PNG</option>
@@ -57,19 +57,21 @@
 
   {% endfor %}
 
-  <div class="mb-3 formulario__grupo" id="grupo__dentro_carpeta"> 
+  <div class="mb-3 formulario__grupo" id="grupo__estructuraDataset">
 
-    <label for="" class="form-label">El dataset se encuentra dentro de una carpeta</label>
+    <label for="" class="form-label">Seleccione la estructura que sigue su archivo .zip</label>
 
-    <select name="dentro_carpeta" id="" class="form-select formulario__select">
-      <option value="" selected>------- SELECCIONE -------</option>
-      <option value="Si">Si, las enfermedades están dentro de una carpeta</option>
-      <option value="No">No, sólo son las carpetas con las enfermedades</option>
+    <select name="estructuraDataset" id="" class="form-select formulario__select">
+      <option value="" selected>------ SELECCIONE ------</option>
+      <option value="Construir_Si_Carpeta">Carpeta cualquiera > Carpeta Enfermedades > Imagenes</option>
+      <option value="Construir_No_Carpeta">Carpeta Enfermedades > Imagenes</option>
+      <option value="Construido_Si_Carpeta">Carpeta cualquiera > Carpetas train/validate/test > Carpeta Enfermedades > Imagenes</option>
+      <option value="Construido_No_Carpeta">Carpetas train/validate/test > Carpeta Enfermedades > Imagenes</option>
     </select>
 
   </div>
 
-  <div class="col-12 help-text" id="help-text-dentro_carpeta">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
+  <div class="col-12 help-text" id="help-text-estructuraDataset">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
 
   <input name="" id="" class="btn btn-success" type="submit" value="Enviar información"> <!-- Botón para enviar el formulario -->
   <a name="" id="" class="btn btn-primary" href="{% url 'datasets' %}" role="button">Cancelar</a> <!-- Botón para cancelar el formulario -->

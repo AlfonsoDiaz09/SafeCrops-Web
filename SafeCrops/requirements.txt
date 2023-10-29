@@ -17,5 +17,11 @@ supervision==0.14.0
 wget==3.2
 
 # Segmentación SAM ---------------------------------------
-git+https://github.com/facebookresearch/segment-anything.git
-#segment-anything==1.0
+#git+https://github.com/facebookresearch/segment-anything.git
+segment-anything==1.0
+
+# Arquitectura Transformers
+datasets
+transformers
+scikit-learn #Activar Accuracy
+accelerate

@@ -1,10 +1,11 @@
 <link rel="stylesheet" href="../static/css/base.css">
+<link rel="stylesheet" href="../static/css/validationForm.css">
 
-<form enctype="multipart/form-data" method="post">
+<form enctype="multipart/form-data" method="post" id="formulario__crear-experto" data-formulario>
   {% csrf_token %}
   {% for campo in formularioExperto %} <!-- Recorremos los campos del formulario -->
 
-    <div class="mb-3"> <!-- Div para cada campo -->
+    <div class="mb-3 formulario__grupo" id="grupo__{{ campo.name }}"> <!-- Div para cada campo -->
 
       {% if campo.name != 'userType' %} <!-- Si el campo no es userType, lo mostramos -->
         <label for="" class="form-label">{{ campo.label }}</label> <!-- Mostramos el label del campo -->
@@ -12,16 +13,19 @@
       {% endif %}
 
       {% if campo.name == 'fechaNac' %} <!-- Si el campo es fechaNac, lo mostramos -->
-          <input type="date" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
+          <input type="date" class="form-control formulario__input" name="{{ campo.name }}" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
       
+        {% elif campo.name == 'imagen' %}
+          <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" accept="image/*" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
+
         {% elif campo.name == 'userType' %} <!-- Si el campo es userType, lo mostramos -->
-          <input type="hidden" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="Experto" />
+          <input type="hidden" class="form-control" name="{{ campo.name }}" aria-describedby="helpId" placeholder="{{ campo.label }}" value="Experto" />
         
         {% elif campo.name == 'user' %}
           {{ campo.form.user }}
 
         {% else %}
-          <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
+          <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
         
       {% endif %}
 
@@ -33,25 +37,30 @@
 
     </div>
 
-    <div class="col-12 help-text">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
+    <div class="col-12 help-text" id="help-text-{{ campo.name }}">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
 
   {% endfor %}
 
   <!-- Formulario de usuario -->
   {% for campo in formularioUsuario %}
 
-    <div class="mb-3">
+    <div class="mb-3 formulario__grupo" id="grupo__{{ campo.name }}">
 
       <label for="" class="form-label">{{ campo.label }}</label>
 
-      <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
+      <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" id="{{ campo.name}}" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
     
     </div>
 
-    <div class="col-12 help-text">{{ campo.errors }}</div>
+    <div class="col-12 help-text" id="help-text-{{ campo.name }}">{{ campo.errors }}</div>
 
   {% endfor %}
 
   <input name="" id="" class="btn btn-success" type="submit" value="Enviar información">
   <a name="" id="" class="btn btn-primary" href="{% url 'expertos' %}" role="button">Cancelar</a>
 </form>
+
+<!-- Diferencia de edades con JS -->
+<script src="http://momentjs.com/downloads/moment.min.js"></script>
+
+<script type="module" src="../../static/js/validationForm/validation.js"></script>

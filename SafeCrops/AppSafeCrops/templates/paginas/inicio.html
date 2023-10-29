@@ -1,13 +1,19 @@
 {% extends "baseInicio.html" %}
 
+{% load static %}
+
 {% block titulo %} Inicio {% endblock %}
 
-{% block contenido %} 
-    <div class="p-5 mb-4 bg-light rounded-3">
-        <div class="container-fluid py-5">
-            <h1 class="display-5 fw-bold">Bienvenidos a Sistema de detección de enfermedades y/o plagas en plantas de cultivo</h1>
-            <p class="col-md-8 fs-4">Empezar a gestionar</p>
-            <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Login</a>
+{% block contenido %}
+        
+        <div class="background-welcome">
+            <div class="p-5 bg-light rounded-3 home-welcome">
+                <div class="px-5 py-5 container-welcome">
+                    <h1 class="display-8 fw-bold">Bienvenidos al Sistema de detección de enfermedades y/o plagas en plantas de cultivo</h1>
+                    <p class="col-md-8 fs-4">Empezar a gestionar</p>
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Iniciar Sesión</a>
+                </div>
+            </div>
         </div>
-    </div>
+        
 {% endblock %}

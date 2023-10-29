@@ -1,10 +1,11 @@
 <link rel="stylesheet" href="../static/css/base.css">
+<link rel="stylesheet" href="../static/css/validationForm.css">
 
-<form enctype="multipart/form-data" method="post">
+<form enctype="multipart/form-data" method="post" id="formulario">
   {% csrf_token %}
   {% for campo in formulario %}
 
-    <div class="mb-3">
+    <div class="mb-3 formulario__grupo" id="grupo__{{ campo.name }}">
 
       {% if campo.name != 'numImgTotal' and campo.name != 'numImgEntrenamiento' and campo.name != 'numImgValidacion' and campo.name != 'estadoDataset' %}
         <label for="" class="form-label">{{ campo.label }}</label>
@@ -14,7 +15,7 @@
 
         {% if campo.name == 'segmentacion_SAM' %} <!-- Si el campo es segmenatación SAM -->
 
-            <select name="segmentacion_SAM" id="" class="form-select" >
+            <select name="segmentacion_SAM" id="" class="form-select formulario__select" >
               
               <option value="{{ campo.value }}" selected>------- {{ campo.value }} segmentar -------</option>
               
@@ -30,7 +31,7 @@
 
           {% elif campo.name == 'formatoImg' %} <!-- Si el campo es formato de imagen -->
           
-            <select name="formatoImg" id="" class="form-select" >
+            <select name="formatoImg" id="" class="form-select formulario__select" >
 
               <option value="{{ campo.value }}" selected>------- {{ campo.value }} -------</option>
 
@@ -58,11 +59,11 @@
 
           {% elif campo.name == 'ruta' %}
 
-            <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value=""  accept=".zip" /> 
+            <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value=""  accept=".zip" /> 
 
           {% else %} <!-- Si el campo es otro -->
 
-            <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ campo.value }}" />
+            <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ campo.value }}" />
           
         {% endif %}
 
@@ -70,10 +71,12 @@
         
     </div>
 
-    <div class="col-12 help-text">{{ campo.errors }}</div>
+    <div class="col-12 help-text" id="help-text-{{ campo.name }}">{{ campo.errors }}</div>
 
   {% endfor %}
 
   <input name="" id="" class="btn btn-success" type="submit" value="Enviar información">
   <a name="" id="" class="btn btn-primary" href="{% url 'datasets' %}" role="button">Cancelar</a>
 </form>
+
+<script type="module" src="../../static/js/validationForm/validation.js"></script>

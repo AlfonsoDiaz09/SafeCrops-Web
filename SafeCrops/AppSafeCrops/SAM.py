@@ -121,7 +121,10 @@ def generar_segmentacion_cuadro_delimitador():
 
     plants_img = []
 
-    dir = (HOME+"/data/campo/")
+    datasetName = "DataPrueba"
+    diseaseName = "Blueberry_Leaf Rust"
+
+    dir = (HOME+"/SafeCrops/datasets/"+datasetName+"/train/"+diseaseName+"/")
     imageContent = os.listdir(dir)
     for image in imageContent: # ciclo para imagenes
         if os.path.isfile(os.path.join(dir, image)):
@@ -210,29 +213,53 @@ def generar_segmentacion_cuadro_delimitador():
         source_image = box_annotator.annotate(scene=image_bgr.copy(), detections=detections, skip_label=True)
         segmented_image = mask_annotator.annotate(scene=image_bgr.copy(), detections=detections)
 
-        sv.plot_images_grid(
-            images = [source_image, segmented_image],
-            grid_size = (1, 2),
-            titles = ["Original", "Segmentation"]
-        )
+        # sv.plot_images_grid(
+        #     images = [source_image, segmented_image],
+        #     grid_size = (1, 2),
+        #     titles = ["Original", "Segmentation"]
+        # )
 
-        sv.plot_images_grid(
-            images=masks,
-            grid_size=(1, 4),
-            size=(16, 4)
-        )
+        # sv.plot_images_grid(
+        #     images=masks,
+        #     grid_size=(1, 4),
+        #     size=(16, 4)
+        # )
 
-        print("Todo correcto")
+        # Guardar imagen
+        print("Comenzando proceso de guardado de imagen: "+nombre_planta)
+        datasetNameSAM_bbox = datasetName+"_SAM_BBOX"
+        dirSAM_bbox = (HOME+"/SafeCrops/datasets/"+datasetNameSAM_bbox+"/train/"+diseaseName+"/")
+
+        if os.path.exists(dirSAM_bbox):
+            cd(dirSAM_bbox)
+        else:
+            os.makedirs(dirSAM_bbox)
+            cd(dirSAM_bbox)
+
+
+        segmentation_mask = masks
+        binary_mask = np.where(segmentation_mask > 0.3, 1, 0)
+
+        white_background = np.ones_like(image_rgb) * 255
+
+        new_image = white_background * (1 - binary_mask[..., np.newaxis]) + image_rgb * binary_mask[..., np.newaxis]
+        new_image = new_image.astype(np.uint8)
+        plt.axis('off')
+        plt.imshow(new_image)
+        plt.imsave(nombre_planta,new_image)
+
+
+
         path_save_model = HOME+"/weights"
         cd(path_save_model)
-        print("Directorio actual:", os.getcwd())
+        print("Directorio actual: ", os.getcwd())
 
         # Save the fine-tuned model
         torch.save(sam.state_dict(), 'fine_tuned_sam.pth')
     
-        print("¡Segmentación con bbox exitosa!")
-        
-        
+        print("Pesos guardados fine_tuned_sam...")
+
+        print("¡Segmentación con BBOX exitosa! - " + diseaseName)
 
 # Función para generar segmentación (máscaras) automáticamente
 def generar_segmentacion_automatica():
@@ -263,7 +290,7 @@ def generar_segmentacion_automatica():
         diseases = diccionarioDataset[diseaseName]
 
         # Nuevo directorio segmentado
-        datasetNameSAM = datasetName+"_SAM"
+        datasetNameSAM = datasetName+"_SAM_2"
         dirSAM = (HOME+"/SafeCrops/datasets/"+datasetNameSAM+"/train/"+diseaseName)
 
         if os.path.exists(dirSAM):
@@ -284,6 +311,9 @@ def generar_segmentacion_automatica():
             image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
 
             sam_result = mask_generator.generate(image_rgb)
+
+            print("SAM_RESULt")
+            print(sam_result)
 
             detections = sv.Detections.from_sam(sam_result = sam_result)
             detections = detections[detections.area == np.max(detections.area)]
@@ -322,13 +352,13 @@ create_weight_directory() # Validar si existe el directorio para guardar los pes
 cd(path_weight) # Ingresar a la ruta de weights
 download_sam_weights() # Validar si eya exiten los pesos predeterminados de SAM
 checkpoint = select_checkpoint() # Seleccionar que archivo de checkpoints (pesos) se utilizará para segmentar
-create_data_directory() # Validar si existe el directorio para guardar las imágenes de prueba 
-cd(path_data) # Ingresar a la ruta de data
-download_example_data() # Descargar las imagenes de prueba
+#create_data_directory() # Validar si existe el directorio para guardar las imágenes de prueba 
+#cd(path_data) # Ingresar a la ruta de data
+#download_example_data() # Descargar las imagenes de prueba
 cd(HOME+"/SafeCrops/imagenes")
 # Cargar el modelo
 sam = sam_model_registry[MODEL_TYPE](checkpoint=checkpoint).to(device=DEVICE).train()
 generar_segmentacion_cuadro_delimitador() # Segmentar dibujando un cuadro delimitador de forma manual
-generar_segmentacion_automatica() # Segmentar de forma automática tomando la figura con mayor area dentro de la imagen
+#generar_segmentacion_automatica() # Segmentar de forma automática tomando la figura con mayor area dentro de la imagen
 
 

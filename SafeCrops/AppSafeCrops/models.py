@@ -10,7 +10,6 @@ import shutil
 
 # Create your models here.
 
-ARQUITECTURAS = [('propia', 'Propia'), ('yolov3', 'YOLOv3'), ('yolov5', 'YOLOv5'), ('yolov7','YOLOv7'), ('transformers', 'Transformers')]
 
 class Usuario(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, default=1, related_name='usuario') #Se crea el campo user que es una relación uno a uno con el modelo User de django
@@ -94,7 +93,7 @@ class Enfermedad(models.Model):
     nombreEnfermedad = models.CharField(max_length=45, unique=True, verbose_name='Nombre de la Enfermedad')
     cultivoEnfermedad = models.CharField(max_length=45, verbose_name='Cultivo en el que se presenta la enfermedad')
     descripcionEnfermedad = models.TextField(max_length=200, verbose_name='Descripción de la enfermedad')
-    curaEnfermedad = models.TextField(max_length=200, verbose_name='Tratamiento de la enfermedad')
+    tratamientoEnfermedad = models.TextField(max_length=200, verbose_name='Tratamiento de la enfermedad')
 
 class Dataset(models.Model):
     id_Dataset = models.AutoField(primary_key=True)
@@ -103,9 +102,10 @@ class Dataset(models.Model):
     numImgTotal = models.IntegerField(verbose_name='Número de imágenes totales', null=True, blank=True)
     numImgEntrenamiento = models.IntegerField(verbose_name='Número de imágenes de entrenamiento', null=True, blank=True)
     numImgValidacion = models.IntegerField(verbose_name='Número de imágenes de validación', null=True, blank=True)
+    numImgPrueba = models.IntegerField(verbose_name='Número de imágenes de prueba', null=True, blank=True)
+    numClases = models.IntegerField(verbose_name='Número de clases', null=True, blank=True)
     segmentacion_SAM = models.CharField(max_length=5, verbose_name='Segmentación SAM')
     formatoImg = models.CharField(max_length=10, verbose_name='Formato de las imágenes')
-    tipoDataset = models.CharField(max_length=45, verbose_name='Tipo de dataset')
     estadoDataset = models.CharField(max_length=10, verbose_name='Estado del dataset', default='Activo')
 
     def __str__(self):
@@ -128,12 +128,31 @@ class Cultivo(models.Model):
 class Modelo_YOLOv7(models.Model):
     id_Modelo_y7 = models.AutoField(primary_key=True)
     nombreModelo_y7 = models.CharField(max_length=45, unique=True, verbose_name='Nombre del Modelo')
-    pesosModelo_y7 = models.FileField(max_length=100, upload_to='modelos/yolov7/', verbose_name='Ruta de Pesos', help_text="Selecciona un archivo de pesos correcto", )
-    epocas_y7 = models.IntegerField(verbose_name="Número de épocas", help_text="Selecciona un valor entre 1 y 6")
-    batch_size_y7 = models.IntegerField(verbose_name="Batch Size", help_text="Selecciona un valor mayor a 2")
+    pesosModelo_y7 = models.FileField(max_length=100, upload_to='weights/yolov7/', verbose_name='Ruta de Pesos')
+    epocas_y7 = models.IntegerField(verbose_name="Número de épocas")
+    batch_size_y7 = models.IntegerField(verbose_name="Batch Size")
 
     def __str__(self):
         fila = self.nombreModelo_y7
+        return fila
+
+    def delete(self, using=None, keep_parents=False):
+        shutil.rmtree(self.ruta.name)
+        super().delete()
+
+class Modelo_Transformer(models.Model):
+    id_Modelo_transformer = models.AutoField(primary_key=True)
+    nombreModelo_transformer = models.CharField(max_length=45, unique=True, verbose_name='Nombre del Modelo')
+    datasetModelo_transformer = models.ForeignKey(Dataset, on_delete=models.CASCADE, verbose_name='Dataset', related_name='transformerDataset')
+    pesosModelo_transformer = models.FileField(max_length=100, upload_to='weights/Transformer/', verbose_name='Ruta de Pesos', null=True, blank=True)
+    epocas_transformer = models.IntegerField(verbose_name="Número de épocas")
+    batch_size_transformer = models.IntegerField(verbose_name="Batch Size")
+    accuracy_transformer = models.FloatField(verbose_name="Accuracy",  null=True, blank=True)
+    loss_transformer = models.FloatField(verbose_name="Loss",  null=True, blank=True)
+    ruta_resultados_transformer = models.CharField(max_length=100, verbose_name='Ruta de resultados',  null=True, blank=True)
+
+    def __str__(self):
+        fila = self.nombreModelo_transformer
         return fila
 
     def delete(self, using=None, keep_parents=False):

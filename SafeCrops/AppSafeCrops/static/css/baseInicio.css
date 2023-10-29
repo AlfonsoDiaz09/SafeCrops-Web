@@ -74,6 +74,20 @@
     display: flex;
 }
 
+/* .background-welcome{
+    width: 100%;
+    background: url('../img/campo_mexico.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: absolute;
+    top: 3.5em;
+    left: 0;
+    bottom: 0;
+}
+.container-welcome{
+    width: 52%;
+} */
+
 .card_login, .card_register{
     width: 100%;
     display: -webkit-flex;
@@ -83,6 +97,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    backdrop-filter: blur(10px);
 }
 
 .card_logo{

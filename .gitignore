@@ -1,6 +1,7 @@
 desktop.ini
 DJSafeCrops/
 SafeCrops/datasets/
+SafeCrops/modelos/
 weights/
 data/
 data_yolov5/

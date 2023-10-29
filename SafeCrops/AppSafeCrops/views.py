@@ -7,8 +7,8 @@ from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required 
-from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Usuario, Cultivo, Modelo_YOLOv7
-from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm, ChangePasswordForm, EnfermedadForm, DatasetForm, CultivoForm, Modelo_YOLOv7_Form
+from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Usuario, Cultivo, Modelo_YOLOv7, Modelo_Transformer
+from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm, ChangePasswordForm, EnfermedadForm, DatasetForm, CultivoForm, Modelo_YOLOv7_Form, Modelo_Transformer_Form
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
@@ -16,6 +16,7 @@ from django.contrib import messages
 from django.views.generic import FormView
 from django.urls import reverse_lazy
 from .zip import Zip
+from .modelo_transformers import Transformer
 import mysql.connector
 
 import smtplib
@@ -502,7 +503,9 @@ def contarDatasets():
 
 #función para contar los modelos registrados y retornarlos
 def contarModelos():
-    num_modelos = Modelo_YOLOv7.objects.all().count()
+    num_modelosYolov7 = Modelo_YOLOv7.objects.all().count()
+    num_modelosTransformer = Modelo_Transformer.objects.all().count()
+    num_modelos = num_modelosYolov7 + num_modelosTransformer
     return num_modelos
 
 #función para contar los reportes registrados y retornarlos
@@ -620,6 +623,15 @@ def crearAdministrador(request): #función para crear un nuevo administrador
             
             # Se redirecciona a la página de la lista de administradores
             return redirect('administradores')
+        
+        else:
+            URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
+            context = perfil(request)
+            context['direccion'] =  'Administrador / Usuarios / Administradores / Registrar'
+            context['formularioUsuario'] = formularioUsuario
+            context['formularioAdministrador'] = formularioAdministrador
+            context['regresar'] = 'http://{}/{}'.format(URL, 'administradores')
     else: # Si no se ha enviado el formulario
         URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
         formularioUsuario = UsuarioForm()
@@ -708,8 +720,7 @@ def expertos(request): #función para redireccionar a la página donde se enlist
     return render(request, 'usuarios/experto/indexE.html', context)
 
 def crearExperto(request): #función para crear un nuevo éxperto
-    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
-
+    
     if request.method == 'POST':
         formularioUsuario = UsuarioForm(request.POST or None)
         formularioExperto = ExpertoForm(request.POST or None, request.FILES or None)
@@ -750,7 +761,17 @@ def crearExperto(request): #función para crear un nuevo éxperto
             
             # Se redirecciona a la página de la lista de administradores
             return redirect('expertos')
+        
+        else:
+            URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
+            context = perfil(request)
+            context['direccion'] =  'Administrador / Usuarios / Expertos / Regsitrar'
+            context['formularioUsuario'] = formularioUsuario
+            context['formularioExperto'] = formularioExperto
+            context['regresar'] = 'http://{}/{}'.format(URL, 'expertos')
     else: # Si no se ha enviado el formulario
+        URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
         formularioUsuario = UsuarioForm()
         formularioExperto = ExpertoForm()
 
@@ -1061,15 +1082,42 @@ def crearDataset(request):
         if formulario.is_valid():
             formulario.save()
             rutaName = formulario.cleaned_data['ruta'].name
-            tipo = formulario.cleaned_data['tipoDataset']
             nombreD = formulario.cleaned_data['nombreDataset']
             formatoImagen = formulario.cleaned_data['formatoImg']
-            Zip.descomprimir(str(formulario.instance.ruta.name), rutaName, tipo, nombreD, formatoImagen)
+            estructuraDataset = request.POST.get('estructuraDataset')
+            print("Dentro: ", estructuraDataset)
+            rutaOrigen = settings.MEDIA_ROOT + 'datasets/' + rutaName
+            rutaDestino = settings.MEDIA_ROOT + 'datasets/' + nombreD
+            try:
+                if(estructuraDataset == 'Construir_Si_Carpeta' or estructuraDataset == 'Construir_No_Carpeta'):
+                    Zip.descomprimirConstruir(str(formulario.instance.ruta.name), rutaOrigen, rutaDestino, formatoImagen, nombreD, estructuraDataset)
+                elif(estructuraDataset == 'Construido_Si_Carpeta' or estructuraDataset == 'Construido_No_Carpeta'):
+                    Zip.descomprimirConstruido(str(formulario.instance.ruta.name), rutaOrigen, rutaDestino, formatoImagen, nombreD, estructuraDataset)
+            except NameError:
+                messages.error(request, f'Hubo un problema al crear el dataset {nombreD} en la parte de extracción del archivo .zip')
+                os.remove(rutaOrigen)
+                shutil.rmtree(rutaDestino)
+
+                # Consultar el último ID registrado en la tabla datasets 
+                conection= mysql.connector.connect(user='root', database='id21050120_safecrops', host='localhost', port='3306', password='') #se conecta a la base de datos
+                last_id = conection.cursor()
+                last_id.execute("""SELECT id_Dataset FROM appsafecrops_dataset ORDER BY id_Dataset DESC LIMIT 1""") #se obtiene el id del ultimo dataset
+                id_dataset = last_id.fetchone()
+                last_id.close()
+
+                # Eliminar el regitro de la base de datos
+                myquery=conection.cursor()
+                myquery.execute("""DELETE FROM appsafecrops_dataset WHERE id_Dataset = %s""", (id_dataset)) #se actualiza la ruta del dataset
+                conection.commit() #se confirma la eliminación
+                myquery.close() #se cierra el cursor
+
+                return redirect('crearDataset')
+
             messages.success(request, f'Dataset {nombreD} creado correctamente')
             return redirect('datasets')
         else:
             messages.error(request, 'Error al crear el dataset.')
-            formulario = DatasetForm()
+            #formulario = DatasetForm()
 
             context = perfil(request)
             context['direccion'] =  'Administrador / Datasets / Registrar'
@@ -1278,11 +1326,13 @@ def eliminarCultivo(request, id_Cultivo):
 def modelos(request): #función para redireccionar a la página donde se enlista todos los modelos
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
 
-    modelos = Modelo_YOLOv7.objects.all()
+    modelosYOLOv7 = Modelo_YOLOv7.objects.all()
+    modelosTransformer = Modelo_Transformer.objects.all()
 
     context = perfil(request)
     context['direccion'] =  'Administrador / Modelos'
-    context['modelos'] = modelos
+    context['modelosYOLOv7'] = modelosYOLOv7
+    context['modelosTransformer'] = modelosTransformer
     context['regresar'] = 'http://{}/{}'.format(URL, 'Panel_administrador')
 
     return render(request, 'modelos/indexM.html', context)
@@ -1291,25 +1341,51 @@ def seleccionarArquitectura(request):
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
 
     if request.method == 'POST':
-        formulario = Modelo_YOLOv7_Form(request.POST, request.FILES)
-        if formulario.is_valid():
-            formulario.save()
-            messages.success(request, f'Modelo creado correctamente')
-            return redirect('modelos')
+        # formularioYOLOv3 = Modelo_YOLOv3_Form(request.POST, request.FILES)
+        # formularioYOLOv5 = Modelo_YOLOv5_Form(request.POST, request.FILES)
+        formularioYOLOv7 = Modelo_YOLOv7_Form(request.POST, request.FILES)
+        formularioTransformer = Modelo_Transformer_Form(request.POST, request.FILES)
+        if formularioYOLOv7.is_valid() or formularioTransformer.is_valid():
+            # if formularioYOLOv3.is_valid():
+            #     formularioYOLOv3.save()
+            #     messages.success(request, f'Modelo YOLOv3 creado correctamente')
+            #     return redirect('modelos')
+            # if formularioYOLOv5.is_valid():
+            #     formularioYOLOv5.save()
+            #     messages.success(request, f'Modelo YOLOv5 creado correctamente')
+            #     return redirect('modelos')
+            if formularioYOLOv7.is_valid():
+                formularioYOLOv7.save()
+                messages.success(request, f'Modelo YOLOv7 creado correctamente')
+                return redirect('modelos')
+            if formularioTransformer.is_valid():
+                nombreTransformer = formularioTransformer.cleaned_data['nombreModelo_transformer']
+                nombreDataset = formularioTransformer.cleaned_data['datasetModelo_transformer']
+                epocas = formularioTransformer.cleaned_data['epocas_transformer']
+                batch_size = formularioTransformer.cleaned_data['batch_size_transformer']
+
+                Transformer.training_model(nombreTransformer, nombreDataset, epocas, batch_size)
+                formularioTransformer.save()
+                messages.success(request, f'Modelo Transformer creado correctamente')
+                return redirect('modelos')
         else:
             messages.error(request, 'Error al crear el modelo.')
-            formulario = Modelo_YOLOv7_Form()
+            formularioYOLOv7 = Modelo_YOLOv7_Form()
+            formularioTransformer = Modelo_Transformer_Form()
 
             context = perfil(request)
             context['direccion'] =  'Administrador / Modelos / Arquitectura'
-            context['formulario'] = formulario
+            context['formularioYOLOv7'] = formularioYOLOv7
+            context['formularioTransformer'] = formularioTransformer
             context['regresar'] = 'http://{}/{}'.format(URL, 'modelos')
     else:
-        formulario = Modelo_YOLOv7_Form()
+        formularioYOLOv7 = Modelo_YOLOv7_Form()
+        formularioTransformer = Modelo_Transformer_Form()
 
         context = perfil(request)
         context['direccion'] =  'Administrador / Modelos / Arquitectura'
-        context['formulario'] = formulario
+        context['formularioYOLOv7'] = formularioYOLOv7
+        context['formularioTransformer'] = formularioTransformer
         context['regresar'] = 'http://{}/{}'.format(URL, 'modelos')
 
     return render(request, 'modelos/seleccionarArquitectura.html', context)
@@ -1365,4 +1441,28 @@ def eliminarModelo_YOLOv7(request, id_Modelo):
     return redirect('modelos')
 
 def crearModeloTransformer(request):
-    return
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
+    if request.method == 'POST':
+        formulario = Modelo_Transformer_Form(request.POST, request.FILES)
+        if formulario.is_valid():
+            formulario.save()
+            messages.success(request, f'Modelo creado correctamente')
+            return redirect('modelos')
+        else:
+            messages.error(request, 'Error al crear el modelo.')
+            formulario = Modelo_Transformer_Form()
+
+            context = perfil(request)
+            context['direccion'] =  'Administrador / Modelos / Registrar'
+            context['formulario'] = formulario
+            context['regresar'] = 'http://{}/{}'.format(URL, 'seleccionarArquitectura')
+    else:
+        formulario = Modelo_Transformer_Form()
+
+        context = perfil(request)
+        context['direccion'] =  'Administrador / Modelos / Registrar'
+        context['formulario'] = formulario
+        context['regresar'] = 'http://{}/{}'.format(URL, 'modelos')
+
+    return render(request, 'modelos/crear.html', context)

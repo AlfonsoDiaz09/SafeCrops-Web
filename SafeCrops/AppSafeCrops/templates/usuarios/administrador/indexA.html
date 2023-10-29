@@ -34,7 +34,7 @@
                         {% for administrador in administradores %}
                             <tr class="">
                                 <td>{{ administrador.id_Administrador }}</td>
-                                <td>{{ administrador.nombre }} {{ administrador.apellidoP }} {{ administrador.apellidoM }}</td>
+                                <td>{{ administrador.nombre }} {{ administrador.apellidoP }} {% if administrador.apellidoM != None %} {{ administrador.apellidoM }} {% endif %}</td>
                                 <td>{{ administrador.fechaNac|date:'Y-m-d' }}</td>
                                 <td>{{ administrador.correo }}</td>
                                 <td>

@@ -1,0 +1,23 @@
+<link rel="stylesheet" href="../static/css/base.css">
+
+<form enctype="multipart/form-data" method="post">
+  {% csrf_token %} <!-- Token de seguridad -->
+  {% for campo in formularioYOLOv5 %} <!-- Recorremos los campos del formulario -->
+
+    <div class="mb-3"> <!-- Div para cada campo -->
+
+      <label for="" class="form-label">{{ campo.label }} yolov5</label>
+      {% if campo.name == 'datasetModelo_transformer' %}
+        {{ campo.form.datasetModelo_transformer }}
+      {% else %}
+        <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" /> 
+      {% endif %}
+    </div>
+
+    <div class="col-12 help-text">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
+  
+  {% endfor %}
+
+  <input name="" id="" class="btn btn-success" type="submit" value="Enviar información"> <!-- Botón para enviar el formulario -->
+  <a name="" id="" class="btn btn-primary" href="{% url 'modelos' %}" role="button">Cancelar</a> <!-- Botón para cancelar el formulario -->
+</form>
