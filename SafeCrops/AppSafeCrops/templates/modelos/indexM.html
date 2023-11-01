@@ -57,10 +57,6 @@
                                     </div>
                                 </td>
                             </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="6">No hay registros</td>
-                            </tr>
                         {% endfor %}
                         {% for modelo in modelosTransformer %}
                             <tr class="">
@@ -88,11 +84,12 @@
                                     </div>
                                 </td>
                             </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="6">No hay registros</td>
-                            </tr>
                         {% endfor %}
+                        {% if modelosYOLOv7|length == 0 and modelosTransformer|length == 0 %}
+                            <tr>
+                                <td colspan="8">No hay registros</td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>

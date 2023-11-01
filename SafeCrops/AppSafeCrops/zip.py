@@ -6,8 +6,63 @@ import os
 import mysql.connector
 
 class Zip:
-    #Función para descomprimir el dataset del archivo zip
-    def descomprimirConstruido(rutaDataset, rutaOrigen, rutaDestino, formatoImg, nombreDataset, estructuraDataset):
+    def descomprimir(rutaOrigen, rutaDestino, formatoImg, nombreDataset):
+        #Función para descomprimir el dataset del archivo zip
+        def construidoDataset(rutaDestino, formatoImg, nombreDataset, carpetas_division):
+            print("Entra 2.6")
+            if not('train' in carpetas_division and 'validation' in carpetas_division):
+                print("Entra 2.7")
+                return 'error_nombre_carpetas'
+            print("Entra 2.8")
+            # Obtener la lista de enfermedades
+            carpetas_enfermedades = [nombre for nombre in os.listdir(rutaDestino + "/train/") if os.path.isdir(os.path.join(rutaDestino, 'train', nombre))]
+            print("Entra 2.9")
+            if len(carpetas_enfermedades) == 0:
+                return 'error_no_clases' 
+            elif len(carpetas_enfermedades) < 2:
+                return 'error_numero_clases'
+
+            total_img_dataset = []
+            train_img_dataset = []
+            validate_img_dataset = []
+            test_img_dataset = [0]
+
+            for division_carpetas in os.listdir(rutaDestino):
+
+                for enfermedad in os.listdir(os.path.join(rutaDestino, division_carpetas)):
+                    
+                    # for i, archivo in enumerate(os.listdir(os.path.join(rutaDestino, division_carpetas, enfermedad))):
+                    if(division_carpetas == 'train'):
+                        train_size = len(os.listdir(os.path.join(rutaDestino, division_carpetas, enfermedad)))
+                        train_img_dataset.append(train_size)
+                    if(division_carpetas == 'validation'):
+                        validate_size = len(os.listdir(os.path.join(rutaDestino, division_carpetas, enfermedad)))
+                        validate_img_dataset.append(validate_size)
+                    if(division_carpetas == 'test'):
+                        test_size = len(os.listdir(os.path.join(rutaDestino, division_carpetas, enfermedad)))
+                        test_img_dataset.append(test_size)
+                    
+                        
+                        # # Renombrar archivos
+                        # ruta_archivo = os.path.join(rutaDestino, division_carpetas, enfermedad, archivo)
+                        # ruta_archivo_nuevo = os.path.join(rutaDestino, division_carpetas, enfermedad, enfermedad + str(i) + '.' + formatoImg)
+                        # os.rename(ruta_archivo, ruta_archivo_nuevo)
+
+                    total_img_dataset.append(len(os.listdir(os.path.join(rutaDestino, division_carpetas, enfermedad))))
+
+            
+
+            # Actualizar los datos en la tabla datasets
+            conection= mysql.connector.connect(user='root', database='id21050120_safecrops', host='localhost', port='3306', password='') #se conecta a la base de datos
+            myquery=conection.cursor()
+            myquery.execute("""UPDATE appsafecrops_dataset set ruta = %s, numImgTotal = %s, numImgEntrenamiento = %s, numImgValidacion = %s, numImgPrueba = %s, numClases = %s WHERE nombreDataset = %s""", ("datasets/"+nombreDataset, sum(total_img_dataset), sum(train_img_dataset), sum(validate_img_dataset), sum(test_img_dataset), len(carpetas_enfermedades), nombreDataset)) #se actualiza la ruta del dataset
+            conection.commit() #se confirma la actualización
+            myquery.close() #se cierra el cursor
+
+            return 'ok'
+
+
+        print("Entra 2 ")
         # Abrir archivo .zip en modo lectura
         zip = zipfile.ZipFile(rutaOrigen, 'r')
 
@@ -18,8 +73,12 @@ class Zip:
         # Eliminar archivo .zip de donde se extrajeron las imagenes
         os.remove(rutaOrigen)
 
+        estructuraDataset = ''
+        if len(os.listdir(rutaDestino)) == 1:
+            estructuraDataset = 'Si_Carpeta_Extra'
+
         # Validar si las enfermedades estan dentro de otra carpeta
-        if(estructuraDataset == 'Construido_Si_Carpeta'):
+        if(estructuraDataset == 'Si_Carpeta_Extra'):
             nombre_otra_carpeta = os.listdir(rutaDestino)
             nueva_rutaDestino = os.path.join(rutaDestino, nombre_otra_carpeta[0])
             for enfermedad in os.listdir(nueva_rutaDestino):
@@ -27,64 +86,24 @@ class Zip:
                     shutil.move(os.path.join(nueva_rutaDestino, enfermedad), rutaDestino)
             shutil.rmtree(nueva_rutaDestino)
 
-        # Obtener la lista de enfermedades
-        carpetas_enfermedades = [nombre for nombre in os.listdir(rutaDestino + "/train/") if os.path.isdir(os.path.join(rutaDestino, 'train', nombre))]
-        
-        total_img_dataset = []
-        train_img_dataset = []
-        validate_img_dataset = []
-        test_img_dataset = [0]
+        carpetas_division = [nombre for nombre in os.listdir(rutaDestino) if os.path.isdir(os.path.join(rutaDestino, nombre))]
 
-        for division_carpetas in os.listdir(rutaDestino):
-
-            for enfermedad in os.listdir(os.path.join(rutaDestino, division_carpetas)):
-                
-                # for i, archivo in enumerate(os.listdir(os.path.join(rutaDestino, division_carpetas, enfermedad))):
-                if(division_carpetas == 'train'):
-                    train_size = len(os.listdir(os.path.join(rutaDestino, division_carpetas, enfermedad)))
-                    train_img_dataset.append(train_size)
-                if(division_carpetas == 'validation'):
-                    validate_size = len(os.listdir(os.path.join(rutaDestino, division_carpetas, enfermedad)))
-                    validate_img_dataset.append(validate_size)
-                if(division_carpetas == 'test'):
-                    test_size = len(os.listdir(os.path.join(rutaDestino, division_carpetas, enfermedad)))
-                    test_img_dataset.append(test_size)
-                    
-                    # # Renombrar archivos
-                    # ruta_archivo = os.path.join(rutaDestino, division_carpetas, enfermedad, archivo)
-                    # ruta_archivo_nuevo = os.path.join(rutaDestino, division_carpetas, enfermedad, enfermedad + str(i) + '.' + formatoImg)
-                    # os.rename(ruta_archivo, ruta_archivo_nuevo)
-
-                total_img_dataset.append(len(os.listdir(os.path.join(rutaDestino, division_carpetas, enfermedad))))
-
-        # Actualizar los datos en la tabla datasets
-        conection= mysql.connector.connect(user='root', database='id21050120_safecrops', host='localhost', port='3306', password='') #se conecta a la base de datos
-        myquery=conection.cursor()
-        myquery.execute("""UPDATE appsafecrops_dataset set ruta = %s, numImgTotal = %s, numImgEntrenamiento = %s, numImgValidacion = %s, numImgPrueba = %s, numClases = %s WHERE nombreDataset = %s""", ("datasets/"+nombreDataset, sum(total_img_dataset), sum(train_img_dataset), sum(validate_img_dataset), sum(test_img_dataset), len(carpetas_enfermedades), nombreDataset)) #se actualiza la ruta del dataset
-        conection.commit() #se confirma la actualización
-        myquery.close() #se cierra el cursor
-
-
-    def descomprimirConstruir(rutaDataset, rutaOrigen, rutaDestino, formatoImg, nombreDataset, estructuraDataset):
-        # Abrir archivo .zip en modo lectura
-        zip = zipfile.ZipFile(rutaOrigen, 'r')
-
-        # Descomprimir el archivo .zip en la ruta destino
-        zip.extractall(rutaDestino)
-        zip.close()
-
-        # Validar si las enfermedades estan dentro de otra carpeta
-        if(estructuraDataset == 'Construir_Si_Carpeta'):
-            nombre_otra_carpeta = os.listdir(rutaDestino)
-            nueva_rutaDestino = os.path.join(rutaDestino, nombre_otra_carpeta[0])
-            for enfermedad in os.listdir(nueva_rutaDestino):
-                if os.path.isdir(os.path.join(nueva_rutaDestino, enfermedad)):
-                    shutil.move(os.path.join(nueva_rutaDestino, enfermedad), rutaDestino)
-            shutil.rmtree(nueva_rutaDestino)
+        if ('train' in carpetas_division or 'validation' in carpetas_division):
+            print("Entra 2.5 ")
+            retorno_valor = construidoDataset(rutaDestino, formatoImg, nombreDataset, carpetas_division)
+            return retorno_valor
 
         # Obtener la lista de enfermedades
         carpetas_enfermedades = [nombre for nombre in os.listdir(rutaDestino) if os.path.isdir(os.path.join(rutaDestino, nombre))]
         
+        print("Entra 3 ")
+        if len(carpetas_enfermedades) == 0:
+            print("Entra 4 ")
+            return 'error_no_clases' 
+        elif len(carpetas_enfermedades) < 2:
+            print("Entra 5 ")
+            return 'error_numero_clases'
+
         total_img_dataset = []
         train_img_dataset = []
         validate_img_dataset = []
@@ -132,11 +151,6 @@ class Zip:
             validate_img_dataset.append(validate_size)
             test_img_dataset.append(test_size)
 
-        
-
-        # Eliminar archivo .zip de donde se extrajeron las imagenes
-        os.remove(rutaOrigen)
-
         # Actualizar los datos en la tabla datasets
         conection= mysql.connector.connect(user='root', database='id21050120_safecrops', host='localhost', port='3306', password='') #se conecta a la base de datos
         myquery=conection.cursor()
@@ -144,5 +158,6 @@ class Zip:
         conection.commit() #se confirma la actualización
         myquery.close() #se cierra el cursor
         
-        
+        return 'ok'
+
         

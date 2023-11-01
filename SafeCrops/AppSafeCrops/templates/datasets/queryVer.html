@@ -1,28 +1,32 @@
 <link rel="stylesheet" href="../static/css/base.css">
 <link rel="stylesheet" href="../static/css/queryDataset.css">
 
-{% for imagen in imagenesEntrenamiento %}
-    <div class="container__img">
-        <div class="btn__eliminar">
-            <a name="" id="" class="btnDelete" href="{% url 'eliminarImagen' id_Dataset imagen %}" role="button"><i class="fa-solid fa-trash"></i></a>
+{% for enfermedad in diccionarioTrain.train %}
+    {%for imagen in enfermedad.imagenes%}
+        <div class="container__img">
+            <div class="btn__eliminar">
+                <a name="" id="" class="btnDelete" href="{% url 'eliminarImagen' id_Dataset imagen %}" role="button"><i class="fa-solid fa-trash"></i></a>
+            </div>
+            <div>
+                <img src="{{ datasetTrain }}/{{ enfermedad.enfermedad }}/{{ imagen }}">
+                <span class="span__train">Train</span>
+            </div>
+            <div class="div__name">{{ imagen }}</div>
         </div>
-        <div>
-            <img src="{{ datasetTrain }}/{{ imagen }}">
-            <span class="span__train">Train</span>
-        </div>
-        <div class="div__name">{{ imagen }}</div>
-    </div>
+    {%endfor%}
 {% endfor %}
 
-{% for imagen in imagenesValidacion %}
-    <div class="container__img">
-        <div class="btn__eliminar">
-            <a name="" id="" class="btnDelete" href="{% url 'eliminarImagen' id_Dataset imagen %}" role="button"><i class="fa-solid fa-trash"></i></a>
+{% for enfermedad in diccionarioValidation.validation %}
+    {%for imagen in enfermedad.imagenes%}
+        <div class="container__img">
+            <div class="btn__eliminar">
+                <a name="" id="" class="btnDelete" href="{% url 'eliminarImagen' id_Dataset imagen %}" role="button"><i class="fa-solid fa-trash"></i></a>
+            </div>
+            <div>
+                <img src="{{ datasetValidation }}/{{ enfermedad.enfermedad }}/{{ imagen }}">
+                <span class="span__validation">Validation</span>
+            </div>
+            <div class="div__name">{{ imagen }}</div>
         </div>
-        <div>
-            <img src="{{ datasetValidate }}/{{ imagen }}">
-            <span class="span__validate">Validate</span>
-        </div>
-        <div class="div__name">{{ imagen }}</div>
-    </div>
+    {%endfor%}
 {% endfor %}

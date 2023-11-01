@@ -4,6 +4,7 @@
     permite validar que cada input se encuentre lleno correctamente
 */
 
+
 import notificationSweet2 from "./notificationSweet2.js";
 
 // (Dataset) Importanciones de funciones alojados en otros archivos JS
@@ -68,7 +69,7 @@ formulario.addEventListener('submit', (e) => {
     switch (nombre){
         case 'Dataset':
             // Valida si alguno o todos los campos no estan llenados de forma correcta
-            if((camposDataset.nombreDataset && camposDataset.ruta && camposDataset.segmentacion_SAM && camposDataset.formatoImg && camposDataset.estructuraDataset) == false){
+            if((camposDataset.nombreDataset && camposDataset.ruta && camposDataset.tipoDataset && camposDataset.segmentacion_SAM && camposDataset.formatoImg) == false){
                 // Evitar que el formulario se envíe
                 e.preventDefault(); 
                 // Mandar una alerta a la vista

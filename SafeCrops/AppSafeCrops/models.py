@@ -95,9 +95,19 @@ class Enfermedad(models.Model):
     descripcionEnfermedad = models.TextField(max_length=200, verbose_name='Descripción de la enfermedad')
     tratamientoEnfermedad = models.TextField(max_length=200, verbose_name='Tratamiento de la enfermedad')
 
+class Cultivo(models.Model):
+    id_Cultivo = models.AutoField(primary_key=True)
+    nombreCultivo = models.CharField(max_length=45, unique=True, verbose_name='Nombre del Cultivo')
+    descripcionCultivo = models.TextField(max_length=200, verbose_name='Descripción del cultivo')
+
+    def __str__(self):
+        fila = self.nombreCultivo
+        return fila
+
 class Dataset(models.Model):
     id_Dataset = models.AutoField(primary_key=True)
     nombreDataset = models.CharField(max_length=45, unique=True, verbose_name='Nombre del Dataset')
+    tipoDataset = models.ForeignKey(Cultivo, on_delete=models.CASCADE,max_length=45, verbose_name='Tipo de dataset')
     ruta = models.FileField(max_length=100, upload_to='datasets/', verbose_name='Ruta del Dataset')
     numImgTotal = models.IntegerField(verbose_name='Número de imágenes totales', null=True, blank=True)
     numImgEntrenamiento = models.IntegerField(verbose_name='Número de imágenes de entrenamiento', null=True, blank=True)
@@ -115,15 +125,6 @@ class Dataset(models.Model):
     def delete(self, using=None, keep_parents=False):
         shutil.rmtree(self.ruta.name)
         super().delete()
-
-class Cultivo(models.Model):
-    id_Cultivo = models.AutoField(primary_key=True)
-    nombreCultivo = models.CharField(max_length=45, unique=True, verbose_name='Nombre del Cultivo')
-    descripcionCultivo = models.TextField(max_length=200, verbose_name='Descripción del cultivo')
-
-    def __str__(self):
-        fila = self.nombreCultivo
-        return fila
     
 class Modelo_YOLOv7(models.Model):
     id_Modelo_y7 = models.AutoField(primary_key=True)

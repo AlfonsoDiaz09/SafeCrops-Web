@@ -9,11 +9,11 @@ from transformers import pipeline
 from PIL import Image
 import requests
 
+from .GLOBAL_VARIABLES import HOME
+
 class Transformer:
-    
     def training_model(nombreTransformer, nombreDataset, epocas, batch_size):
 
-        HOME = os.getcwd() # Directorio principal
         print("Directorio principal: ", HOME)
 
         save_model_transformer_dir = os.path.join(HOME, 'modelos', 'transformer')
@@ -44,6 +44,8 @@ class Transformer:
 
         dataset = load_dataset("imagefolder", data_dir=dir_dataset)
         metric = load_metric("accuracy")
+
+        print(dataset)
 
         labels = dataset["train"].features["label"].names
         label2id, id2label = dict(), dict()
@@ -128,7 +130,7 @@ class Transformer:
         #model_name = model_checkpoint.split("/")[-1]
         
         args = TrainingArguments(
-            f"{model_name}-finetuned-transformer",
+            f"{model_name}-finetuned",
             remove_unused_columns=False,
             evaluation_strategy = "epoch",
             save_strategy = "epoch",
@@ -168,6 +170,7 @@ class Transformer:
         )
 
         train_results = trainer.train()
+        print("TRAIN_RESULTS: ", train_results)
         # rest is optional but nice to have
         trainer.save_model()
         trainer.log_metrics("train", train_results.metrics)
@@ -175,11 +178,10 @@ class Transformer:
         trainer.save_state()
 
         metrics = trainer.evaluate()
+        print("METRICS: ", metrics)
         # some nice to haves:
         trainer.log_metrics("eval", metrics)
         trainer.save_metrics("eval", metrics)
-
-        cd(HOME)
 
     # Inferencia
     def prediction_model():

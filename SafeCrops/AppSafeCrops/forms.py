@@ -88,10 +88,10 @@ class EnfermedadForm(forms.ModelForm):
 
 class DatasetForm(forms.ModelForm):
     ruta = forms.FileField(validators=[FileExtensionValidator(allowed_extensions=['zip'])])
-
+    tipoDataset = forms.ModelChoiceField(queryset=Cultivo.objects.all().order_by('-id_Cultivo'), label="Tipo de Dataset", widget=forms.Select(attrs={'class':'form-select formulario__select'}), empty_label='------ SELECCIONE ------') # Se crea un campo de tipo ModelChoiceField
     class Meta:
         model = Dataset
-        fields = '__all__'
+        fields = ['nombreDataset', 'tipoDataset', 'ruta', 'segmentacion_SAM', 'formatoImg']
 
 class CultivoForm(forms.ModelForm):
     class Meta:

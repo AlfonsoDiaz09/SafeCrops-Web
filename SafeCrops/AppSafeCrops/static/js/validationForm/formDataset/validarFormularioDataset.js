@@ -14,16 +14,16 @@ const validarFormularioDataset = (e) => {
             validarCampoFile(expresiones.ruta, e.target, e.target.name, errores.error_ruta);
         break;
 
+        case "tipoDataset":
+            validarCampoSelect(e.target.value, e.target.name, errores.error_tipoDataset);
+        break;
+        
         case "segmentacion_SAM":
             validarCampoSelect(e.target.value, e.target.name, errores.error_segmentacion_SAM);
         break;
         
         case "formatoImg":
             validarCampoSelect(e.target.value, e.target.name, errores.error_formatoImg);
-        break;
-
-        case "estructuraDataset":
-            validarCampoSelect(e.target.value, e.target.name, errores.error_estructuraDataset);
         break;
     }
 }

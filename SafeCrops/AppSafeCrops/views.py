@@ -578,7 +578,7 @@ def inicioT(request):
 
 def administradores(request): #función para redireccionar a la página donde se enlista todos los administradores 
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']   
-    administradores = Administrador.objects.all()
+    administradores = Administrador.objects.all().order_by('-id_Administrador')
     context = perfil(request)
     context['direccion'] =  'Administrador / Usuarios / Administradores'
     context['administradores'] = administradores
@@ -710,7 +710,7 @@ def eliminarAdministrador(request, id_Administrador): #función para eliminar un
 def expertos(request): #función para redireccionar a la página donde se enlista todos los expertos
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
 
-    expertos = Experto.objects.all()
+    expertos = Experto.objects.all().order_by('-id_Experto')
 
     context = perfil(request)
     context['direccion'] =  'Administrador / Usuarios / Expertos'
@@ -849,7 +849,7 @@ def eliminarExperto(request, id_Experto):
 def testers(request): #función para redireccionar a la página donde se enlista todos los testers
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
 
-    testers = Tester.objects.all()
+    testers = Tester.objects.all().order_by('-id_Tester')
 
     context = perfil(request)
     context['direccion'] =  'Administrador / Usuarios / Testers'
@@ -976,7 +976,7 @@ def eliminarTester(request, id_Tester): #función para eliminar un tester con pa
 #*****************************************************************************************************#
 
 def usuarios(request): #función para redireccionar a la página donde se enlista todos los usuarios
-    usuarios = User.objects.all()
+    usuarios = User.objects.all().order_by('-id')
 
     context = perfil(request)
     context['direccion'] =  'Administrador / Usuarios'
@@ -997,7 +997,7 @@ def eliminarUsuario(request, id):
 def enfermedades(request): #función para redireccionar a la página donde se enlista todas las enfermedades
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
 
-    enfermedades = Enfermedad.objects.all()
+    enfermedades = Enfermedad.objects.all().order_by('-id_Enfermedad')
 
     context = perfil(request)
     context['direccion'] =  'Administrador / Enfermedades'
@@ -1057,7 +1057,7 @@ def eliminarEnfermedad(request, id_Enfermedad):
 def datasets(request): #función para redireccionar a la página donde se enlista todos los datasets
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
 
-    datasets = Dataset.objects.all()
+    datasets = Dataset.objects.all().order_by('-id_Dataset')
 
     estadoDataset = request.GET.get('estadoDataset')
     if estadoDataset == 'Todos' or estadoDataset == None:
@@ -1084,15 +1084,12 @@ def crearDataset(request):
             rutaName = formulario.cleaned_data['ruta'].name
             nombreD = formulario.cleaned_data['nombreDataset']
             formatoImagen = formulario.cleaned_data['formatoImg']
-            estructuraDataset = request.POST.get('estructuraDataset')
-            print("Dentro: ", estructuraDataset)
             rutaOrigen = settings.MEDIA_ROOT + 'datasets/' + rutaName
             rutaDestino = settings.MEDIA_ROOT + 'datasets/' + nombreD
             try:
-                if(estructuraDataset == 'Construir_Si_Carpeta' or estructuraDataset == 'Construir_No_Carpeta'):
-                    Zip.descomprimirConstruir(str(formulario.instance.ruta.name), rutaOrigen, rutaDestino, formatoImagen, nombreD, estructuraDataset)
-                elif(estructuraDataset == 'Construido_Si_Carpeta' or estructuraDataset == 'Construido_No_Carpeta'):
-                    Zip.descomprimirConstruido(str(formulario.instance.ruta.name), rutaOrigen, rutaDestino, formatoImagen, nombreD, estructuraDataset)
+                print("Fuera 1 ")
+                respuesta_sentencia = Zip.descomprimir(rutaOrigen, rutaDestino, formatoImagen, nombreD)
+                print("Fuera 2 ")
             except NameError:
                 messages.error(request, f'Hubo un problema al crear el dataset {nombreD} en la parte de extracción del archivo .zip')
                 os.remove(rutaOrigen)
@@ -1112,9 +1109,36 @@ def crearDataset(request):
                 myquery.close() #se cierra el cursor
 
                 return redirect('crearDataset')
+            print(respuesta_sentencia)
+            if respuesta_sentencia != 'ok':
+                if respuesta_sentencia == 'error_nombre_carpetas':
+                    messages.error(request, f'El archivo {rutaName} no cuenta con los nombres de carpeta train y/o validation')
+                    shutil.rmtree(rutaDestino)
+                elif respuesta_sentencia == 'error_no_clases':
+                    messages.error(request, f'El dataset no contiene ninguna clase de enfermedad')
+                    shutil.rmtree(rutaDestino)
+                elif respuesta_sentencia == 'error_numero_clases':
+                    messages.error(request, f'El dataset debe contener por lo menos 2 clases de enfermedades')
+                    shutil.rmtree(rutaDestino)
 
-            messages.success(request, f'Dataset {nombreD} creado correctamente')
-            return redirect('datasets')
+                # Consultar el último ID registrado en la tabla datasets 
+                conection= mysql.connector.connect(user='root', database='id21050120_safecrops', host='localhost', port='3306', password='') #se conecta a la base de datos
+                last_id = conection.cursor()
+                last_id.execute("""SELECT id_Dataset FROM appsafecrops_dataset ORDER BY id_Dataset DESC LIMIT 1""") #se obtiene el id del ultimo dataset
+                id_dataset = last_id.fetchone()
+                last_id.close()
+
+                # Eliminar el regitro de la base de datos
+                myquery=conection.cursor()
+                myquery.execute("""DELETE FROM appsafecrops_dataset WHERE id_Dataset = %s""", (id_dataset)) #se actualiza la ruta del dataset
+                conection.commit() #se confirma la eliminación
+                myquery.close() #se cierra el cursor
+
+                return redirect('crearDataset')
+            else:
+                messages.success(request, f'Dataset {nombreD} creado correctamente')
+                return redirect('datasets')
+            
         else:
             messages.error(request, 'Error al crear el dataset.')
             #formulario = DatasetForm()
@@ -1138,24 +1162,46 @@ def verDataset(request, id_Dataset):
 
     dataset = Dataset.objects.get(id_Dataset=id_Dataset)
     nombre = dataset.nombreDataset
-    rutaDatasetTrain = '/datasets/'+dataset.ruta.name+'/entrenamiento/'
-    dirsTrain = os.listdir(dataset.ruta.name+'/entrenamiento')
-    rutaDatasetValidate = '/datasets/'+dataset.ruta.name+'/validacion/'
-    dirsValidate = os.listdir(dataset.ruta.name+'/validacion')
+    rutaDataset = dataset.ruta.name
 
-    n_img_total = len(dirsTrain) + len(dirsValidate)
+    rutaDatasetTrain = '/datasets/'+dataset.ruta.name+'/train/'
+
+    # Lista de extensiones de archivo de imagen que deseas considerar
+    extensiones_imagen = ['.jpg', '.jpeg', '.png', '.webp']
+
+    diccionarioTrain = {}
+    diccionarioValidation = {}
+
+    for division_file in os.listdir(rutaDataset):
+        for enfermedad in os.listdir(os.path.join(rutaDataset, division_file)):
+            imagenes = []
+
+            for imagen in os.listdir(os.path.join(rutaDataset, division_file, enfermedad)):
+                if any(imagen.endswith(ext) for ext in extensiones_imagen):
+                    imagenes.append(imagen)
+
+            if division_file == 'train':
+                if 'train' not in diccionarioTrain:
+                    diccionarioTrain['train'] = []
+                diccionarioTrain['train'].append({'enfermedad':enfermedad, 'imagenes':imagenes})
+            elif division_file == 'validation':
+                if 'validation' not in diccionarioValidation:
+                    diccionarioValidation['validation'] = []
+                diccionarioValidation['validation'].append({'enfermedad':enfermedad, 'imagenes':imagenes})
+
+    rutaDatasetValidation = '/datasets/'+dataset.ruta.name+'/validation/'
 
     context = perfil(request)
     context['direccion'] =  'Administrador / Datasets / '+nombre
-    context['imagenesEntrenamiento'] = dirsTrain
-    context['imagenesValidacion'] = dirsValidate
+    context['diccionarioTrain'] = diccionarioTrain
+    context['diccionarioValidation'] = diccionarioValidation
     context['id_Dataset'] = id_Dataset
     context['datasetTrain'] = rutaDatasetTrain
-    context['datasetValidate'] = rutaDatasetValidate
+    context['datasetValidation'] = rutaDatasetValidation
     context['dataset_info'] = dataset
-    context['numImagenes'] = n_img_total
-    context['numTrain'] = len(dirsTrain)
-    context['numValidate'] = len(dirsValidate)
+    context['numImagenes'] = dataset.numImgTotal
+    context['numTrain'] = dataset.numImgEntrenamiento
+    context['numValidation'] = dataset.numImgValidacion
     context['regresar'] = 'http://{}/{}'.format(URL, 'datasets') 
 
     return render(request, 'datasets/ver.html', context)
@@ -1225,8 +1271,8 @@ def eliminarImagen(request, id_Dataset, imagen):
     dataset = Dataset.objects.get(id_Dataset=id_Dataset)
     nombre = dataset.nombreDataset
     ruta = dataset.ruta.name
-    if os.path.exists(ruta+'/entrenamiento/'+imagen):
-        os.remove(ruta+'/entrenamiento/'+imagen)
+    if os.path.exists(ruta+'/train/'+imagen):
+        os.remove(ruta+'/train/'+imagen)
 
         num_imagenes = contarImagenes(request, id_Dataset)
 
@@ -1258,10 +1304,10 @@ def eliminarImagen(request, id_Dataset, imagen):
 def contarImagenes(request, id_Dataset):
     dataset = Dataset.objects.get(id_Dataset=id_Dataset)
     ruta = dataset.ruta.name
-    dirsTrain = os.listdir(ruta+'/entrenamiento')
-    dirsValidate = os.listdir(ruta+'/validacion')
-    n_img_total = len(dirsTrain) + len(dirsValidate)
-    num_imagenes = [n_img_total, len(dirsTrain), len(dirsValidate)]
+    dirsTrain = os.listdir(ruta+'/train')
+    dirsValidation = os.listdir(ruta+'/validation')
+    n_img_total = len(dirsTrain) + len(dirsValidation)
+    num_imagenes = [n_img_total, len(dirsTrain), len(dirsValidation)]
     return num_imagenes
 
 #*****************************************************************************************************#
@@ -1269,7 +1315,7 @@ def contarImagenes(request, id_Dataset):
 #*****************************************************************************************************#
 
 def cultivos(request): #función para redireccionar a la página donde se enlista todos los cultivos
-    cultivos = Cultivo.objects.all()
+    cultivos = Cultivo.objects.all().order_by('-id_Cultivo')
 
     context = perfil(request)
     context['direccion'] =  'Administrador / Cultivos'

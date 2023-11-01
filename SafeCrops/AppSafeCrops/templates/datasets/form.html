@@ -9,46 +9,42 @@
 
     <div class="mb-3 formulario__grupo" id="grupo__{{ campo.name }}"> 
 
-      {% if campo.name != 'numImgTotal' and campo.name != 'numImgEntrenamiento' and campo.name != 'numImgValidacion' and campo.name != 'estadoDataset' and campo.name != 'numImgPrueba' and campo.name != 'numClases' %}
+      <label for="" class="form-label">{{ campo.label }}</label>
+
+      {% if campo.name == 'segmentacion_SAM' %} <!-- Si el campo es segmenatación SAM -->
+
+        <select name="segmentacion_SAM" id="" class="form-select formulario__select" >
+          <option value="" selected>------ SELECCIONE ------</option>
+          <option value="Si">Si segmentar</option>
+          <option value="No">No segmentar</option>
+        </select>
         
-        <label for="" class="form-label">{{ campo.label }}</label>
+      {% elif campo.name == 'tipoDataset' %}
 
-      {% endif %}
+        {{ campo.form.tipoDataset }}
 
-      {% if campo.name != 'numImgTotal' and campo.name != 'numImgEntrenamiento' and campo.name != 'numImgValidacion' and campo.name != 'numImgPrueba' and campo.name != 'numClases' %}
+      {% elif campo.name == 'formatoImg' %}
 
-        {% if campo.name == 'segmentacion_SAM' %} <!-- Si el campo es segmenatación SAM -->
+        <select name="formatoImg" id="" class="form-select formulario__select" >
+          <option value="" selected>------ SELECCIONE ------</option>
+          <option value="jpg">JPG</option>
+          <option value="jpeg">JPEG</option>
+          <option value="png">PNG</option>
+          <option value="webp">WEBP</option>
+        </select>
 
-            <select name="segmentacion_SAM" id="" class="form-select formulario__select" >
-              <option value="" selected>------ SELECCIONE ------</option>
-              <option value="Si">Si segmentar</option>
-              <option value="No">No segmentar</option>
-            </select>
+      {% elif campo.name == 'estadoDataset' %}
 
-          {% elif campo.name == 'formatoImg' %}
+        <input type="hidden" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="Activo" /> 
 
-            <select name="formatoImg" id="" class="form-select formulario__select" >
-              <option value="" selected>------ SELECCIONE ------</option>
-              <option value="jpg">JPG</option>
-              <option value="jpeg">JPEG</option>
-              <option value="png">PNG</option>
-              <option value="webp">WEBP</option>
-            </select>
+      {% elif campo.name == 'ruta' %}
 
-          {% elif campo.name == 'estadoDataset' %}
+        <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value=""  accept=".zip" /> 
 
-            <input type="hidden" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="Activo" /> 
+      {% else %}
 
-          {% elif campo.name == 'ruta' %}
-
-            <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value=""  accept=".zip" /> 
-
-          {% else %}
-
-            <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" /> 
-          
-        {% endif %}
-
+        <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" /> 
+      
       {% endif %}
 
     </div>
@@ -56,23 +52,7 @@
     <div class="col-12 help-text" id="help-text-{{ campo.name }}">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
 
   {% endfor %}
-
-  <div class="mb-3 formulario__grupo" id="grupo__estructuraDataset">
-
-    <label for="" class="form-label">Seleccione la estructura que sigue su archivo .zip</label>
-
-    <select name="estructuraDataset" id="" class="form-select formulario__select">
-      <option value="" selected>------ SELECCIONE ------</option>
-      <option value="Construir_Si_Carpeta">Carpeta cualquiera > Carpeta Enfermedades > Imagenes</option>
-      <option value="Construir_No_Carpeta">Carpeta Enfermedades > Imagenes</option>
-      <option value="Construido_Si_Carpeta">Carpeta cualquiera > Carpetas train/validate/test > Carpeta Enfermedades > Imagenes</option>
-      <option value="Construido_No_Carpeta">Carpetas train/validate/test > Carpeta Enfermedades > Imagenes</option>
-    </select>
-
-  </div>
-
-  <div class="col-12 help-text" id="help-text-estructuraDataset">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
-
+  
   <input name="" id="" class="btn btn-success" type="submit" value="Enviar información"> <!-- Botón para enviar el formulario -->
   <a name="" id="" class="btn btn-primary" href="{% url 'datasets' %}" role="button">Cancelar</a> <!-- Botón para cancelar el formulario -->
 </form>

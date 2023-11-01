@@ -91,17 +91,17 @@
                                     {% if dataset.estadoDataset == "Inactivo" %}
                                         <div class="tooltip__div">
                                             <div class="tooltip">
-                                                <span class="tooltip__text">Eliminar</span>
-                                                <i class="fa-solid fa-sort-down"></i>
-                                            </div>
-                                            <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarDataset' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-trash"></i></a>
-                                        </div>
-                                        <div class="tooltip__div">
-                                            <div class="tooltip">
                                                 <span class="tooltip__text">Activar</span>
                                                 <i class="fa-solid fa-sort-down"></i>
                                             </div>
                                             <a name="" id="" class="btn btn-success" href="{% url 'activarDataset' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-check"></i></a>
+                                        </div>
+                                        <div class="tooltip__div">
+                                            <div class="tooltip">
+                                                <span class="tooltip__text">Eliminar</span>
+                                                <i class="fa-solid fa-sort-down"></i>
+                                            </div>
+                                            <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarDataset' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-trash"></i></a>
                                         </div>
                                     {% elif dataset.estadoDataset == "Activo" %}
                                         <div class="tooltip__div">
@@ -110,6 +110,13 @@
                                                 <i class="fa-solid fa-sort-down"></i>
                                             </div>
                                             <a name="" id="" class="btn btn-warning btnDeleteDataset" href="{% url 'desactivarDataset' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-ban"></i></a>
+                                        </div>
+                                        <div class="tooltip__div">
+                                            <div class="tooltip">
+                                                <span class="tooltip__text">Eliminar</span>
+                                                <i class="fa-solid fa-sort-down"></i>
+                                            </div>
+                                            <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarDataset' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-trash"></i></a>
                                         </div>
                                     {% endif %}
                                 </td>

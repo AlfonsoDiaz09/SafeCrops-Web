@@ -8,9 +8,9 @@
 const campos = {
     nombreDataset: false,
     ruta: false,
+    tipoDataset: false,
     segmentacion_SAM: false,
     formatoImg: false,
-    estructuraDataset: false,
 }
 
 export default campos;
