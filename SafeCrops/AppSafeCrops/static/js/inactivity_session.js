@@ -20,13 +20,35 @@ let logoutTimer;
 // Función para reiniciar el temporizador de cierre de sesión
 function resetLogoutTimer(){
     clearTimeout(logoutTimer);
-    logoutTimer = setTimeout(logout_redirect, 60000*15); // 15 min de inactividad (60,000 mls = 1 min)
+    setTimeout(logout_redirect, 60000*60); // 15 min de inactividad (60,000 mls = 1 min)
+    logoutTimer = 60000*60;
 }
 
+// Función para actualizar el contador regresivo
+function updateCountdown() {
+    const countdownElement = document.getElementById('countdown');
+    if (logoutTimer) {
+        logoutTimer -= 1000;
+        const minutos = Math.floor(logoutTimer / 60000); // 1 min = 60000 ms
+        var segundos = Math.floor((logoutTimer % 60000) / 1000); // segundos restantes
+        if (segundos >= 0 && segundos <= 9){
+            segundos = `0${segundos}`;
+        }
+        countdownElement.textContent = `Cierre de sesión en ${minutos} : ${segundos}`;
+    } else {
+        countdownElement.textContent = '';
+    }
+}
+
+
 // Registrar eventos para detectar la actividad del usuario
-document.addEventListener('mousemove', resetLogoutTimer);
-document.addEventListener('keypress', resetLogoutTimer);
-document.addEventListener('load', resetLogoutTimer);
+window.addEventListener('mousemove', resetLogoutTimer);
+window.addEventListener('click', resetLogoutTimer);
+window.addEventListener('keyup', resetLogoutTimer);
+window.addEventListener('load', resetLogoutTimer);
 
 // Iniciar temporizador de cierre de sesión al cargar la página
 resetLogoutTimer();
+
+// Actualizar el contador regresivo cada segundo
+setInterval(updateCountdown, 1000)

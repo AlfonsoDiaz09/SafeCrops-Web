@@ -100,7 +100,7 @@ class CultivoForm(forms.ModelForm):
 
 class Modelo_YOLOv7_Form(forms.ModelForm):
     datasetModelo_y7 = forms.ModelChoiceField(queryset=Dataset.objects.all().order_by('-id_Dataset'), label="Dataset", widget=forms.Select(attrs={'class':'form-select'})) # Se crea un campo de tipo ModelChoiceField
-
+    batch_size_y7 = forms.ChoiceField(choices=Batch_Size, widget=forms.Select(attrs={'class':'form-select formulario__select'}))
     class Meta:
         model = Modelo_YOLOv7
         fields = ['nombreModelo_y7', 'datasetModelo_y7', 'pesosModelo_y7', 'epocas_y7', 'batch_size_y7']
