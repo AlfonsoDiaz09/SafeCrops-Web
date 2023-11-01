@@ -129,9 +129,13 @@ class Dataset(models.Model):
 class Modelo_YOLOv7(models.Model):
     id_Modelo_y7 = models.AutoField(primary_key=True)
     nombreModelo_y7 = models.CharField(max_length=45, unique=True, verbose_name='Nombre del Modelo')
-    pesosModelo_y7 = models.FileField(max_length=100, upload_to='weights/yolov7/', verbose_name='Ruta de Pesos')
+    datasetModelo_y7 = models.ForeignKey(Dataset, on_delete=models.CASCADE, verbose_name='Dataset', related_name='y7Dataset')
+    pesosModelo_y7 = models.FileField(max_length=100, upload_to='weights/YOLOv7/', verbose_name='Ruta de Pesos')
     epocas_y7 = models.IntegerField(verbose_name="Número de épocas")
     batch_size_y7 = models.IntegerField(verbose_name="Batch Size")
+    accuracy_y7 = models.FloatField(verbose_name="Accuracy", null=True, blank=True)
+    loss_y7 = models.FloatField(verbose_name="Loss", null=True, blank=True)
+    ruta_resultados_y7 = models.CharField(max_length=100, verbose_name='Ruta de resultados', null=True, blank=True)
 
     def __str__(self):
         fila = self.nombreModelo_y7
