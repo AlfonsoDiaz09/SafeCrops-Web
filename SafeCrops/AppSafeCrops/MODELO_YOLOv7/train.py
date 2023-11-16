@@ -1,7 +1,7 @@
 import sys
 import wget
-sys.path.insert(1, 'D:/Programas/SafeCrops/SafeCrops-Web/SafeCrops/AppSafeCrops')
-from GLOBAL_VARIABLES import HOME
+#sys.path.insert(1, 'D:/Programas/SafeCrops/SafeCrops-Web/SafeCrops/AppSafeCrops')
+from ..GLOBAL_VARIABLES import HOME
 #print(HOME)
 
 import argparse

@@ -1463,7 +1463,7 @@ def seleccionarArquitectura(request):
                 
 
                 # Proceso para realizar el entrenamiento de YOLOv7 con parámetros
-                subprocess.call([sys.executable, '-m', 'train','--device', '0', '--batch-size', str(batch_size), '--epochs', str(epocas), '--img', '640', '640', '--data', 'data/custom_data.yaml', '--cfg', 'cfg/training/yolov7-tiny-custom.yaml', '--name', nombreYOLOv7, '--weights', 'yolov7-tiny.pt'])
+                subprocess.call([sys.executable, '-m', 'train','--device', 'cpu', '--batch-size', str(batch_size), '--epochs', str(epocas), '--img', '640', '640', '--data', 'data/custom_data.yaml', '--cfg', 'cfg/training/yolov7-tiny-custom.yaml', '--name', nombreYOLOv7, '--weights', 'yolov7-tiny.pt'])
                 formularioYOLOv7.save()
                 cd(HOME)
                 print(os.getcwd())
