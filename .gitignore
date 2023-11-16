@@ -6,5 +6,6 @@ weights/SAM/
 weights/Transformer/
 weights/YOLOv5/
 weights/YOLOv7/
+SafeCrops/weights/
 reportesPDF/
 MODELO_YOLOv7/runs/

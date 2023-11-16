@@ -1,0 +1,4 @@
+train: D:\Programas\SafeCrops\SafeCrops-Web\SafeCrops\datasets/Pruebota\train/
+val: D:\Programas\SafeCrops\SafeCrops-Web\SafeCrops\datasets/Pruebota\validation/
+nc: 2
+names: [ 'GLS', 'NLB' ]
