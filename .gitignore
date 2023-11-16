@@ -7,3 +7,4 @@ data/
 data_yolov5/
 weights_yolov5/
 reportesPDF/
+MODELO_YOLOv7/runs/
