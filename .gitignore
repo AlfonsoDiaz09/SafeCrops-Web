@@ -2,9 +2,9 @@ desktop.ini
 DJSafeCrops/
 SafeCrops/datasets/
 SafeCrops/modelos/
-weights/
-data/
-data_yolov5/
-weights_yolov5/
+weights/SAM/
+weights/Transformer/
+weights/YOLOv5/
+weights/YOLOv7/
 reportesPDF/
 MODELO_YOLOv7/runs/
