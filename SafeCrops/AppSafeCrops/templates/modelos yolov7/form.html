@@ -7,8 +7,10 @@
     <div class="mb-3"> <!-- Div para cada campo -->
 
       <label for="" class="form-label">{{ campo.label }} yolov7</label>
-      {% if campo.name == 'datasetModelo_transformer' %}
-        {{ campo.form.datasetModelo_transformer }}
+      {% if campo.name == 'datasetModelo_y7' %}
+        {{ campo.form.datasetModelo_y7 }}
+      {% elif campo.name == 'batch_size_y7' %}
+        {{ campo.form.batch_size_y7 }}
       {% else %}
         <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" /> 
       {% endif %}

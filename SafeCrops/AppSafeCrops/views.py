@@ -17,6 +17,10 @@ from django.views.generic import FormView
 from django.urls import reverse_lazy
 from .zip import Zip
 from .modelo_transformers import Transformer
+#from .MODELO_YOLOv7.train import YOLOv7
+import subprocess
+import sys
+from .GLOBAL_VARIABLES import cd, HOME, query_ruta_dataset
 import mysql.connector
 
 import smtplib
@@ -1391,6 +1395,9 @@ def seleccionarArquitectura(request):
         # formularioYOLOv5 = Modelo_YOLOv5_Form(request.POST, request.FILES)
         formularioYOLOv7 = Modelo_YOLOv7_Form(request.POST, request.FILES)
         formularioTransformer = Modelo_Transformer_Form(request.POST, request.FILES)
+
+        
+
         if formularioYOLOv7.is_valid() or formularioTransformer.is_valid():
             # if formularioYOLOv3.is_valid():
             #     formularioYOLOv3.save()
@@ -1400,8 +1407,56 @@ def seleccionarArquitectura(request):
             #     formularioYOLOv5.save()
             #     messages.success(request, f'Modelo YOLOv5 creado correctamente')
             #     return redirect('modelos')
+
             if formularioYOLOv7.is_valid():
+                # Valores obtenidos del formulario 
+                nombreYOLOv7 = formularioYOLOv7.cleaned_data['nombreModelo_y7']
+                nombreDataset = formularioYOLOv7.cleaned_data['datasetModelo_y7']
+                epocas = formularioYOLOv7.cleaned_data['epocas_y7']
+                batch_size = formularioYOLOv7.cleaned_data['batch_size_y7']
+
+                query_dataset = query_ruta_dataset(str(nombreDataset))
+
+                # Variables para documento .yaml
+                dir_train = os.path.join(str(query_dataset[0]), "train/")
+                dir_val = os.path.join(str(query_dataset[0]), "validation/")
+                n_clases = query_dataset[1]
+                nombres_clases = str(query_dataset[2]).split('[')
+                nombres_clases = str(nombres_clases[1]).split(']')
+                nombres_clases = str(nombres_clases[0])
+                print(os.getcwd())
+                cd("AppSafeCrops/MODELO_YOLOv7")
+
+                # Creación del archivo custom_data.yaml
+                file = open(os.path.join(HOME, "AppSafeCrops","MODELO_YOLOv7","data","custom_data.yaml"), "w")
+                print("Archivo creado")
+                file.write(f"train: {dir_train}" + os.linesep)
+                file.write(f"val: {dir_val}" + os.linesep)
+                file.write(f"nc: {n_clases}" + os.linesep)
+                file.write(f"names: [ {nombres_clases} ]" + os.linesep)
+                file.close()
+
+                # Modificar el archivo yolov7-tiny-custom
+                with open (os.path.join(HOME,"AppSafeCrops","MODELO_YOLOv7","cfg","training","yolov7-tiny-custom.yaml"),"r") as archivo:
+                    lineas = archivo.readlines()
+                
+                #Modificar la primer línea del archivo
+                lineas[0] = f"nc: {n_clases}"
+                print(lineas)
+
+                #Escribir el contenido actualizado al archivo
+                with open(os.path.join(HOME,"AppSafeCrops","MODELO_YOLOv7","cfg","training","yolov7-tiny-custom.yaml"),"w") as archivo:
+                    archivo.writelines(lineas)
+                    #archivo.seek(0)
+                    #archivo.writelines(lineas)
+                    #archivo.truncate()
+                
+
+                # Proceso para realizar el entrenamiento de YOLOv7 con parámetros
+                subprocess.call([sys.executable, '-m', 'train','--device', '0', '--batch-size', str(batch_size), '--epochs', str(epocas), '--img', '640', '640', '--data', 'data/custom_data.yaml', '--cfg', 'cfg/training/yolov7-tiny-custom.yaml', '--name', nombreYOLOv7, '--weights', 'yolov7-tiny.pt'])
                 formularioYOLOv7.save()
+                cd(HOME)
+                print(os.getcwd())
                 messages.success(request, f'Modelo YOLOv7 creado correctamente')
                 return redirect('modelos')
             if formularioTransformer.is_valid():
@@ -1441,7 +1496,9 @@ def crearModelo_YOLOv7(request):
 
     if request.method == 'POST':
         formulario = Modelo_YOLOv7_Form(request.POST, request.FILES)
+
         if formulario.is_valid():
+            
             formulario.save()
             messages.success(request, f'Modelo creado correctamente')
             return redirect('modelos')
