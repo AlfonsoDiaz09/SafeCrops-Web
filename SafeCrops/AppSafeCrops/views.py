@@ -8,7 +8,7 @@ from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required 
 from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Usuario, Cultivo, Modelo_YOLOv7, Modelo_Transformer
-from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm, ChangePasswordForm, EnfermedadForm, DatasetForm, CultivoForm, Modelo_YOLOv7_Form, Modelo_Transformer_Form
+from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm, ChangePasswordForm, EnfermedadForm, DatasetForm, CultivoForm, Modelo_YOLOv7_Form, Modelo_Transformer_Form, ReporteForm
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
@@ -16,8 +16,11 @@ from django.contrib import messages
 from django.views.generic import FormView
 from django.urls import reverse_lazy
 from .zip import Zip
+from .pdf import PDF
 from .modelo_transformers import Transformer
 import mysql.connector
+
+from .GLOBAL_VARIABLES import HOME
 
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -463,19 +466,22 @@ def perfil(request):
     #obtener el usuario logueado
     usuario = User.objects.get(id=id)
     #obtener el administrador logueado
-    administrador = Administrador.objects.get(user_id=usuario.id)
+    perfil = Administrador.objects.get(user_id=usuario.id)
     #obtener el nombre del administrador logueado
-    nombre = administrador.nombre
+    nombre = perfil.nombre
     #obtener el apellido del administrador logueado
-    apellidoP = administrador.apellidoP
+    apellidoP = perfil.apellidoP
     #obtener el correo del administrador logueado
-    correo = administrador.correo
+    correo = perfil.correo
     #obtener la foto del administrador logueado
-    imagen = '/imagenes/'+str(administrador.imagen)
+    imagen = '/imagenes/'+str(perfil.imagen)
 
     context = {
+               'id': id,
+               'usuario': usuario,
+               'perfil': perfil,
                'nombre': nombre, 
-               'apellido': apellidoP, 
+               'apellido': apellidoP,
                'correo': correo, 
                'imagen': imagen
               }
@@ -1315,11 +1321,14 @@ def contarImagenes(request, id_Dataset):
 #*****************************************************************************************************#
 
 def cultivos(request): #función para redireccionar a la página donde se enlista todos los cultivos
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+    
     cultivos = Cultivo.objects.all().order_by('-id_Cultivo')
 
     context = perfil(request)
     context['direccion'] =  'Administrador / Cultivos'
     context['cultivos'] = cultivos
+    context['regresar'] = 'http://{}/{}'.format(URL, 'Panel_administrador')
 
     return render(request, 'cultivos/indexC.html', context)
 
@@ -1372,8 +1381,8 @@ def eliminarCultivo(request, id_Cultivo):
 def modelos(request): #función para redireccionar a la página donde se enlista todos los modelos
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
 
-    modelosYOLOv7 = Modelo_YOLOv7.objects.all()
-    modelosTransformer = Modelo_Transformer.objects.all()
+    modelosYOLOv7 = Modelo_YOLOv7.objects.all().order_by('-id_Modelo_y7')
+    modelosTransformer = Modelo_Transformer.objects.all().order_by('-id_Modelo_transformer')
 
     context = perfil(request)
     context['direccion'] =  'Administrador / Modelos'
@@ -1385,6 +1394,7 @@ def modelos(request): #función para redireccionar a la página donde se enlista
 
 def seleccionarArquitectura(request):
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+    context = perfil(request)
 
     if request.method == 'POST':
         # formularioYOLOv3 = Modelo_YOLOv3_Form(request.POST, request.FILES)
@@ -1402,24 +1412,33 @@ def seleccionarArquitectura(request):
             #     return redirect('modelos')
             if formularioYOLOv7.is_valid():
                 formularioYOLOv7.save()
-                messages.success(request, f'Modelo YOLOv7 creado correctamente')
-                return redirect('modelos')
+                message = f'Modelo YOLOv7 creado correctamente'
             if formularioTransformer.is_valid():
                 nombreTransformer = formularioTransformer.cleaned_data['nombreModelo_transformer']
                 nombreDataset = formularioTransformer.cleaned_data['datasetModelo_transformer']
                 epocas = formularioTransformer.cleaned_data['epocas_transformer']
                 batch_size = formularioTransformer.cleaned_data['batch_size_transformer']
+                pesos = 'Predeterminados'
+                arquitectura = 'Transformer'
 
                 Transformer.training_model(nombreTransformer, nombreDataset, epocas, batch_size)
                 formularioTransformer.save()
-                messages.success(request, f'Modelo Transformer creado correctamente')
-                return redirect('modelos')
+
+                accuracy, loss = 0.95, 0.05
+
+                message = f'Modelo Transformer {nombreTransformer} creado correctamente'
+            
+            profile = context['perfil']
+            id = context['id']
+            print("ID USU: ",id)
+            sendEmailNewModel(request, profile, nombreTransformer, nombreDataset, epocas, batch_size, arquitectura, pesos, accuracy, loss)
+            messages.success(request, message)
+            return redirect('modelos')
         else:
             messages.error(request, 'Error al crear el modelo.')
             formularioYOLOv7 = Modelo_YOLOv7_Form()
             formularioTransformer = Modelo_Transformer_Form()
 
-            context = perfil(request)
             context['direccion'] =  'Administrador / Modelos / Arquitectura'
             context['formularioYOLOv7'] = formularioYOLOv7
             context['formularioTransformer'] = formularioTransformer
@@ -1428,7 +1447,6 @@ def seleccionarArquitectura(request):
         formularioYOLOv7 = Modelo_YOLOv7_Form()
         formularioTransformer = Modelo_Transformer_Form()
 
-        context = perfil(request)
         context['direccion'] =  'Administrador / Modelos / Arquitectura'
         context['formularioYOLOv7'] = formularioYOLOv7
         context['formularioTransformer'] = formularioTransformer
@@ -1512,3 +1530,127 @@ def crearModeloTransformer(request):
         context['regresar'] = 'http://{}/{}'.format(URL, 'modelos')
 
     return render(request, 'modelos/crear.html', context)
+
+
+#*****************************************************************************************************#
+#**********                 ENVIAR EMAIL DESPUES DE GENERAR UN NUEVO MODELO                 **********#
+#*****************************************************************************************************#
+
+def sendEmailNewModel(request, perfil, nombreModelo, nombreDataset, numEpocas, batchSize, arquitectura, pesos, accuracy, loss):
+    # Se obtienen los correos de los administradores y expertos
+    queryEmailAdmin = Administrador.objects.all()
+    queryEmailExperto = Experto.objects.all()
+
+    # Contruir el archivo PDF del reporte del modelo para adjuntarlo al correo
+    pdf_file_path = PDF.crear_reporte_por_modelo(arquitectura, nombreModelo, nombreDataset, pesos, numEpocas, batchSize, accuracy, loss)  # Ruta del archivo PDF a adjuntar
+    pdf_filename = os.path.basename(pdf_file_path)  # Nombre del archivo
+    pdf_content = open(pdf_file_path, 'rb').read()  # Leer el contenido del archivo PDF
+    
+    bandera = False
+    
+    for user in queryEmailAdmin:
+        mail = user.correo
+        print("Enviar correo a: ", mail)
+        URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+        
+        context={
+            'mail': mail,
+            'nombre': user.nombre,
+            'userType': perfil.userType,
+            'usuario': perfil.nombre,
+            'arquitectura': arquitectura,
+            'nombreModelo': nombreModelo,
+            'nombreDataset': nombreDataset,
+            'numEpocas': numEpocas,
+            'batchSize': batchSize,
+            'link_models': 'http://{}/modelos'.format(URL),
+            'link_home': 'http://{}'.format(URL)
+            }
+        #template = get_template('registration/send_email_reset_pwd.html')
+        content = render_to_string('modelos/send_email_new_model.html', context)
+        
+        email = EmailMultiAlternatives(
+            'Nuevo Modelo Safe Crops',
+            'SafeCrops',
+            settings.EMAIL_HOST_USER,#Origen
+            [mail],#Destinatarios
+
+        )
+        email.attach_alternative(content,'text/html')
+
+        # Adjuntar un archivo PDF
+        email.attach(pdf_filename, pdf_content, 'application/pdf')  # Adjuntar el archivo PDF
+
+        email.send()
+        messages.success(request, f'Correo enviado correctamente')
+        bandera = True
+
+    for user in queryEmailExperto:
+        mail = user.correo
+        print("Enviar correo a", mail)
+        URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+        
+        context={
+            'mail': mail,
+            'nombre': user.nombre,
+            'userType': perfil.userType,
+            'usuario': perfil.nombre,
+            'arquitectura': arquitectura,
+            'nombreModelo': nombreModelo,
+            'nombreDataset': nombreDataset,
+            'numEpocas': numEpocas,
+            'batchSize': batchSize,
+            'link_models': 'http://{}/modelos'.format(URL),
+            'link_home': 'http://{}'.format(URL)
+            }
+        # template = get_template('registration/send_email_reset_pwd.html')
+        content = render_to_string('modelos/send_email_new_model.html', context)
+        
+        email = EmailMultiAlternatives(
+            'Nuevo Modelo Safe Crops',
+            'SafeCrops',
+            settings.EMAIL_HOST_USER,#Origen
+            [mail],#Destinatarios
+
+        )
+        email.attach_alternative(content,'text/html')
+
+        # Adjuntar un archivo PDF
+        email.attach(pdf_filename, pdf_content, 'application/pdf')  # Adjuntar el archivo PDF
+
+        email.send()
+        messages.success(request, f'Correo enviado correctamente')
+        bandera = True
+
+    if bandera == False:
+        messages.error(request, f'El correo {mail} no existe en la base de datos')
+    return redirect('modelos')
+
+
+
+
+def reportes(request): #función para redireccionar a la página donde se enlista todos los modelos
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
+    formulario = ReporteForm(request.GET or None)
+
+    context = perfil(request)
+    context['direccion'] =  'Administrador / Generación de reportes'
+    context['formulario'] = formulario
+    context['regresar'] = 'http://{}/{}'.format(URL, 'Panel_administrador')
+
+    return render(request, 'reportes pdf/indexR.html', context)
+
+
+def generarReportesPDF(request): #función para redireccionar a la página donde se enlista todos los modelos
+    #URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
+    dataset = request.GET.get('dataset')
+    arquitectura = request.GET.get('arquitectura')
+    accuracyMin = request.GET.get('accuracyMinimo')
+    accuracyMax = request.GET.get('accuracyMaximo')
+    #reporte = PDF.createPDF(dataset, arquitectura, accuracyMin, accuracyMax)
+
+    messages.success(request, f'Reporte generado correctamente')
+    
+    return redirect('reportes')

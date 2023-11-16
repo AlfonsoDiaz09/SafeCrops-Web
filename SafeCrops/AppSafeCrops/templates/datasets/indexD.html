@@ -39,16 +39,13 @@
                 <table class="table table-primary">
                     <thead>
                         <tr>
-                            <th scope="col">ID</th>
                             <th scope="col">Nombre</th>
-                            <!-- <th scope="col">Ruta</th> -->
-                            <th scope="col"># Img Total</th>
-                            <th scope="col"># Img Train</th>
-                            <th scope="col"># Img Validate</th>
-                            <th scope="col"># Img Test</th>
-                            <th scope="col"># Clases</th>
-                            <th scope="col">Segmentacion</th>
-                            <th scope="col">Formato</th>
+                            <th scope="col">Img Total</th>
+                            <th scope="col">Img Train</th>
+                            <th scope="col">Img Validation</th>
+                            <th scope="col">Img Test</th>
+                            <th scope="col">Clases</th>
+                            <th scope="col">SAM</th>
                             <th scope="col">Estado</th>
                             <th scope="col" class="col-md-3">Acciones</th>
                         </tr>
@@ -56,16 +53,13 @@
                     <tbody>
                         {% for dataset in datasets %}
                             <tr class="">
-                                <td>{{ dataset.id_Dataset }}</td>
                                 <td>{{ dataset.nombreDataset }}</td>
-                                <!-- <td>{{ dataset.ruta }}</td> -->
                                 <td>{{ dataset.numImgTotal }}</td>
                                 <td>{{ dataset.numImgEntrenamiento }}</td>
                                 <td>{{ dataset.numImgValidacion }}</td>
                                 <td>{{ dataset.numImgPrueba }}</td>
                                 <td>{{ dataset.numClases }}</td>
                                 <td>{{ dataset.segmentacion_SAM }}</td>
-                                <td>{{ dataset.formatoImg }}</td>
                                 <td>
                                     {% if dataset.estadoDataset == "Activo" %}
                                         <span class="badge bg-success">Activo</span>

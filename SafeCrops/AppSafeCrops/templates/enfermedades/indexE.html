@@ -20,7 +20,6 @@
                 <table class="table table-primary">
                     <thead>
                         <tr>
-                            <th scope="col">ID</th>
                             <th scope="col">Enfermedad</th>
                             <th scope="col">Cultivo</th>
                             <th scope="col">Despripción</th>
@@ -31,7 +30,6 @@
                     <tbody>
                         {% for enfermedad in enfermedades %}
                             <tr class="">
-                                <td>{{ enfermedad.id_Enfermedad }}</td>
                                 <td>{{ enfermedad.nombreEnfermedad }}</td>
                                 <td>{{ enfermedad.cultivoEnfermedad }}</td>
                                 <td>{{ enfermedad.descripcionEnfermedad }}</td>

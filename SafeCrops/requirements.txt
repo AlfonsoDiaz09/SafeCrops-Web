@@ -25,3 +25,6 @@ datasets
 transformers
 scikit-learn #Activar Accuracy
 accelerate
+
+# PDF's ---------------------------------------
+reportlab

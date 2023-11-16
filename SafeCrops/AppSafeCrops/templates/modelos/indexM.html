@@ -23,10 +23,11 @@
                             <th scope="col">ID</th>
                             <th scope="col">Modelo</th>
                             <th scope="col">Nombre</th>
-                            <th scope="col">Ruta Pesos</th>
+                            <!-- <th scope="col">Ruta Pesos</th> -->
                             <th scope="col">Dataset</th>
                             <th scope="col"># Epocas</th>
                             <th scope="col">Batch Size</th>
+                            <th scope="col">Responsable</th>
                             <th scope="col">Acciones</th>
                         </tr>
                     </thead>
@@ -36,10 +37,11 @@
                                 <td>{{ modelo.id_Modelo_y7 }}</td>
                                 <td>YOLOv7</td>
                                 <td>{{ modelo.nombreModelo_y7 }}</td>
-                                <td>{{ modelo.pesosModelo_y7 }}</td>
+                                <!-- <td>{{ modelo.pesosModelo_y7 }}</td> -->
                                 <td></td>
                                 <td>{{ modelo.epocas_y7 }}</td>
                                 <td>{{ modelo.batch_size_y7 }}</td>
+                                <!-- <td>{{ modelo.user.username }}</td> -->
                                 <td>
                                     <div class="tooltip__div">
                                         <div class="tooltip">
@@ -63,10 +65,11 @@
                                 <td>{{ modelo.id_Modelo_transformer }}</td>
                                 <td>Transformer</td>
                                 <td>{{ modelo.nombreModelo_transformer }}</td>
-                                <td>{{ modelo.pesosModelo_transformer }}</td>
+                                <!-- <td>{{ modelo.pesosModelo_transformer }}</td> -->
                                 <td>{{ modelo.datasetModelo_transformer.nombreDataset }}</td>
                                 <td>{{ modelo.epocas_transformer }}</td>
                                 <td>{{ modelo.batch_size_transformer }}</td>
+                                <td>{{ modelo.user.username }}</td>
                                 <td>
                                     <div class="tooltip__div">
                                         <div class="tooltip">

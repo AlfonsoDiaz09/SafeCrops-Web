@@ -112,3 +112,14 @@ class Modelo_Transformer_Form(forms.ModelForm):
     class Meta:
         model = Modelo_Transformer
         fields = ['nombreModelo_transformer', 'datasetModelo_transformer', 'pesosModelo_transformer', 'epocas_transformer', 'batch_size_transformer']
+
+
+class TempDataset(forms.ModelChoiceField): # Se crea una clase para el campo de tipo ModelChoiceField
+    def label_from_instance(self, obj): # Se define el método label_from_instance
+        return obj.nombreDataset # Se retorna el valor que se va a mostrar en el campo
+
+class ReporteForm(forms.Form):
+    nombreDataset = TempDataset(queryset=Dataset.objects.all(), label="Dataset", widget=forms.Select(attrs={'class':'form-select formulario__select'}), empty_label='------ SELECCIONE ------') # Se crea un campo de tipo ModelChoiceField
+
+    class Meta:
+        fields = ['nombreDataset']

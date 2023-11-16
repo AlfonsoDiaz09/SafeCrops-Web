@@ -92,6 +92,11 @@
             margin-top: 20px;
         }
 
+        .datos_modelo{
+            text-align: left;
+            margin-left: 15%;
+        }
+
         .container__email__body > p > span{
             font-weight: 200;
             color: #0b8b27;
@@ -108,7 +113,8 @@
             text-decoration: none;
         }
 
-        .container__email__body .btn__restablecer{
+        .container__email__body .btn__restablecer,
+        .container__email__body .btn__modelos{
             margin: 60px 0 40px 0;
         }
 
@@ -124,22 +130,33 @@
             <div class="container__email__header">
                 <img src="https://raw.githubusercontent.com/Alfonso1311/SafeCrops-Web/develop/SafeCrops/AppSafeCrops/static/img/logoSafeCrops.png" title="logoSafeCrops">
                 <h1>SafeCrops</h1>
-                <p>Recuperación de contraseña</p>
-                <!-- <img src="{{ imagen_profile }}" title="imagen_profile">--><span>{{ mail }}</span> 
+                <p>Nuevo Modelo</p>
             </div>
             <hr class="hr">
             <div class="container__email__body">
                 <span><strong>Hola {{ nombre }}!</strong></span>
-                <p>Hemos recibido una solicitud para recuperar tu cuenta de <span><b>Safe Crops</b></span>. Para poder cambiar la contraseña de tu cuenta debes dar click en el boton cambiar contraseña y sigue los pasos para resetear tu contraseña.</p>
-                <div class="btn__restablecer">
-                    <a href="{{ link_resetpwd }}" class="btn btn-warning">Restablecer contraseña</a>
+                <p>
+                    El {{ userType }} <span><b>{{ usuario }}</b></span> ha generado un nuevo modelo con la arquitectura <span><b>{{ arquitectura }}</b></span>, este modelo fue entrenado con los siguientes parametros:
+                </p>
+                <p class="datos_modelo">
+                    <span><b>Nombre del modelo</b></span> : {{ nombreModelo }} <br>
+                    <span><b>Dataset</b></span> : {{ nombreDataset }} <br>
+                    <span><b>Numero de epocas</b></span> : {{ numEpocas }} <br>
+                    <span><b>Batch size</b></span> : {{ batchSize }} <br>
+                </p>
+                <p>
+                    Se adjunta documento con información más detallada acerca del modelo. <br><br>
+                    Para ver el modelo en la plataforma de <span>SafeCrops</span>, haga click en el siguiente botón: <br>
+                </p>
+                <div class="btn__modelos">
+                    <a href="{{ link_models }}" class="btn btn-warning">Ir a modelos</a>
                 </div>
                 <div class="btn__pagina_inicio">
                     <a href="{{ link_home }}" class="btn-home-web">O visite nuestro sitio web</a>
                 </div>
             </div>
             <div class="container__email__footer">
-                <p>Si no ha solicitado restablecer su contraseña, ignore este mensaje.</p>
+                <p>Este correo es únicamente con fines informativos, favor de no responder a este.</p>
             </div>
         </div>
     </div>

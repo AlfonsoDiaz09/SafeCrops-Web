@@ -155,6 +155,7 @@ class Modelo_Transformer(models.Model):
     accuracy_transformer = models.FloatField(verbose_name="Accuracy",  null=True, blank=True)
     loss_transformer = models.FloatField(verbose_name="Loss",  null=True, blank=True)
     ruta_resultados_transformer = models.CharField(max_length=100, verbose_name='Ruta de resultados',  null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='ID_Usuario', related_name='transformerUser', null=True, blank=True)
 
     def __str__(self):
         fila = self.nombreModelo_transformer

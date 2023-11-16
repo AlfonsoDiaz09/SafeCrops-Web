@@ -71,4 +71,7 @@ urlpatterns = [
     path('modelo/editar?id=<int:id_Modelo>', login_required(views.editarModelo_YOLOv7), name='editarModelo_YOLOv7'), #editar modelo YOLOv7
     path('eliminarModelo/?id=<int:id_Modelo>', login_required(views.eliminarModelo_YOLOv7), name='eliminarModelo_YOLOv7'), #eliminar modelo YOLOv7
 
+    path('reportes', login_required(views.reportes), name='reportes'), #consulta de reportes
+    path('reportes_generar', login_required(views.generarReportesPDF), name='generarReportes'), #consulta de reportes
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.MEDIA_URL_DATASET, document_root=settings.MEDIA_ROOT)

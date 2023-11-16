@@ -6,6 +6,7 @@ from datasets import load_metric
 from transformers import AutoImageProcessor
 from transformers import AutoModelForImageClassification, TrainingArguments, Trainer
 from transformers import pipeline
+from sklearn.metrics import f1_score
 from PIL import Image
 import requests
 
@@ -43,7 +44,7 @@ class Transformer:
         dir_dataset = (HOME+"/datasets/"+datasetName)
 
         dataset = load_dataset("imagefolder", data_dir=dir_dataset)
-        metric = load_metric("accuracy")
+        metric = load_metric("accuracy", "f1")
 
         print(dataset)
 
@@ -150,9 +151,14 @@ class Transformer:
         # predictions, which are the logits of the model as Numpy arrays,
         # and label_ids, which are the ground-truth labels as Numpy arrays.
         def compute_metrics(eval_pred):
-            """Computes accuracy on a batch of predictions"""
+            """Computes accuracy and F1 on a batch of predictions"""
             predictions = np.argmax(eval_pred.predictions, axis=1)
-            return metric.compute(predictions=predictions, references=eval_pred.label_ids)
+            accuracy = metric.compute(predictions=predictions, references=eval_pred.label_ids)['accuracy']
+            f1 = f1_score(eval_pred.label_ids, predictions, average='weighted')  # Puedes ajustar el average según tus necesidades
+            loss = eval_pred.loss
+            result_metrics = {"accuracy": accuracy, "f1": f1, "loss": loss}
+            print("METRIc_FA: ", result_metrics)
+            return result_metrics
 
         def collate_fn(examples):
             pixel_values = torch.stack([example["pixel_values"] for example in examples])

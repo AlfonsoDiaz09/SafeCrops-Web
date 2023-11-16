@@ -321,4 +321,7 @@ nav{
     .w-6_5{
         display: none;
     }
+    .brandSafeCrops > span{
+        display: none;
+    }
 }

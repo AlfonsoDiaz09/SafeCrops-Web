@@ -31,7 +31,6 @@
             document.querySelectorAll('.nav__span').forEach(span =>{
               span.style.display = "inline-block";
              })
-            // nav__span.style.display = "inline-flex";
           }
           if(nameClass == "w-18"){
             const header = document.getElementById("header");
@@ -42,9 +41,27 @@
             document.querySelectorAll('.nav__span').forEach(span =>{
               span.style.display = "none";
              })
-            // nav__span.style.display = "none";
           }
+
+          // Guardar la clase en el localStorage
+          localStorage.setItem("headerWidthClass", header.className);
       });
+
+      // Restaurar la clase desde el localStorage
+      const storedClass = localStorage.getItem("headerWidthClass");
+      if (storedClass) {
+        header.className = storedClass;
+        if (storedClass === "w-6_5") {
+          const header = document.getElementById("header");
+          const beforeHeader = document.querySelector(".before_header");
+
+          header.classList.replace("w-18", "w-6_5");
+          beforeHeader.style.width = "5.5%";
+          document.querySelectorAll('.nav__span').forEach(span =>{
+            span.style.display = "none";
+            })
+        }
+      }
 })();
 
 (function(){
@@ -90,12 +107,24 @@
             collapse.style.display = "none";
             collapseIcon.classList.replace("fa-chevron-down", "fa-chevron-right");
           }
+
+          // Guardar la clase en el localStorage
+          localStorage.setItem("userCollapseClass", userCollapse.className);
       });
+
+      // Restaurar la clase desde el localStorage
+      const storedClass = localStorage.getItem("userCollapseClass");
+      if (storedClass) {
+        userCollapse.className = storedClass;
+        if (storedClass === "displayFlex") {
+          const collapse = document.getElementById("userCollapse");
+          const collapseIcon = document.getElementById("row_collapse");
+          
+          collapse.classList.replace("displayNone", "displayFlex");
+          collapse.style.display = "flex";
+          collapse.style.flexDirection = "column";
+          collapseIcon.classList.replace("fa-chevron-right", "fa-chevron-down");
+        }
+      }
 })();
-
-
-  
-
-
-
 

@@ -22,25 +22,31 @@ class Zip:
             elif len(carpetas_enfermedades) < 2:
                 return 'error_numero_clases'
 
+            # Arreglos para almacenar la cantidad de imagenes totales y por cada division (train, validation, test)
             total_img_dataset = []
             train_img_dataset = []
             validate_img_dataset = []
             test_img_dataset = [0]
 
+            # Arreglo con extensiones de imagenes válidas
+            extensiones_imagen = ['.jpg', '.jpeg', '.png', '.webp']
+
             for division_carpetas in os.listdir(rutaDestino):
 
                 for enfermedad in os.listdir(os.path.join(rutaDestino, division_carpetas)):
-                    
                     # for i, archivo in enumerate(os.listdir(os.path.join(rutaDestino, division_carpetas, enfermedad))):
+
+                    directorio = os.path.join(rutaDestino, division_carpetas, enfermedad)
+                    # Lista de archivos en el directorio con extensiones de imagen
+                    archivos_imagen = [archivo for archivo in os.listdir(directorio) if any(archivo.endswith(ext) for ext in extensiones_imagen)]
+
+                    # Almacenar la cantidad de imagenes que existen por cada enfermedad
                     if(division_carpetas == 'train'):
-                        train_size = len(os.listdir(os.path.join(rutaDestino, division_carpetas, enfermedad)))
-                        train_img_dataset.append(train_size)
+                        train_img_dataset.append(len(archivos_imagen))
                     if(division_carpetas == 'validation'):
-                        validate_size = len(os.listdir(os.path.join(rutaDestino, division_carpetas, enfermedad)))
-                        validate_img_dataset.append(validate_size)
+                        validate_img_dataset.append(len(archivos_imagen))
                     if(division_carpetas == 'test'):
-                        test_size = len(os.listdir(os.path.join(rutaDestino, division_carpetas, enfermedad)))
-                        test_img_dataset.append(test_size)
+                        test_img_dataset.append(len(archivos_imagen))
                     
                         
                         # # Renombrar archivos
@@ -48,7 +54,8 @@ class Zip:
                         # ruta_archivo_nuevo = os.path.join(rutaDestino, division_carpetas, enfermedad, enfermedad + str(i) + '.' + formatoImg)
                         # os.rename(ruta_archivo, ruta_archivo_nuevo)
 
-                    total_img_dataset.append(len(os.listdir(os.path.join(rutaDestino, division_carpetas, enfermedad))))
+                    # Almacenar la cantidad de imagenes que existen para realizar un conteo total
+                    total_img_dataset.append(len(archivos_imagen))
 
             
 
