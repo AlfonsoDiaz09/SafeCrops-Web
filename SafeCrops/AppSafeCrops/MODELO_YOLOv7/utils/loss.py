@@ -783,12 +783,12 @@ class ComputeLossOTA:
                 matching_targets[i] = torch.cat(matching_targets[i], dim=0)
                 matching_anchs[i] = torch.cat(matching_anchs[i], dim=0)
             else:
-                matching_bs[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_as[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_gjs[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_gis[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_targets[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_anchs[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
+                matching_bs[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_as[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_gjs[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_gis[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_targets[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_anchs[i] = torch.tensor([], device='cpu', dtype=torch.int64)
 
         return matching_bs, matching_as, matching_gjs, matching_gis, matching_targets, matching_anchs           
 
@@ -1110,12 +1110,12 @@ class ComputeLossBinOTA:
                 matching_targets[i] = torch.cat(matching_targets[i], dim=0)
                 matching_anchs[i] = torch.cat(matching_anchs[i], dim=0)
             else:
-                matching_bs[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_as[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_gjs[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_gis[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_targets[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_anchs[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
+                matching_bs[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_as[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_gjs[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_gis[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_targets[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_anchs[i] = torch.tensor([], device='cpu', dtype=torch.int64)
 
         return matching_bs, matching_as, matching_gjs, matching_gis, matching_targets, matching_anchs       
 
@@ -1428,12 +1428,12 @@ class ComputeLossAuxOTA:
                 matching_targets[i] = torch.cat(matching_targets[i], dim=0)
                 matching_anchs[i] = torch.cat(matching_anchs[i], dim=0)
             else:
-                matching_bs[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_as[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_gjs[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_gis[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_targets[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_anchs[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
+                matching_bs[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_as[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_gjs[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_gis[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_targets[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_anchs[i] = torch.tensor([], device='cpu', dtype=torch.int64)
 
         return matching_bs, matching_as, matching_gjs, matching_gis, matching_targets, matching_anchs
 
@@ -1581,12 +1581,12 @@ class ComputeLossAuxOTA:
                 matching_targets[i] = torch.cat(matching_targets[i], dim=0)
                 matching_anchs[i] = torch.cat(matching_anchs[i], dim=0)
             else:
-                matching_bs[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_as[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_gjs[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_gis[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_targets[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
-                matching_anchs[i] = torch.tensor([], device='cuda:0', dtype=torch.int64)
+                matching_bs[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_as[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_gjs[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_gis[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_targets[i] = torch.tensor([], device='cpu', dtype=torch.int64)
+                matching_anchs[i] = torch.tensor([], device='cpu', dtype=torch.int64)
 
         return matching_bs, matching_as, matching_gjs, matching_gis, matching_targets, matching_anchs              
 

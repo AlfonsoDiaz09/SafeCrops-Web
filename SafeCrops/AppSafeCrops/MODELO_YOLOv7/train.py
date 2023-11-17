@@ -1,7 +1,7 @@
 import sys
 import wget
 sys.path.insert(1, '../')
-from GLOBAL_VARIABLES import HOME
+from GLOBAL_VARIABLES import HOME, cd
 
 print(HOME)
 
@@ -530,14 +530,6 @@ def train(hyp, opt, device, tb_writer=None):
     torch.cuda.empty_cache()
     return results
 
-# Función para cambiar de directorio con try except
-def cd(path):
-    try:
-        os.chdir(path)
-        print("Directorio actual: ", os.getcwd())
-    except:
-        print("Error al cambiar de directorio ", path)
-
 def download_weights():
     if not os.path.exists('yolov7.pt'):
         wget.download('https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7.pt')
@@ -551,7 +543,7 @@ def download_weights():
         
 
 if __name__ == '__main__':
-    weights_dir = os.path.join(HOME, 'AppSafeCrops', 'MODELO_YOLOv7')
+    weights_dir = HOME
     # os.makedirs(weights_dir, exist_ok=True)
     cd(weights_dir)
     download_weights()

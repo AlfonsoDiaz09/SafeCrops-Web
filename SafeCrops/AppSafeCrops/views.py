@@ -1452,7 +1452,7 @@ def seleccionarArquitectura(request):
                     archivo.close()
                 
                 #Modificar la primer línea del archivo
-                lineas[0] = f"nc: {n_clases}" + os.linesep
+                lineas[0] = f"nc: {n_clases}\n"
                 print(lineas)
 
                 #Escribir el contenido actualizado al archivo
