@@ -1,4 +1,6 @@
 desktop.ini
+custom_data.yaml
+yolov7-tiny-custom.yaml
 DJSafeCrops/
 SafeCrops/datasets/
 SafeCrops/modelos/

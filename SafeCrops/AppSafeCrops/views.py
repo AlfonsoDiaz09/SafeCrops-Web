@@ -1449,14 +1449,16 @@ def seleccionarArquitectura(request):
                 # Modificar el archivo yolov7-tiny-custom
                 with open (os.path.join(HOME,"AppSafeCrops","MODELO_YOLOv7","cfg","training","yolov7-tiny-custom.yaml"),"r") as archivo:
                     lineas = archivo.readlines()
+                    archivo.close()
                 
                 #Modificar la primer línea del archivo
-                lineas[0] = f"nc: {n_clases}"
+                lineas[0] = f"nc: {n_clases}" + os.linesep
                 print(lineas)
 
                 #Escribir el contenido actualizado al archivo
                 with open(os.path.join(HOME,"AppSafeCrops","MODELO_YOLOv7","cfg","training","yolov7-tiny-custom.yaml"),"w") as archivo:
                     archivo.writelines(lineas)
+                    archivo.close()
                     #archivo.seek(0)
                     #archivo.writelines(lineas)
                     #archivo.truncate()
