@@ -1,0 +1,6 @@
+train: D:\SafeCrops-Web\SafeCrops\datasets/DataCRSAM\train/
+val: D:\SafeCrops-Web\SafeCrops\datasets/DataCRSAM\validation/
+names:
+    0: GLS
+    1: NLB
+    2: NLS

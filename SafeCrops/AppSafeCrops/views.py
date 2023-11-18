@@ -7,8 +7,8 @@ from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required 
-from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Usuario, Cultivo, Modelo_YOLOv7, Modelo_Transformer
-from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm, ChangePasswordForm, EnfermedadForm, DatasetForm, CultivoForm, Modelo_YOLOv7_Form, Modelo_Transformer_Form, ReporteForm
+from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Usuario, Cultivo, Modelo_YOLOv5, Modelo_YOLOv7, Modelo_Transformer
+from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm, ChangePasswordForm, EnfermedadForm, DatasetForm, CultivoForm, Modelo_YOLOv5_Form, Modelo_YOLOv7_Form, Modelo_Transformer_Form, ReporteForm
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
@@ -1401,22 +1401,48 @@ def seleccionarArquitectura(request):
     context = perfil(request)
 
     if request.method == 'POST':
-        # formularioYOLOv3 = Modelo_YOLOv3_Form(request.POST, request.FILES)
-        # formularioYOLOv5 = Modelo_YOLOv5_Form(request.POST, request.FILES)
+        formularioYOLOv5 = Modelo_YOLOv5_Form(request.POST, request.FILES)
         formularioYOLOv7 = Modelo_YOLOv7_Form(request.POST, request.FILES)
         formularioTransformer = Modelo_Transformer_Form(request.POST, request.FILES)
 
         
 
-        if formularioYOLOv7.is_valid() or formularioTransformer.is_valid():
-            # if formularioYOLOv3.is_valid():
-            #     formularioYOLOv3.save()
-            #     messages.success(request, f'Modelo YOLOv3 creado correctamente')
-            #     return redirect('modelos')
-            # if formularioYOLOv5.is_valid():
-            #     formularioYOLOv5.save()
-            #     messages.success(request, f'Modelo YOLOv5 creado correctamente')
-            #     return redirect('modelos')
+        if formularioYOLOv5.is_valid() or formularioYOLOv7.is_valid() or formularioTransformer.is_valid():
+            if formularioYOLOv5.is_valid():
+                # Valores obtenidos del formulario 
+                nombreYOLOv5 = formularioYOLOv5.cleaned_data['nombreModelo_y5']
+                nombreDataset = formularioYOLOv5.cleaned_data['datasetModelo_y5']
+                epocas = formularioYOLOv5.cleaned_data['epocas_y5']
+                batch_size = formularioYOLOv5.cleaned_data['batch_size_y5']
+
+                query_dataset = query_ruta_dataset(str(nombreDataset))
+
+                # Variables para documento .yaml
+                dir_train = os.path.join(str(query_dataset[0]), "train/")
+                dir_val = os.path.join(str(query_dataset[0]), "validation/")
+                n_clases = query_dataset[1]
+                nombres_clases = query_dataset[2]
+                
+                print(os.getcwd())
+                cd("AppSafeCrops/MODELO_YOLOv5")
+
+                # Creación del archivo custom_data.yaml
+                file = open(os.path.join(HOME, "AppSafeCrops","MODELO_YOLOv5","data","custom_data.yaml"), "w")
+                print("Archivo creado")
+                file.write(f"train: {dir_train}\n")
+                file.write(f"val: {dir_val}\n")
+                file.write(f"names:\n")
+                for i in range(len(nombres_clases)):
+                    escribir = "    " + str(i) + ": " + str(nombres_clases[i])
+                    file.write(f"{escribir}\n")
+                file.close()
+
+                # Proceso para realizar el entrenamiento de YOLOv7 con parámetros
+                subprocess.call([sys.executable, '-m', 'train','--device', 'cpu', '--batch-size', str(batch_size), '--epochs', str(epocas), '--img', '640', '--data', 'data/custom_data.yaml', '--name', nombreYOLOv5, '--weights', 'yolov5n.pt'])
+
+                formularioYOLOv5.save()
+                messages.success(request, f'Modelo YOLOv5 creado correctamente')
+                return redirect('modelos')
 
             if formularioYOLOv7.is_valid():
                 # Valores obtenidos del formulario 
@@ -1440,10 +1466,10 @@ def seleccionarArquitectura(request):
                 # Creación del archivo custom_data.yaml
                 file = open(os.path.join(HOME, "AppSafeCrops","MODELO_YOLOv7","data","custom_data.yaml"), "w")
                 print("Archivo creado")
-                file.write(f"train: {dir_train}" + os.linesep)
-                file.write(f"val: {dir_val}" + os.linesep)
-                file.write(f"nc: {n_clases}" + os.linesep)
-                file.write(f"names: [ {nombres_clases} ]" + os.linesep)
+                file.write(f"train: {dir_train}\n")
+                file.write(f"val: {dir_val}\n")
+                file.write(f"nc: {n_clases}\n")
+                file.write(f"names: [ {nombres_clases} ]\n")
                 file.close()
 
                 # Modificar el archivo yolov7-tiny-custom
@@ -1494,18 +1520,22 @@ def seleccionarArquitectura(request):
             return redirect('modelos')
         else:
             messages.error(request, 'Error al crear el modelo.')
+            formularioYOLOv5 = Modelo_YOLOv5_Form()
             formularioYOLOv7 = Modelo_YOLOv7_Form()
             formularioTransformer = Modelo_Transformer_Form()
 
             context['direccion'] =  'Administrador / Modelos / Arquitectura'
+            context['formularioYOLOv5'] = formularioYOLOv5
             context['formularioYOLOv7'] = formularioYOLOv7
             context['formularioTransformer'] = formularioTransformer
             context['regresar'] = 'http://{}/{}'.format(URL, 'modelos')
     else:
+        formularioYOLOv5 = Modelo_YOLOv5_Form()
         formularioYOLOv7 = Modelo_YOLOv7_Form()
         formularioTransformer = Modelo_Transformer_Form()
 
         context['direccion'] =  'Administrador / Modelos / Arquitectura'
+        context['formularioYOLOv5'] = formularioYOLOv5
         context['formularioYOLOv7'] = formularioYOLOv7
         context['formularioTransformer'] = formularioTransformer
         context['regresar'] = 'http://{}/{}'.format(URL, 'modelos')

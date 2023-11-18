@@ -3,8 +3,6 @@ import wget
 sys.path.insert(1, '../')
 from GLOBAL_VARIABLES import HOME, cd
 
-print(HOME)
-
 import argparse
 import logging
 import math

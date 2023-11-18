@@ -125,7 +125,28 @@ class Dataset(models.Model):
     def delete(self, using=None, keep_parents=False):
         shutil.rmtree(self.ruta.name)
         super().delete()
-    
+
+class Modelo_YOLOv5(models.Model):
+    id_Modelo_y5 = models.AutoField(primary_key=True)
+    nombreModelo_y5 = models.CharField(max_length=45, unique=True, verbose_name='Nombre del Modelo')
+    datasetModelo_y5 = models.ForeignKey(Dataset, on_delete=models.CASCADE, verbose_name='Dataset', related_name='y5Dataset')
+    pesosModelo_y5 = models.FileField(max_length=100, upload_to='weights/YOLOv5/', verbose_name='Ruta de Pesos', null=True, blank=True)
+    epocas_y5 = models.IntegerField(verbose_name="Número de épocas")
+    batch_size_y5 = models.IntegerField(verbose_name="Batch Size")
+    accuracy_y5 = models.FloatField(verbose_name="Accuracy", null=True, blank=True)
+    loss_y5 = models.FloatField(verbose_name="Loss", null=True, blank=True)
+    f1Score_y5 = models.FloatField(verbose_name="F1 Score",  null=True, blank=True)
+    ruta_resultados_y5 = models.CharField(max_length=100, verbose_name='Ruta de resultados', null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='ID_Usuario', related_name='yolov5User', null=True, blank=True)
+
+    def __str__(self):
+        fila = self.nombreModelo_y5
+        return fila
+
+    def delete(self, using=None, keep_parents=False):
+        shutil.rmtree(self.ruta.name)
+        super().delete()
+
 class Modelo_YOLOv7(models.Model):
     id_Modelo_y7 = models.AutoField(primary_key=True)
     nombreModelo_y7 = models.CharField(max_length=45, unique=True, verbose_name='Nombre del Modelo')
@@ -135,7 +156,9 @@ class Modelo_YOLOv7(models.Model):
     batch_size_y7 = models.IntegerField(verbose_name="Batch Size")
     accuracy_y7 = models.FloatField(verbose_name="Accuracy", null=True, blank=True)
     loss_y7 = models.FloatField(verbose_name="Loss", null=True, blank=True)
+    f1Score_y5 = models.FloatField(verbose_name="F1 Score",  null=True, blank=True)
     ruta_resultados_y7 = models.CharField(max_length=100, verbose_name='Ruta de resultados', null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='ID_Usuario', related_name='yolov7User', null=True, blank=True)
 
     def __str__(self):
         fila = self.nombreModelo_y7
@@ -154,6 +177,7 @@ class Modelo_Transformer(models.Model):
     batch_size_transformer = models.IntegerField(verbose_name="Batch Size")
     accuracy_transformer = models.FloatField(verbose_name="Accuracy",  null=True, blank=True)
     loss_transformer = models.FloatField(verbose_name="Loss",  null=True, blank=True)
+    f1Score_transformer = models.FloatField(verbose_name="F1 Score",  null=True, blank=True)
     ruta_resultados_transformer = models.CharField(max_length=100, verbose_name='Ruta de resultados',  null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='ID_Usuario', related_name='transformerUser', null=True, blank=True)
 
