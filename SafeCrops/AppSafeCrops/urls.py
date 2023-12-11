@@ -67,11 +67,18 @@ urlpatterns = [
 
     path('modelos', login_required(views.modelos), name='modelos'), #consulta de modelos
     path('modelo/arquitectura', login_required(views.seleccionarArquitectura), name='seleccionarArquitectura'),
-    path('modelo/crear', login_required(views.crearModelo_YOLOv7), name='crearModelo_YOLOv7'), #crear modelo YOLOv7
-    path('modelo/editar?id=<int:id_Modelo>', login_required(views.editarModelo_YOLOv7), name='editarModelo_YOLOv7'), #editar modelo YOLOv7
-    path('eliminarModelo/?id=<int:id_Modelo>', login_required(views.eliminarModelo_YOLOv7), name='eliminarModelo_YOLOv7'), #eliminar modelo YOLOv7
+    #path('modelo/crear', login_required(views.crearModelo_YOLOv7), name='crearModelo_YOLOv7'), #crear modelo YOLOv7
+    #path('modelo/editar?id=<int:id_Modelo>', login_required(views.editarModelo_YOLOv7), name='editarModelo_YOLOv7'), #editar modelo YOLOv7
+    path('eliminarModelo/YOLOv5/?id=<int:id_Modelo>', login_required(views.eliminarModelo_YOLOv5), name='eliminarModelo_YOLOv5'), #eliminar modelo YOLOv5
+    path('eliminarModelo/YOLOv7/?id=<int:id_Modelo>', login_required(views.eliminarModelo_YOLOv7), name='eliminarModelo_YOLOv7'), #eliminar modelo YOLOv7
+    path('eliminarModelo/Transformer/?id=<int:id_Modelo>', login_required(views.eliminarModelo_Transformer), name='eliminarModelo_Transformer'), #eliminar modelo eliminarModelo_Transformer
 
     path('reportes', login_required(views.reportes), name='reportes'), #consulta de reportes
     path('reportes_generar', login_required(views.generarReportesPDF), name='generarReportes'), #consulta de reportes
+
+    path('segmentacion_SAM/?id=<int:id_Dataset>', login_required(views.generarSegmentacionSAM), name='generarSegmentacionSAM'), #Segmentar imagenes
+    
+    path('homogeneizacion_YIQ/?id=<int:id_Dataset_homogeneizar>', login_required(views.homogeneizacion_YIQ), name='homogeneizacionYIQ'), #Segmentar imagenes
+    path('generar_homogeneizacion_YIQ', login_required(views.generarHomogeneizacionYIQ), name='generarHomogeneizacionYIQ'), #Segmentar imagenes
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.MEDIA_URL_DATASET, document_root=settings.MEDIA_ROOT)

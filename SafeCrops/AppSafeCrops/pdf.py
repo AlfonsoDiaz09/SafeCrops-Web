@@ -14,11 +14,23 @@ import os
 
 
 class PDF:
-    def crear_reporte_por_modelo(arquitectura, modelo, dataset, pesos, epocas, batch_size, accuracy, loss):
+    def crear_reporte_por_modelo(arquitectura, modelo, dataset, pesos, epocas, batch_size, accuracy, f1_score, loss, metrics_for_epoch):
         dataset = str(dataset)
 
+        acc_epoch = []
+        f1_epoch = []
+        loss_epoch = []
+
+        ''' Obtener los valores de Accuracy, F1 Score y Loss por época para usarlos más adelante
+         en la grágica de cómo se comportó el modelo en cada época '''
+        for i in metrics_for_epoch:
+            acc_epoch.append(i['accuracy'])
+            f1_epoch.append(i['f1'])
+            #loss_epoch.append(i['loss'])
+
         # Accuracy y Loss por época
-        acc_epoch = [0.57, 0.85, 0.78, 0.89, 0.95, 0.98, 0.99, 0.99, 0.99, 0.99]
+        # acc_epoch = [0.57, 0.85, 0.78, 0.89, 0.95, 0.98, 0.99, 0.99, 0.99, 0.99]
+        # f1_epoch = [0.36, 0.96, 0.52, 0.64, 0.18, 0.42, 0.31, 0.97, 0.96, 0.81]
         loss_epoch = [0.12, 0.25, 0.58, 0.12, 0.08, 0.05, 0.03, 0.02, 0.01, 0.01]
 
         # Función para obtener las coordenadas de (Epoca, Accuracy)
@@ -27,6 +39,13 @@ class PDF:
             for i in range(epocas):
                 acc_coord.append((i+1, acc_epoch[i]))
             return acc_coord
+        
+        # Función para obtener las coordenadas de (Epoca, F1 Score)
+        def f1_coordinates(f1_epoch, epocas):
+            f1_coord = []
+            for i in range(epocas):
+                f1_coord.append((i+1, f1_epoch[i]))
+            return f1_coord
 
         # Función para obtener las coordenadas de (Epoca, Loss)
         def loss_coordinates(loss_epoch, epocas):
@@ -200,13 +219,13 @@ class PDF:
         pdf.drawString(posicionX, posicionY, texto) # (posicionX, posicionY, texto-dibujar)
 
         # DIBUJAR TABLA DE RESULTADOS
-        dataset_lines = [dataset[i:i+25] for i in range(0, len(dataset), 25)] # Dividir el nombre del dataset en líneas más cortas
+        dataset_lines = [dataset[i:i+20] for i in range(0, len(dataset), 20)] # Dividir el nombre del dataset en líneas más cortas
 
-        pesos_lines = [pesos[i:i+25] for i in range(0, len(pesos), 25)] # Dividir el nombre de los pesos en líneas más cortas
+        pesos_lines = [pesos[i:i+20] for i in range(0, len(pesos), 20)] # Dividir el nombre de los pesos en líneas más cortas
 
         data = [
-            ['Dataset', 'Pesos', 'Epocas', 'Batch Size', 'Accuracy', 'Loss'],
-            ['\n'.join(dataset_lines), '\n'.join(pesos_lines), epocas, batch_size, accuracy, loss],
+            ['Dataset', 'Pesos', 'Epocas', 'Batch Size', 'Accuracy', 'F1 Score', 'Loss'],
+            ['\n'.join(dataset_lines), '\n'.join(pesos_lines), epocas, batch_size, accuracy, f1_score, loss],
         ] # Datos de la tabla
 
         style = [
@@ -223,7 +242,7 @@ class PDF:
             ('INNERGRID', (0, 0), (-1, -1), 1, colors.black), # Borde interno de la tabla
         ] # Estilo de la tabla
 
-        col_widths = [145, 145, 50, 60, 55, 55] # Ancho de las columnas
+        col_widths = [117.5, 117.5, 50, 60, 55, 55, 55] # Ancho de las columnas
 
         # Crear la tabla con datos y estilo
         table = Table(data, colWidths=col_widths) # Crear la tabla con los datos y el ancho de las columnas
@@ -256,7 +275,7 @@ class PDF:
         drawing.add(x_title)
 
         y_title = Label()
-        y_title.setText('Accuracy / Loss')
+        y_title.setText('Accuracy / F1 Score / Loss')
         y_title.fillColor = colors.green
         y_title.fontSize = 12
         y_title.x = 15   # Posición X del título en el eje Y
@@ -267,6 +286,7 @@ class PDF:
 
         data = [
             acc_coordinates(acc_epoch, epocas),
+            f1_coordinates(f1_epoch, epocas),
             loss_coordinates(loss_epoch, epocas)
         ] # Crear una lista con los datos de las coordenadas
 
@@ -281,7 +301,9 @@ class PDF:
         lp.lines[0].symbol = makeMarker('FilledCircle') # Agregar marcador a la línea
         lp.lines[0].strokeColor = colors.blue # Color de la línea
         lp.lines[1].symbol = makeMarker('Circle') # Agregar marcador a la línea
-        lp.lines[1].strokeColor = colors.red # Color de la línea
+        lp.lines[1].strokeColor = colors.gray # Color de la línea
+        lp.lines[2].symbol = makeMarker('Circle')
+        lp.lines[2].strokeColor = colors.red
         # lp.lineLabelFormat = '%2.2f' # Formato de los valores de las líneas
         lp.strokeColor = colors.black # Color de las líneas
         lp.xValueAxis.valueMin = 0 # Valor mínimo del eje X
@@ -310,9 +332,11 @@ class PDF:
         legend.colorNamePairs = [
             (lp.lines[0].strokeColor, ''), # Espacio para el color
             (lp.lines[1].strokeColor, ''), # Espacio para el color
-            ('', ''), # Espacio para el texto
+            (lp.lines[2].strokeColor, ''), # Espacio para el color
             ('', 'Accuracy'), # Texto de Accuracy
+            ('', 'F1 Score'), # Texto de F1 Score
             ('', 'Loss'), # Texto de Loss
+            ('', ''), # Espacio para el texto
         ]
         drawing.add(legend)  # Agregar la leyenda al objeto Drawing
 

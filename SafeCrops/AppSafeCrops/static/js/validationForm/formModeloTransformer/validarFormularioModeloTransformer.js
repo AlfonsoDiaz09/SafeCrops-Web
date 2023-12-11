@@ -4,7 +4,7 @@ import validarCampoText from "../camposValidate/campoText/validarCampoText.js";
 import validarCampoFile from "../camposValidate/campoFile/validarCampoFile.js";
 import validarCampoSelect from "../camposValidate/campoSelect/validarCampoSelect.js";
 
-const validarFormularioDataset = (e) => {
+const validarFormularioModeloTransformer = (e) => {
     switch (e.target.name){
         case "nombreModelo_transformer":
             validarCampoText(expresiones.nombreModelo_transformer, e.target, e.target.name, errores.error_nombreModelo_transformer);
@@ -28,4 +28,4 @@ const validarFormularioDataset = (e) => {
     }
 }
 
-export default validarFormularioDataset;
+export default validarFormularioModeloTransformer;

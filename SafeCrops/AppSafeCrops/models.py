@@ -7,6 +7,8 @@ from django.dispatch import receiver #Libreria para usar la tabla usuarios por d
 from django.db.models.signals import post_save #Libreria para usar la tabla usuarios por defecto de Django
 from django.utils import timezone
 import shutil
+import os
+from .GLOBAL_VARIABLES import HOME
 
 # Create your models here.
 
@@ -114,7 +116,8 @@ class Dataset(models.Model):
     numImgValidacion = models.IntegerField(verbose_name='Número de imágenes de validación', null=True, blank=True)
     numImgPrueba = models.IntegerField(verbose_name='Número de imágenes de prueba', null=True, blank=True)
     numClases = models.IntegerField(verbose_name='Número de clases', null=True, blank=True)
-    segmentacion_SAM = models.CharField(max_length=5, verbose_name='Segmentación SAM')
+    segmentacion_SAM = models.CharField(max_length=5, verbose_name='El dataset está segmentado con SAM')
+    homogenizacion_YIQ = models.CharField(max_length=5, verbose_name='El dataset está homogenizado con YIQ')
     formatoImg = models.CharField(max_length=10, verbose_name='Formato de las imágenes')
     estadoDataset = models.CharField(max_length=10, verbose_name='Estado del dataset', default='Activo')
 
@@ -123,7 +126,36 @@ class Dataset(models.Model):
         return fila
 
     def delete(self, using=None, keep_parents=False):
-        shutil.rmtree(self.ruta.name)
+        nombreDataset = self.ruta.name
+        splitNombreDataset = nombreDataset.split('_')
+        for i in range(len(splitNombreDataset)):
+            if splitNombreDataset[i] != 'SAM' and splitNombreDataset[i] != 'YIQ':
+                nombreDataset = splitNombreDataset[i]
+                print(f"Nombre del dataset a eliminar: {nombreDataset}")
+                break
+        print("NOMBRE: ", nombreDataset)
+        try:
+            shutil.rmtree(os.path.join(HOME, 'datasets', nombreDataset))
+            print(f"Se eliminó el dataset {nombreDataset}")
+        except:
+            print(f"No se encontró el dataset {nombreDataset}")
+        try:
+            shutil.rmtree(os.path.join(HOME, 'datasets', nombreDataset+'_SAM_YIQ'))
+        except:
+            print(f"No se encontró el dataset {nombreDataset+'_SAM_YIQ'}")
+        try:
+            shutil.rmtree(os.path.join(HOME, 'datasets', nombreDataset+'_YIQ_SAM'))
+        except:
+            print(f"No se encontró el dataset {nombreDataset+'_YIQ_SAM'}")
+        try:
+            shutil.rmtree(os.path.join(HOME, 'datasets', nombreDataset+'_SAM'))
+        except:
+            print(f"No se encontró el dataset {nombreDataset+'_SAM'}")
+        try:
+            shutil.rmtree(os.path.join(HOME, 'datasets', nombreDataset+'_YIQ'))
+        except:
+            print(f"No se encontró el dataset {nombreDataset+'_YIQ'}")
+
         super().delete()
 
 class Modelo_YOLOv5(models.Model):
@@ -144,7 +176,8 @@ class Modelo_YOLOv5(models.Model):
         return fila
 
     def delete(self, using=None, keep_parents=False):
-        shutil.rmtree(self.ruta.name)
+        if self.ruta_resultados_y5 != None:
+            shutil.rmtree(self.ruta_resultados_y5.name)
         super().delete()
 
 class Modelo_YOLOv7(models.Model):
@@ -165,10 +198,11 @@ class Modelo_YOLOv7(models.Model):
         return fila
 
     def delete(self, using=None, keep_parents=False):
-        shutil.rmtree(self.ruta.name)
+        if self.ruta_resultados_y7 != None:
+            shutil.rmtree(self.ruta_resultados_y7.name)
         super().delete()
 
-class Modelo_Transformer(models.Model):
+class Modelo_Transformer(models.Model): # Clase para el modelo Transformer que contiene los campos que se van a registrar en la base de datos
     id_Modelo_transformer = models.AutoField(primary_key=True)
     nombreModelo_transformer = models.CharField(max_length=45, unique=True, verbose_name='Nombre del Modelo')
     datasetModelo_transformer = models.ForeignKey(Dataset, on_delete=models.CASCADE, verbose_name='Dataset', related_name='transformerDataset')
@@ -181,10 +215,12 @@ class Modelo_Transformer(models.Model):
     ruta_resultados_transformer = models.CharField(max_length=100, verbose_name='Ruta de resultados',  null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='ID_Usuario', related_name='transformerUser', null=True, blank=True)
 
-    def __str__(self):
-        fila = self.nombreModelo_transformer
-        return fila
+    def __str__(self): #Se crea el método __str__ para que al momento de mostrar el objeto en la consola se muestre el nombre del modelo
+        fila = self.nombreModelo_transformer #Se crea la variable fila que es una cadena de caracteres
+        return fila #Se retorna la variable fila
 
-    def delete(self, using=None, keep_parents=False):
-        shutil.rmtree(self.ruta.name)
-        super().delete()
+    def delete(self, using=None, keep_parents=False): #Se sobreescribe el método delete para que no se elimine el usuario de django
+        shutil.rmtree(os.path.join(HOME, 'modelos', 'transformer', self.nombreModelo_transformer+"-finetuned"))
+        if self.ruta_resultados_transformer != None: #Se verifica que la ruta de resultados no sea nula
+            shutil.rmtree(self.ruta_resultados_transformer.name) #Se elimina la carpeta de resultados
+        super().delete() #Se llama al método delete de la clase padre (Model)

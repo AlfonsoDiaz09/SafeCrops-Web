@@ -86,13 +86,13 @@
 
 
 (function(){
-  const btnCollapse = document.getElementById("iconCollapse");
+  const btnCollapse = document.getElementById("iconCollapse-user");
 
       btnCollapse.addEventListener('click', (e) => {
           const nameClass = document.getElementById("userCollapse").className;
           if(nameClass == "displayNone"){
             const collapse = document.getElementById("userCollapse");
-            const collapseIcon = document.getElementById("row_collapse");
+            const collapseIcon = document.getElementById("row_collapse-user");
 
             collapse.classList.replace("displayNone", "displayFlex");
             collapse.style.display = "flex";
@@ -101,7 +101,7 @@
           }
           if(nameClass == "displayFlex"){
             const collapse = document.getElementById("userCollapse");
-            const collapseIcon = document.getElementById("row_collapse");
+            const collapseIcon = document.getElementById("row_collapse-user");
 
             collapse.classList.replace("displayFlex", "displayNone");
             collapse.style.display = "none";
@@ -118,7 +118,7 @@
         userCollapse.className = storedClass;
         if (storedClass === "displayFlex") {
           const collapse = document.getElementById("userCollapse");
-          const collapseIcon = document.getElementById("row_collapse");
+          const collapseIcon = document.getElementById("row_collapse-user");
           
           collapse.classList.replace("displayNone", "displayFlex");
           collapse.style.display = "flex";
@@ -128,3 +128,76 @@
       }
 })();
 
+// Aplicar estilo al contenedor del checkbox seleccionado
+(function(){
+  console.log("Hola");
+  const checkboxes = document.querySelectorAll("#container_referencia input[type='checkbox']");
+  console.log(checkboxes);
+
+  checkboxes.forEach((input) => {
+    console.log(input);
+    input.addEventListener('click', (e) => {
+      console.log("target");
+      console.log(e.target.parentElement.parentElement.parentElement);
+      const container_img = e.target.parentElement.parentElement.parentElement;
+      const container_check = e.target.parentElement.querySelector("input");
+      const icon_check = e.target.nextElementSibling;
+      console.log(icon_check);
+
+      // Desactivar todos los demás checkboxes
+      checkboxes.forEach((otherCheckbox) => {
+        if (otherCheckbox !== input) {
+          otherCheckbox.checked = false;
+          const otherContainer_img = otherCheckbox.parentElement.parentElement.parentElement;
+          const otherContainer_check = otherCheckbox.parentElement.querySelector("input");
+          const otherIcon_check = otherCheckbox.nextElementSibling;
+
+          otherContainer_img.classList.remove("container__img_selected");
+          otherContainer_check.style.opacity = "0";
+          otherIcon_check.style.display = "none";
+          otherIcon_check.style.opacity = "0";
+        }
+      });
+
+      // Activar el checkbox seleccionado
+      container_img.classList.toggle("container__img_selected");
+
+      // container_check.style.opacity = "1";
+      // icon_check.style.display = "block";
+      // icon_check.style.opacity = "1";
+
+      if (container_check.checked) {
+        container_check.style.opacity = "1";
+        icon_check.style.display = "block";
+        icon_check.style.opacity = "1";
+      } else {
+        container_check.style.opacity = "0";
+        icon_check.style.display = "none";
+        icon_check.style.opacity = "0";
+      }
+
+
+    });
+    container = input.parentElement.parentElement.parentElement;
+    // Mostrar el checkbox solo cuando el mouse está sobre su contenedor
+    container.addEventListener('mouseenter', (e) => {
+      const container_check = e.target.children[0].children[0].children[0];
+      console.log("probando");
+      console.log(container_check);
+      const icon_check = e.target.children[0].children[0].children[1];
+      console.log("probando 2");
+      console.log(icon_check);
+      container_check.style.opacity = "1";
+      icon_check.style.opacity = "1";
+    });
+
+    container.addEventListener('mouseleave', (e) => {
+      const container_check = e.target.children[0].children[0].children[0];
+      const icon_check = e.target.children[0].children[0].children[1];
+      if (!container_check.checked) {
+        container_check.style.opacity = "0";
+        icon_check.style.opacity = "0";
+      }
+    });
+  });
+})();

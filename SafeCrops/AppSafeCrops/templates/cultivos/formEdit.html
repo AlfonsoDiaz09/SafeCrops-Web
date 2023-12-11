@@ -1,20 +1,23 @@
 <link rel="stylesheet" href="../static/css/base.css">
+<link rel="stylesheet" href="../static/css/validationForm.css">
 
-<form enctype="multipart/form-data" method="post">
+<form enctype="multipart/form-data" method="post" id="formulario__editar-cultivo" data-formulario>
   {% csrf_token %}
   {% for campo in formulario %}
 
-    <div class="mb-3">
+    <div class="mb-3 formulario__grupo" id="grupo__{{ campo.name }}">
 
       <label for="" class="form-label">{{ campo.label }}</label>
-      <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ campo.value }}" />
+      <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ campo.value }}" />
     
     </div>
 
-    <div class="col-12 help-text">{{ campo.errors }}</div>
+    <div class="col-12 help-text" id="help-text-{{ campo.name }}">{{ campo.errors }}</div>
 
   {% endfor %}
   
   <input name="" id="" class="btn btn-success" type="submit" value="Enviar información">
   <a name="" id="" class="btn btn-primary" href="{% url 'cultivos' %}" role="button">Cancelar</a>
 </form>
+
+<script type="module" src="../../static/js/validationForm/validation.js"></script>

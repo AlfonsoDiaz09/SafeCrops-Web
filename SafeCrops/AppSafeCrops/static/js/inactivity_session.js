@@ -20,8 +20,8 @@ let logoutTimer;
 // Función para reiniciar el temporizador de cierre de sesión
 function resetLogoutTimer(){
     clearTimeout(logoutTimer);
-    setTimeout(logout_redirect, 60000*60); // 15 min de inactividad (60,000 mls = 1 min)
-    logoutTimer = 60000*60;
+    setTimeout(logout_redirect, 60000*15); // 15 min de inactividad (60,000 mls = 1 min)
+    logoutTimer = 60000*15;
 }
 
 // Función para actualizar el contador regresivo

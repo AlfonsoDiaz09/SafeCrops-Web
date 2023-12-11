@@ -1,24 +1,25 @@
 <link rel="stylesheet" href="../static/css/base.css">
+<link rel="stylesheet" href="../static/css/validationForm.css">
 
-<form enctype="multipart/form-data" method="post">
+<form enctype="multipart/form-data" method="post" id="formulario__editar-administrador" data-formulario>
   {% csrf_token %} <!-- Token de seguridad -->
   <!-- Formulario de editar administrador -->
   {% for campo in formularioAdministrador %}
 
-    <div class="mb-3">
+    <div class="mb-3 formulario__grupo" id="grupo__{{ campo.name }}">
 
       {% if campo.name != 'userType' and campo.name != 'id_Administrador' %}
         <label for="" class="form-label">{{ campo.label }}</label>
       {% endif %}
       
       {% if campo.name == 'id_Administrador' %} <!-- Si el campo es id_Administrador no mostramos nada -->
-        <input type="hidden" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ administrador.id_Administrador }}" />
+        <input type="hidden" class="form-control formulario__input" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ administrador.id_Administrador }}" />
         
         {% elif campo.name == 'fechaNac' %}
-          <input type="date" class="form-control" name="{{ campo.name }}" id="upload_img" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ campo.value|date:'Y-m-d' }}" />
+          <input type="date" class="form-control formulario__input" name="{{ campo.name }}" id="upload_img" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ campo.value|date:'Y-m-d' }}" />
 
         {% elif campo.name == 'imagen' %}
-          <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" accept="image/*" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
+          <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" id="" accept="image/*" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
 
         {% elif campo.name == 'userType' %}
           <input type="hidden" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="Administrador" />  
@@ -27,7 +28,7 @@
           <input type="hidden" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ administrador.user_id }}" />
 
         {% else %}
-          <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ campo.value }}" />
+          <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{% if campo.value == None %}{% else %}{{ campo.value }}{% endif %}" />
     
       {% endif %}
 
@@ -40,27 +41,32 @@
 
     </div>
 
-    <div class="col-12 help-text">{{ campo.errors }}</div>
+    <div class="col-12 help-text" id="help-text-{{ campo.name }}">{{ campo.errors }}</div>
 
   {% endfor %}
 
   <!-- Formulario de usuario -->
   {% for campo in formularioUsuario %}
 
-    <div class="mb-3">
+    <div class="mb-3 formulario__grupo" id="grupo__{{ campo.name }}">
 
       {% if campo.field.widget.input_type != 'password' %}
         <label for="" class="form-label">{{ campo.label }}</label>
-        <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ campo.value }}" />
+        <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" id="{{ campo.name}}" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ campo.value }}" />
       
       {% endif %}
 
     </div>
 
-    <div class="col-12 help-text">{{ campo.errors }}</div>
+    <div class="col-12 help-text" id="help-text-{{ campo.name }}">{{ campo.errors }}</div>
 
   {% endfor %}
 
   <input name="" id="" class="btn btn-success" type="submit" value="Enviar información">
   <a name="" id="" class="btn btn-primary" href="{% url 'administradores' %}" role="button">Cancelar</a>
 </form>
+
+<!-- Diferencia de edades con JS -->
+<script src="http://momentjs.com/downloads/moment.min.js"></script>
+
+<script type="module" src="../../static/js/validationForm/validation.js"></script>

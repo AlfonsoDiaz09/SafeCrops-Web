@@ -1,0 +1,43 @@
+{% extends "baseA.html" %}
+
+{% block titulo %} Segmentación automática con SAM {% endblock %}
+
+{% block contenido %}
+    <link rel="stylesheet" href="../static/css/base.css">
+    <link rel="stylesheet" href="../static/css/validationForm.css">
+    <link rel="stylesheet" href="../static/css/loadingAnimation.css">
+
+    <div class="card">
+        <div class="card-header">
+            <a href="{{ regresar }}" class="btn__return"><i class="fa-solid fa-circle-arrow-left"></i></a>
+            Segment Anything Modelo (SAM)
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Dataset a segmentar</h4>
+
+            <form enctype="multipart/form-data" action="{% url 'generarSegmentacionSAM' %}" method="get" id="formulario__crear-segmentacion" data-formulario>
+                {% csrf_token %} <!-- Token de seguridad -->
+              
+                <!-- Campo nombreDataset -->
+                {% for campo in formulario %}
+              
+                  <div class="mb-3 formulario__grupo" id="grupo__{{ campo.name }}"> 
+              
+                    <label for="" class="form-label">{{ campo.label }}</label>
+                    {{ campo.form.nombreDataset }}
+              
+                  </div>
+              
+                  <div class="col-12 help-text" id="help-text-{{ campo.name }}">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
+              
+                {% endfor %}
+
+                <input name="" id="" class="btn btn-success" type="submit" value="Enviar información"> <!-- Botón para enviar el formulario -->
+                <a name="" id="" class="btn btn-primary" href="{% url 'datasets' %}" role="button">Cancelar</a> <!-- Botón para cancelar el formulario -->
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="../../static/js/validationForm/validation.js"></script>
+
+{% endblock %}

@@ -9,14 +9,10 @@ class Zip:
     def descomprimir(rutaOrigen, rutaDestino, formatoImg, nombreDataset):
         #Función para descomprimir el dataset del archivo zip
         def construidoDataset(rutaDestino, formatoImg, nombreDataset, carpetas_division):
-            print("Entra 2.6")
             if not('train' in carpetas_division and 'validation' in carpetas_division):
-                print("Entra 2.7")
                 return 'error_nombre_carpetas'
-            print("Entra 2.8")
             # Obtener la lista de enfermedades
-            carpetas_enfermedades = [nombre for nombre in os.listdir(rutaDestino + "/train/") if os.path.isdir(os.path.join(rutaDestino, 'train', nombre))]
-            print("Entra 2.9")
+            carpetas_enfermedades = [nombre for nombre in os.listdir(os.path.join(rutaDestino, 'train')) if os.path.isdir(os.path.join(rutaDestino, 'train', nombre))]
             if len(carpetas_enfermedades) == 0:
                 return 'error_no_clases' 
             elif len(carpetas_enfermedades) < 2:
@@ -31,9 +27,9 @@ class Zip:
             # Arreglo con extensiones de imagenes válidas
             extensiones_imagen = ['.jpg', '.jpeg', '.png', '.webp']
 
-            for division_carpetas in os.listdir(rutaDestino):
+            for division_carpetas in os.listdir(rutaDestino) if os.path.isdir(rutaDestino) else []:
 
-                for enfermedad in os.listdir(os.path.join(rutaDestino, division_carpetas)):
+                for enfermedad in os.listdir(os.path.join(rutaDestino, division_carpetas)) if os.path.isdir(os.path.join(rutaDestino, division_carpetas)) else []:
                     # for i, archivo in enumerate(os.listdir(os.path.join(rutaDestino, division_carpetas, enfermedad))):
 
                     directorio = os.path.join(rutaDestino, division_carpetas, enfermedad)

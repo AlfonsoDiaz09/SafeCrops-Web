@@ -11,3 +11,4 @@ weights/YOLOv7/
 SafeCrops/weights/
 reportesPDF/
 MODELO_YOLOv7/runs/
+SafeCrops/AppSafeCrops/MODELO_SAM/*.pth

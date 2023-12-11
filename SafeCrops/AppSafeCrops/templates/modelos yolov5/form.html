@@ -1,25 +1,31 @@
 <link rel="stylesheet" href="../static/css/base.css">
+<link rel="stylesheet" href="../static/css/validationForm.css">
+<link rel="stylesheet" href="../static/css/loadingAnimation.css">
 
-<form enctype="multipart/form-data" method="post">
+<form enctype="multipart/form-data" method="post" id="formulario__crear-modeloYOLOv5" data-formulario-yolov5>
   {% csrf_token %} <!-- Token de seguridad -->
   {% for campo in formularioYOLOv5 %} <!-- Recorremos los campos del formulario -->
 
-    <div class="mb-3"> <!-- Div para cada campo -->
+    <div class="mb-3 formulario__grupo" id="grupo__{{ campo.name }}"> <!-- Div para cada campo -->
 
-      <label for="" class="form-label">{{ campo.label }} yolov5</label>
+      <label for="" class="form-label">{{ campo.label }}</label>
       {% if campo.name == 'datasetModelo_y5' %}
         {{ campo.form.datasetModelo_y5 }}
       {% elif campo.name == 'batch_size_y5' %}
         {{ campo.form.batch_size_y5 }}
+      {% elif campo.name == 'epocas_y5' %}
+        <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" aria-describedby="helpId" placeholder="{{ campo.label }}" value="20" min="20" max="300" />
       {% else %}
-        <input type="{{ campo.field.widget.input_type }}" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" /> 
+        <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" /> 
       {% endif %}
     </div>
 
-    <div class="col-12 help-text">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
+    <div class="col-12 help-text" id="help-text-{{ campo.name }}">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
   
   {% endfor %}
 
   <input name="" id="" class="btn btn-success" type="submit" value="Enviar información"> <!-- Botón para enviar el formulario -->
   <a name="" id="" class="btn btn-primary" href="{% url 'modelos' %}" role="button">Cancelar</a> <!-- Botón para cancelar el formulario -->
 </form>
+
+<script type="module" src="../../static/js/validationForm/validation_modelo_yolov5.js"></script>

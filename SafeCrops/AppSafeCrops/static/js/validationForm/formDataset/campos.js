@@ -10,6 +10,7 @@ const campos = {
     ruta: false,
     tipoDataset: false,
     segmentacion_SAM: false,
+    homogenizacion_YIQ: false,
     formatoImg: false,
 }
 

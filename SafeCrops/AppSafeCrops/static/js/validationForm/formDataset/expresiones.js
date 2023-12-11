@@ -4,7 +4,7 @@
 */
 
 const expresiones = {
-	nombreDataset: /^[a-zA-Z0-9À-ÿ\s\_]{4,45}$/,
+	nombreDataset: /^[a-zA-Z0-9À-ÿ\s]{4,45}$/,
 	ruta: /\.(zip)$/,
 }
 

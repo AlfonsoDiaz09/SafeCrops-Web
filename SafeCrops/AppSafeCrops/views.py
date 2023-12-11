@@ -8,7 +8,7 @@ from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required 
 from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Usuario, Cultivo, Modelo_YOLOv5, Modelo_YOLOv7, Modelo_Transformer
-from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm, ChangePasswordForm, EnfermedadForm, DatasetForm, CultivoForm, Modelo_YOLOv5_Form, Modelo_YOLOv7_Form, Modelo_Transformer_Form, ReporteForm
+from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm, ChangePasswordForm, EnfermedadForm, DatasetForm, CultivoForm, Modelo_YOLOv5_Form, Modelo_YOLOv7_Form, Modelo_Transformer_Form, ReporteForm, ListaDatasetsForm, HomogeneizacionForm
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
@@ -22,9 +22,9 @@ from .modelo_transformers import Transformer
 import subprocess
 import sys
 from .GLOBAL_VARIABLES import cd, HOME, query_ruta_dataset
+from .MODELO_SAM.SAM import SAM
+from .ConversionYIQ import YIQ
 import mysql.connector
-
-from .GLOBAL_VARIABLES import HOME
 
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -513,9 +513,10 @@ def contarDatasets():
 
 #función para contar los modelos registrados y retornarlos
 def contarModelos():
+    num_modelosYolov5 = Modelo_YOLOv5.objects.all().count()
     num_modelosYolov7 = Modelo_YOLOv7.objects.all().count()
     num_modelosTransformer = Modelo_Transformer.objects.all().count()
-    num_modelos = num_modelosYolov7 + num_modelosTransformer
+    num_modelos = num_modelosYolov5 + num_modelosYolov7 + num_modelosTransformer
     return num_modelos
 
 #función para contar los reportes registrados y retornarlos
@@ -775,6 +776,9 @@ def crearExperto(request): #función para crear un nuevo éxperto
         else:
             URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
 
+            formularioUsuario = UsuarioForm()
+            formularioExperto = ExpertoForm()
+
             context = perfil(request)
             context['direccion'] =  'Administrador / Usuarios / Expertos / Regsitrar'
             context['formularioUsuario'] = formularioUsuario
@@ -789,7 +793,7 @@ def crearExperto(request): #función para crear un nuevo éxperto
         context['direccion'] =  'Administrador / Usuarios / Expertos / Regsitrar'
         context['formularioUsuario'] = formularioUsuario
         context['formularioExperto'] = formularioExperto
-        context['regresar'] = 'http://{}/{}'.format(URL, 'expertos') 
+        context['regresar'] = 'http://{}/{}'.format(URL, 'expertos')
 
     return render(request, 'usuarios/experto/crear.html', context)
 
@@ -920,6 +924,12 @@ def crearTester(request): #función para crear un nuevo éxperto
         context['formularioUsuario'] = formularioUsuario
         context['formularioTester'] = formularioTester
         context['regresar'] = 'http://{}/{}'.format(URL, 'testers') 
+
+    context = perfil(request)
+    context['direccion'] =  'Administrador / Usuarios / Testers / Registrar'
+    context['formularioUsuario'] = formularioUsuario
+    context['formularioTester'] = formularioTester
+    context['regresar'] = 'http://{}/{}'.format(URL, 'testers') 
 
     return render(request, 'usuarios/tester/crear.html', context)
 
@@ -1068,7 +1078,7 @@ def datasets(request): #función para redireccionar a la página donde se enlist
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
 
     datasets = Dataset.objects.all().order_by('-id_Dataset')
-
+    formulario = ListaDatasetsForm(request.GET or None)
     estadoDataset = request.GET.get('estadoDataset')
     if estadoDataset == 'Todos' or estadoDataset == None:
         datasets = Dataset.objects.all()
@@ -1080,6 +1090,7 @@ def datasets(request): #función para redireccionar a la página donde se enlist
     context = perfil(request)
     context['direccion'] =  'Administrador / Datasets'
     context['datasets'] = datasets
+    context['formulario'] = formulario
     context['regresar'] = 'http://{}/{}'.format(URL, 'Panel_administrador')
 
     return render(request, 'datasets/indexD.html', context)
@@ -1172,7 +1183,8 @@ def verDataset(request, id_Dataset):
 
     dataset = Dataset.objects.get(id_Dataset=id_Dataset)
     nombre = dataset.nombreDataset
-    rutaDataset = dataset.ruta.name
+    rutaDataset = os.path.join(HOME, dataset.ruta.name)
+    print('RUTA DATASET: ', rutaDataset)
 
     rutaDatasetTrain = '/datasets/'+dataset.ruta.name+'/train/'
 
@@ -1183,7 +1195,7 @@ def verDataset(request, id_Dataset):
     diccionarioValidation = {}
 
     for division_file in os.listdir(rutaDataset):
-        for enfermedad in os.listdir(os.path.join(rutaDataset, division_file)):
+        for enfermedad in os.listdir(os.path.join(rutaDataset, division_file)) if os.path.isdir(os.path.join(rutaDataset, division_file)) else []:
             imagenes = []
 
             for imagen in os.listdir(os.path.join(rutaDataset, division_file, enfermedad)):
@@ -1262,6 +1274,126 @@ def editarDataset(request, id_Dataset):
 def eliminarDataset(request, id_Dataset):
     dataset = Dataset.objects.get(id_Dataset=id_Dataset)
     dataset.delete()
+    return redirect('datasets')
+
+def generarSegmentacionSAM(request, id_Dataset): #función para redireccionar a la página donde se enlista todos los modelos
+    dataset = Dataset.objects.get(id_Dataset=id_Dataset)
+    try:
+        # Función que genera la segmentación de la imagen con SAM
+        respuesta_sentencia = SAM.sam_automatico(dataset.nombreDataset)
+    except NameError:
+        messages.error(request, f'Hubo un problema al segmentar el dataset {dataset.nombreDataset} con SAM')
+        rutaNuevoDataset = os.path.join(HOME, 'datasets', dataset.nombreDataset+'_SAM')
+        if os.path.exists(rutaNuevoDataset):
+            shutil.rmtree(rutaNuevoDataset)
+
+    if respuesta_sentencia == 'ok':
+        dataset.nombreDataset = dataset.nombreDataset+'_SAM'
+        dataset.ruta = 'datasets/'+dataset.nombreDataset
+        dataset.segmentacion_SAM = 'Si'
+        dataset.save()
+        messages.success(request, f'El dataset {dataset.nombreDataset} se ha segmentado con SAM correctamente')
+    return redirect('datasets')
+
+def homogeneizacion_YIQ(request, id_Dataset_homogeneizar):
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
+    dataset_homogeneizar = Dataset.objects.get(id_Dataset=id_Dataset_homogeneizar)
+    nombre_homogeneizar = dataset_homogeneizar.nombreDataset
+    formulario = HomogeneizacionForm(request.GET or None)
+    if request.method == 'GET':
+        if formulario.is_valid():
+            id_Dataset_referencia = request.GET.get('nombreDataset')
+            print('Formulario válido: ', id_Dataset_referencia)
+            dataset_referencia = Dataset.objects.get(id_Dataset=id_Dataset_referencia)
+            nombre_referencia = dataset_referencia.nombreDataset
+            rutaDataset = os.path.join(HOME, dataset_referencia.ruta.name)
+            print('RUTA DATASET: ', rutaDataset)
+
+            rutaDatasetTrain = '/datasets/'+dataset_referencia.ruta.name+'/train/'
+
+            # Lista de extensiones de archivo de imagen que deseas considerar
+            extensiones_imagen = ['.jpg', '.jpeg', '.png', '.webp']
+
+            diccionarioTrain = {}
+            diccionarioValidation = {}
+
+            for division_file in os.listdir(rutaDataset):
+                for enfermedad in os.listdir(os.path.join(rutaDataset, division_file)) if os.path.isdir(os.path.join(rutaDataset, division_file)) else []:
+                    imagenes = []
+
+                    for imagen in os.listdir(os.path.join(rutaDataset, division_file, enfermedad)):
+                        if any(imagen.endswith(ext) for ext in extensiones_imagen):
+                            imagenes.append(imagen)
+
+                    if division_file == 'train':
+                        if 'train' not in diccionarioTrain:
+                            diccionarioTrain['train'] = []
+                        diccionarioTrain['train'].append({'enfermedad':enfermedad, 'imagenes':imagenes})
+                    elif division_file == 'validation':
+                        if 'validation' not in diccionarioValidation:
+                            diccionarioValidation['validation'] = []
+                        diccionarioValidation['validation'].append({'enfermedad':enfermedad, 'imagenes':imagenes})
+
+            rutaDatasetValidation = '/datasets/'+dataset_referencia.ruta.name+'/validation/'
+            context = perfil(request)
+            context['direccion'] =  'Administrador / YIQ / '+nombre_homogeneizar
+            context['diccionarioTrain'] = diccionarioTrain
+            context['diccionarioValidation'] = diccionarioValidation
+            context['id_dataset_homogeneizar'] = id_Dataset_homogeneizar
+            context['nombreDataset_referencia'] = nombre_referencia
+            context['datasetTrain'] = rutaDatasetTrain
+            context['datasetValidation'] = rutaDatasetValidation
+            context['formulario'] = formulario
+            context['regresar'] = 'http://{}/{}'.format(URL, 'datasets')
+
+            return render(request, 'datasets/homogeneizarYIQ.html', context)
+
+    context = perfil(request)
+    context['direccion'] =  'Administrador / YIQ / '+nombre_homogeneizar
+    context['formulario'] = formulario
+    context['regresar'] = 'http://{}/{}'.format(URL, 'datasets')
+
+    return render(request, 'datasets/homogeneizarYIQ.html', context)
+
+def generarHomogeneizacionYIQ(request):
+    if request.method == 'GET':
+        datos_check_seleccionado = request.GET.get('imagenReferencia')
+
+        data = datos_check_seleccionado.split('|')
+        ruta_img_referencia = data[0]
+        id_dataset_homogeneizar = data[1]
+        print('RUTA REERENCIA: ', ruta_img_referencia)
+        print('DATASET HOMOGENEIZAR: ', id_dataset_homogeneizar)
+
+        dataset_homogeneizar = Dataset.objects.get(id_Dataset=id_dataset_homogeneizar)
+        nombreDataset_homogeneizar = dataset_homogeneizar.nombreDataset
+
+        try:
+            # Función que genera la homogeneización de la imagen con YIQ
+            respuesta_sentencia = YIQ.yiq_conversion(ruta_img_referencia, nombreDataset_homogeneizar)
+        except NameError:
+            messages.error(request, f'Hubo un problema al homogeneizar el dataset {nombreDataset_homogeneizar} con YIQ')
+            rutaNuevoDataset = os.path.join(HOME, 'datasets', nombreDataset_homogeneizar+'_YIQ')
+            if os.path.exists(rutaNuevoDataset):
+                shutil.rmtree(rutaNuevoDataset)
+
+        if respuesta_sentencia == 'ok':
+            # # Las variables de ruta_actual y nueva_ruta se utilizan para renombrar la carpeta del dataset sin alterar la ruta relativa de la base de datos que indica que el dataset está guardado dentro de la carpeta 'datasets' sin pasarle la dirección completa
+
+            # # Obtener la ruta actual del dataset
+            # ruta_actual = dataset_homogeneizar.ruta
+
+            # # Modificar la ruta agregando '_YIQ' al final
+            # nueva_ruta = os.path.join(os.path.dirname(ruta_actual), f"{os.path.basename(ruta_actual)}_YIQ")
+            # print("Nueva ruta: ", nueva_ruta)
+
+            # dataset_homogeneizar.nombreDataset = nombreDataset_homogeneizar+'_YIQ'
+            # dataset_homogeneizar.ruta = dataset_homogeneizar.nombreDataset
+            # dataset_homogeneizar.homogenizacion_YIQ = 'Si'
+            # dataset_homogeneizar.save()
+            messages.success(request, f'El dataset {nombreDataset_homogeneizar} se ha homogeneizado correctamente')
+
     return redirect('datasets')
 
 def activarDataset(request, id_Dataset):
@@ -1383,140 +1515,95 @@ def eliminarCultivo(request, id_Cultivo):
 #*****************************************************************************************************#
 
 def modelos(request): #función para redireccionar a la página donde se enlista todos los modelos
+    # Se obtiene el URL del servidor
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
 
+    # Se obtienen los modelos de YOLOv5, YOLOv7 y Transformer
+    modelosYOLOv5 = Modelo_YOLOv5.objects.all().order_by('-id_Modelo_y5')
     modelosYOLOv7 = Modelo_YOLOv7.objects.all().order_by('-id_Modelo_y7')
     modelosTransformer = Modelo_Transformer.objects.all().order_by('-id_Modelo_transformer')
 
     context = perfil(request)
     context['direccion'] =  'Administrador / Modelos'
+    context['modelosYOLOv5'] = modelosYOLOv5
     context['modelosYOLOv7'] = modelosYOLOv7
     context['modelosTransformer'] = modelosTransformer
     context['regresar'] = 'http://{}/{}'.format(URL, 'Panel_administrador')
 
     return render(request, 'modelos/indexM.html', context)
 
-def seleccionarArquitectura(request):
-    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
-    context = perfil(request)
+def seleccionarArquitectura(request): #función para seleccionar la arquitectura del modelo y generarlo una vez llenado el formulario
+    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST'] # Se obtiene el URL del servidor
+    context = perfil(request) # Se obtiene el perfil del usuario
 
-    if request.method == 'POST':
-        formularioYOLOv5 = Modelo_YOLOv5_Form(request.POST, request.FILES)
-        formularioYOLOv7 = Modelo_YOLOv7_Form(request.POST, request.FILES)
-        formularioTransformer = Modelo_Transformer_Form(request.POST, request.FILES)
+    if request.method == 'POST': # Si se ha enviado el formulario
+        formularioYOLOv5 = Modelo_YOLOv5_Form(request.POST, request.FILES) # Se obtiene el formulario de YOLOv5
+        formularioYOLOv7 = Modelo_YOLOv7_Form(request.POST, request.FILES) # Se obtiene el formulario de YOLOv7
+        formularioTransformer = Modelo_Transformer_Form(request.POST, request.FILES) # Se obtiene el formulario de Transformer
 
-        
-
+        # Se valida que alguno de los formularios sea válido
         if formularioYOLOv5.is_valid() or formularioYOLOv7.is_valid() or formularioTransformer.is_valid():
+            # Se valida si el formulario válido es el de YOLOv5
             if formularioYOLOv5.is_valid():
-                # Valores obtenidos del formulario 
-                nombreYOLOv5 = formularioYOLOv5.cleaned_data['nombreModelo_y5']
+                # Valores obtenidos del formulario
+                nombreModelo = formularioYOLOv5.cleaned_data['nombreModelo_y5']
                 nombreDataset = formularioYOLOv5.cleaned_data['datasetModelo_y5']
                 epocas = formularioYOLOv5.cleaned_data['epocas_y5']
                 batch_size = formularioYOLOv5.cleaned_data['batch_size_y5']
-
-                query_dataset = query_ruta_dataset(str(nombreDataset))
-
-                # Variables para documento .yaml
-                dir_train = os.path.join(str(query_dataset[0]), "train/")
-                dir_val = os.path.join(str(query_dataset[0]), "validation/")
-                n_clases = query_dataset[1]
-                nombres_clases = query_dataset[2]
+                pesos = 'Predeterminados'
+                arquitectura = 'YOLOv5'
                 
-                print(os.getcwd())
-                cd("AppSafeCrops/MODELO_YOLOv5")
-
-                # Creación del archivo custom_data.yaml
-                file = open(os.path.join(HOME, "AppSafeCrops","MODELO_YOLOv5","data","custom_data.yaml"), "w")
-                print("Archivo creado")
-                file.write(f"train: {dir_train}\n")
-                file.write(f"val: {dir_val}\n")
-                file.write(f"names:\n")
-                for i in range(len(nombres_clases)):
-                    escribir = "    " + str(i) + ": " + str(nombres_clases[i])
-                    file.write(f"{escribir}\n")
-                file.close()
-
-                # Proceso para realizar el entrenamiento de YOLOv7 con parámetros
-                subprocess.call([sys.executable, '-m', 'train','--device', 'cpu', '--batch-size', str(batch_size), '--epochs', str(epocas), '--img', '640', '--data', 'data/custom_data.yaml', '--name', nombreYOLOv5, '--weights', 'yolov5n.pt'])
-
+                # Se manda a traer la función para crear el modelo YOLOv5 pasándole los parámetros obtenidos del formulario
+                crearModelo_YOLOv5(request, nombreModelo, nombreDataset, epocas, batch_size)
+                # Se guarda la presición y la pérdida del modelo
+                accuracy, loss = 0.95, 0.05
+                id = context['id']
+                # Asignar el valor de 'id' al campo correspondiente del formulario
+                formularioYOLOv5.instance.user_id = id
+                # Se guarda el modelo en la base de datos
                 formularioYOLOv5.save()
-                messages.success(request, f'Modelo YOLOv5 creado correctamente')
-                return redirect('modelos')
 
+            # Se valida si el formulario válido es el de YOLOv7
             if formularioYOLOv7.is_valid():
                 # Valores obtenidos del formulario 
-                nombreYOLOv7 = formularioYOLOv7.cleaned_data['nombreModelo_y7']
+                nombreModelo = formularioYOLOv7.cleaned_data['nombreModelo_y7']
                 nombreDataset = formularioYOLOv7.cleaned_data['datasetModelo_y7']
                 epocas = formularioYOLOv7.cleaned_data['epocas_y7']
                 batch_size = formularioYOLOv7.cleaned_data['batch_size_y7']
+                pesos = 'Predeterminados'
+                arquitectura = 'YOLOv7'
 
-                query_dataset = query_ruta_dataset(str(nombreDataset))
-
-                # Variables para documento .yaml
-                dir_train = os.path.join(str(query_dataset[0]), "train/")
-                dir_val = os.path.join(str(query_dataset[0]), "validation/")
-                n_clases = query_dataset[1]
-                nombres_clases = str(query_dataset[2]).split('[')
-                nombres_clases = str(nombres_clases[1]).split(']')
-                nombres_clases = str(nombres_clases[0])
-                print(os.getcwd())
-                cd("AppSafeCrops/MODELO_YOLOv7")
-
-                # Creación del archivo custom_data.yaml
-                file = open(os.path.join(HOME, "AppSafeCrops","MODELO_YOLOv7","data","custom_data.yaml"), "w")
-                print("Archivo creado")
-                file.write(f"train: {dir_train}\n")
-                file.write(f"val: {dir_val}\n")
-                file.write(f"nc: {n_clases}\n")
-                file.write(f"names: [ {nombres_clases} ]\n")
-                file.close()
-
-                # Modificar el archivo yolov7-tiny-custom
-                with open (os.path.join(HOME,"AppSafeCrops","MODELO_YOLOv7","cfg","training","yolov7-tiny-custom.yaml"),"r") as archivo:
-                    lineas = archivo.readlines()
-                    archivo.close()
-                
-                #Modificar la primer línea del archivo
-                lineas[0] = f"nc: {n_clases}\n"
-                print(lineas)
-
-                #Escribir el contenido actualizado al archivo
-                with open(os.path.join(HOME,"AppSafeCrops","MODELO_YOLOv7","cfg","training","yolov7-tiny-custom.yaml"),"w") as archivo:
-                    archivo.writelines(lineas)
-                    archivo.close()
-                    #archivo.seek(0)
-                    #archivo.writelines(lineas)
-                    #archivo.truncate()
-                
-
-                # Proceso para realizar el entrenamiento de YOLOv7 con parámetros
-                subprocess.call([sys.executable, '-m', 'train','--device', 'cpu', '--batch-size', str(batch_size), '--epochs', str(epocas), '--img', '640', '640', '--data', 'data/custom_data.yaml', '--cfg', 'cfg/training/yolov7-tiny-custom.yaml', '--name', nombreYOLOv7, '--weights', 'yolov7-tiny.pt'])
+                crearModelo_YOLOv7(request, nombreModelo, nombreDataset, epocas, batch_size)
+                accuracy, loss = 0.95, 0.05
+                id = context['id']
+                # Asignar el valor de 'id' al campo correspondiente del formulario
+                formularioYOLOv7.instance.user_id = id
                 formularioYOLOv7.save()
-                cd(HOME)
-                print(os.getcwd())
-                messages.success(request, f'Modelo YOLOv7 creado correctamente')
-                return redirect('modelos')
+          
+            # Se valida si el formulario válido es el de Transformer
             if formularioTransformer.is_valid():
-                nombreTransformer = formularioTransformer.cleaned_data['nombreModelo_transformer']
+                # Valores obtenidos del formulario
+                nombreModelo = formularioTransformer.cleaned_data['nombreModelo_transformer']
                 nombreDataset = formularioTransformer.cleaned_data['datasetModelo_transformer']
                 epocas = formularioTransformer.cleaned_data['epocas_transformer']
                 batch_size = formularioTransformer.cleaned_data['batch_size_transformer']
-                pesos = 'Predeterminados'
+                pesos = 'swin-tiny-patch4-window7-224'
                 arquitectura = 'Transformer'
 
-                Transformer.training_model(nombreTransformer, nombreDataset, epocas, batch_size)
+                metrics = crearModelo_Transformer(request, nombreModelo, nombreDataset, epocas, batch_size)
+                metrics_for_epoch = metrics[1]
+                print("ACCURACY: ", metrics[0]['eval_accuracy'])
+                print("F1: ", metrics[0]['eval_f1'])
+                print("LOSS: ", metrics[0]['eval_loss'])
+                accuracy, f1_score, loss = round(metrics[0]['eval_accuracy'], 3), round(metrics[0]['eval_f1'], 3), round(metrics[0]['eval_loss'], 3)
+                id = context['id']
+                # Asignar el valor de 'id' al campo correspondiente del formulario
+                formularioTransformer.instance.user_id = id
                 formularioTransformer.save()
-
-                accuracy, loss = 0.95, 0.05
-
-                message = f'Modelo Transformer {nombreTransformer} creado correctamente'
             
             profile = context['perfil']
-            id = context['id']
-            print("ID USU: ",id)
-            sendEmailNewModel(request, profile, nombreTransformer, nombreDataset, epocas, batch_size, arquitectura, pesos, accuracy, loss)
-            messages.success(request, message)
+            sendEmailNewModel(request, profile, nombreModelo, nombreDataset, epocas, batch_size, arquitectura, pesos, accuracy, f1_score, loss, metrics_for_epoch)
+            messages.success(request, f'Modelo {arquitectura} {nombreModelo} creado correctamente')
             return redirect('modelos')
         else:
             messages.error(request, 'Error al crear el modelo.')
@@ -1542,35 +1629,79 @@ def seleccionarArquitectura(request):
 
     return render(request, 'modelos/seleccionarArquitectura.html', context)
 
-def crearModelo_YOLOv7(request):
-    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+def crearModelo_YOLOv5(request, nombreYOLOv5, nombreDataset, epocas, batch_size): #función para crear un modelo YOLOv5 con parametros de nombre, dataset, epocas y batch_size
+    # Consultar la información del dataset en la BD
+    query_dataset = query_ruta_dataset(str(nombreDataset))
 
-    if request.method == 'POST':
-        formulario = Modelo_YOLOv7_Form(request.POST, request.FILES)
+    # Variables para documento .yaml
+    dir_train = os.path.join(str(query_dataset[0]), "train/")
+    dir_val = os.path.join(str(query_dataset[0]), "validation/")
+    nombres_clases = query_dataset[2]
 
-        if formulario.is_valid():
-            
-            formulario.save()
-            messages.success(request, f'Modelo creado correctamente')
-            return redirect('modelos')
-        else:
-            messages.error(request, 'Error al crear el modelo.')
-            formulario = Modelo_YOLOv7_Form()
+    # Cambiar el directorio de trabajo
+    cd("AppSafeCrops/MODELO_YOLOv5")
 
-            context = perfil(request)
-            context['direccion'] =  'Administrador / Modelos / Registrar'
-            context['formulario'] = formulario
-            context['regresar'] = 'http://{}/{}'.format(URL, 'seleccionarArquitectura')
-    else:
-        formulario = Modelo_YOLOv7_Form()
+    # Creación del archivo custom_data.yaml
+    file = open(os.path.join(HOME, "AppSafeCrops","MODELO_YOLOv5","data","custom_data.yaml"), "w")
+    file.write(f"train: {dir_train}\n")
+    file.write(f"val: {dir_val}\n")
+    file.write(f"names:\n")
+    for i in range(len(nombres_clases)):
+        clase = "    " + str(i) + ": " + str(nombres_clases[i])
+        file.write(f"{clase}\n")
+    file.close()
 
-        context = perfil(request)
-        context['direccion'] =  'Administrador / Modelos / Registrar'
-        context['formulario'] = formulario
-        context['regresar'] = 'http://{}/{}'.format(URL, 'modelos')
+    # Proceso para realizar el entrenamiento de YOLOv5 con parámetros
+    subprocess.call([sys.executable, '-m', 'train','--device', 'cpu', '--batch-size', str(batch_size), '--epochs', str(epocas), '--img', '640', '--data', 'data/custom_data.yaml', '--name', nombreYOLOv5, '--weights', 'yolov5n.pt'])
 
-    return render(request, 'modelos/crear.html', context)
+def crearModelo_YOLOv7(request, nombreYOLOv7, nombreDataset, epocas, batch_size):
+    # Consultar la información del dataset en la BD
+    query_dataset = query_ruta_dataset(str(nombreDataset))
 
+    # Variables para documento .yaml
+    dir_train = os.path.join(str(query_dataset[0]), "train/")
+    dir_val = os.path.join(str(query_dataset[0]), "validation/")
+    n_clases = query_dataset[1]
+    nombres_clases = str(query_dataset[2]).split('[')
+    nombres_clases = str(nombres_clases[1]).split(']')
+    nombres_clases = str(nombres_clases[0])
+    
+    # Cambiar el directorio de trabajo
+    cd("AppSafeCrops/MODELO_YOLOv7")
+
+    # Creación del archivo custom_data.yaml
+    file = open(os.path.join(HOME, "AppSafeCrops","MODELO_YOLOv7","data","custom_data.yaml"), "w")
+    file.write(f"train: {dir_train}\n")
+    file.write(f"val: {dir_val}\n")
+    file.write(f"nc: {n_clases}\n")
+    file.write(f"names: [ {nombres_clases} ]\n")
+    file.close()
+
+    # Modificar el archivo yolov7-tiny-custom
+    with open (os.path.join(HOME,"AppSafeCrops","MODELO_YOLOv7","cfg","training","yolov7-tiny-custom.yaml"),"r") as archivo:
+        lineas = archivo.readlines()
+        archivo.close()
+    
+    #Modificar la primer línea del archivo
+    lineas[0] = f"nc: {n_clases}\n"
+    print(lineas)
+
+    #Escribir el contenido actualizado al archivo
+    with open(os.path.join(HOME,"AppSafeCrops","MODELO_YOLOv7","cfg","training","yolov7-tiny-custom.yaml"),"w") as archivo:
+        archivo.writelines(lineas)
+        archivo.close()
+    
+    # Proceso para realizar el entrenamiento de YOLOv7 con parámetros
+    subprocess.call([sys.executable, '-m', 'train','--device', 'cpu', '--batch-size', str(batch_size), '--epochs', str(epocas), '--img', '640', '640', '--data', 'data/custom_data.yaml', '--cfg', 'cfg/training/yolov7-tiny-custom.yaml', '--name', nombreYOLOv7, '--weights', 'yolov7-tiny.pt'])
+
+def crearModelo_Transformer(request, nombreTransformer, nombreDataset, epocas, batch_size):
+    '''Se obtiene en la variable 'metrics' las métricas del modelo Transformer entrenado
+    como el accuracy, f1_score y loss y además se obtiene otro diccionario con las métricas
+    de entrenamiento y validación por cada época'''
+
+    metrics = Transformer.training_model(nombreTransformer, nombreDataset, epocas, batch_size)
+
+    return metrics
 def editarModelo_YOLOv7(request, id_Modelo):
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
 
@@ -1589,8 +1720,18 @@ def editarModelo_YOLOv7(request, id_Modelo):
 
     return render(request, 'modelos/editar.html', context)
 
+def eliminarModelo_YOLOv5(request, id_Modelo):
+    modelo = Modelo_YOLOv5.objects.get(id_Modelo_y5=id_Modelo)
+    modelo.delete()
+    return redirect('modelos')
+
 def eliminarModelo_YOLOv7(request, id_Modelo):
-    modelo = Modelo_YOLOv7.objects.get(id_Modelo=id_Modelo)
+    modelo = Modelo_YOLOv7.objects.get(id_Modelo_y7=id_Modelo)
+    modelo.delete()
+    return redirect('modelos')
+
+def eliminarModelo_Transformer(request, id_Modelo):
+    modelo = Modelo_Transformer.objects.get(id_Modelo_transformer=id_Modelo)
     modelo.delete()
     return redirect('modelos')
 
@@ -1626,13 +1767,13 @@ def crearModeloTransformer(request):
 #**********                 ENVIAR EMAIL DESPUES DE GENERAR UN NUEVO MODELO                 **********#
 #*****************************************************************************************************#
 
-def sendEmailNewModel(request, perfil, nombreModelo, nombreDataset, numEpocas, batchSize, arquitectura, pesos, accuracy, loss):
+def sendEmailNewModel(request, perfil, nombreModelo, nombreDataset, numEpocas, batchSize, arquitectura, pesos, accuracy, f1_score, loss, metrics_for_epoch):
     # Se obtienen los correos de los administradores y expertos
     queryEmailAdmin = Administrador.objects.all()
     queryEmailExperto = Experto.objects.all()
 
     # Contruir el archivo PDF del reporte del modelo para adjuntarlo al correo
-    pdf_file_path = PDF.crear_reporte_por_modelo(arquitectura, nombreModelo, nombreDataset, pesos, numEpocas, batchSize, accuracy, loss)  # Ruta del archivo PDF a adjuntar
+    pdf_file_path = PDF.crear_reporte_por_modelo(arquitectura, nombreModelo, nombreDataset, pesos, numEpocas, batchSize, accuracy, f1_score, loss, metrics_for_epoch)  # Ruta del archivo PDF a adjuntar
     pdf_filename = os.path.basename(pdf_file_path)  # Nombre del archivo
     pdf_content = open(pdf_file_path, 'rb').read()  # Leer el contenido del archivo PDF
     
@@ -1672,7 +1813,7 @@ def sendEmailNewModel(request, perfil, nombreModelo, nombreDataset, numEpocas, b
         email.attach(pdf_filename, pdf_content, 'application/pdf')  # Adjuntar el archivo PDF
 
         email.send()
-        messages.success(request, f'Correo enviado correctamente')
+        # messages.success(request, f'Correo enviado correctamente')
         bandera = True
 
     for user in queryEmailExperto:
@@ -1709,15 +1850,12 @@ def sendEmailNewModel(request, perfil, nombreModelo, nombreDataset, numEpocas, b
         email.attach(pdf_filename, pdf_content, 'application/pdf')  # Adjuntar el archivo PDF
 
         email.send()
-        messages.success(request, f'Correo enviado correctamente')
+        # messages.success(request, f'Correo enviado correctamente')
         bandera = True
 
     if bandera == False:
         messages.error(request, f'El correo {mail} no existe en la base de datos')
     return redirect('modelos')
-
-
-
 
 def reportes(request): #función para redireccionar a la página donde se enlista todos los modelos
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']

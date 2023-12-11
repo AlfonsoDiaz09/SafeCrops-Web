@@ -6,8 +6,6 @@
 {% block titulo %} Registro {% endblock %}
 
 {% block contenido %}
-
-
     <div class="container">
         <div class="row">
             <div class="col-md-15">
@@ -18,59 +16,59 @@
                             <p class="parrafo1"><span class="txtgreen">Safe Crops</p>
                         </div>
                     </div>
-                    <form enctype="multipart/form-data" method="POST" action="" class="formRegister" novalidate>
+                    <form enctype="multipart/form-data" method="POST" action="" class="formRegister" id="formulario__crear-administrador" data-formulario>
                         <legend class="legend">Register</legend>
                         <fieldset class="fieldset fregister">
                             {% csrf_token %}
                             <!-- Formulario de crear administrador -->
                             {% for campo in formularioAdministrador %} <!-- Recorremos los campos del formulario -->
 
-                            <p> <!-- Div para cada campo -->
+                                <div class="mb-3 formulario__grupo" id="grupo__{{ campo.name }}"> <!-- Div para cada campo -->
 
                                 {% if campo.name != 'userType' %} <!-- Si el campo no es userType, lo mostramos -->
-                                <label for="" class="form-label">{{ campo.label }}</label> <!-- Mostramos el label del campo -->
+                                    <label for="" class="form-label">{{ campo.label }}</label> <!-- Mostramos el label del campo -->
 
                                 {% endif %}
 
                                 {% if campo.name == 'fechaNac' %} <!-- Si el campo es fechaNac, lo mostramos -->
-                                    <input type="date" name="{{ campo.name }}" id="" aria-describedby="helpId" value="" />
+                                    <input type="date" class="form-control formulario__input" name="{{ campo.name }}" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
                                 
-                                {% elif campo.name == 'imagen' %}
-                                    <input type="{{ campo.field.widget.input_type }}" name="{{ campo.name }}" id="" accept="image/*" aria-describedby="helpId" value="" />
+                                    {% elif campo.name == 'imagen' %}
+                                    <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" accept="image/*" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
 
-                                {% elif campo.name == 'userType' %} <!-- Si el campo es userType, lo mostramos -->
-                                    <input type="hidden" name="{{ campo.name }}" id="" aria-describedby="helpId" value="Administrador" />
+                                    {% elif campo.name == 'userType' %} <!-- Si el campo es userType, lo mostramos -->
+                                    <input type="hidden" class="form-control" name="{{ campo.name }}" aria-describedby="helpId" placeholder="{{ campo.label }}" value="Administrador" />
 
 
-                                {% else %}
-                                    <input type="{{ campo.field.widget.input_type }}" name="{{ campo.name }}" id="" aria-describedby="helpId" value="" />
-                                
+                                    {% else %}
+                                    <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
+                                    
                                 {% endif %}
 
                                 {% if campo.field.widget.input_type == 'file' and campo.value %} <!-- Si el campo es file y tiene valor, lo mostramos -->
-                                <br>
-                                <img src="{{MEDIA_URL}}/imagenes/{{campo.value}}" width="100" height="100" alt="">
-                                
+                                    <br>
+                                    <img src="{{MEDIA_URL}}/imagenes/{{campo.value}}" width="100" height="100" alt="">
+                                    
                                 {% endif %}
 
-                            </p>
+                                </div>
 
-                            <div class="col-12 help-text">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
+                                <div class="col-12 help-text" id="help-text-{{ campo.name }}">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
 
                             {% endfor %}
 
                             <!-- Formulario de usuario -->
                             {% for campo in formularioUsuario %}
 
-                            <p>
+                                <div class="mb-3 formulario__grupo" id="grupo__{{ campo.name }}">
 
                                 <label for="" class="form-label">{{ campo.label }}</label>
 
-                                <input type="{{ campo.field.widget.input_type }}" name="{{ campo.name }}" id="" aria-describedby="helpId" value="" />
-                            
-                            </p>
+                                <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" id="{{ campo.name}}" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
+                                
+                                </div>
 
-                            <div class="col-12 help-text">{{ campo.errors }}</div>
+                                <div class="col-12 help-text" id="help-text-{{ campo.name }}">{{ campo.errors }}</div>
 
                             {% endfor %}
 
@@ -89,4 +87,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Diferencia de edades con JS -->
+    <script src="http://momentjs.com/downloads/moment.min.js"></script>
+
+    <script type="module" src="../../static/js/validationForm/validation.js"></script>
 {% endblock %}

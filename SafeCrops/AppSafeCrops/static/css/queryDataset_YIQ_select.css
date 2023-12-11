@@ -1,0 +1,129 @@
+.container__img{
+    max-width: 10.5%;
+    min-width: 10.5%;
+    position: relative;
+    display: inline-block;
+    padding: 1em 0.3em;
+    border-radius: 10px;
+    margin-top: 1em;
+    z-index: 90;
+    box-sizing: border-box;
+    border: 2px solid #ffffff;
+}
+
+.container__img_selected{
+    border: 2px solid #0acd82;
+    background-color: #0acd9326;
+    box-sizing: border-box;
+    z-index: 1;
+}
+
+.container__img:hover{
+    border: 2px solid #0acd82;
+    background-color: #0acd9326;
+    box-sizing: border-box;
+    z-index: 1;
+}
+
+.opciones_img{
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 99;
+    width: 100%;
+}
+
+.container__img .btn__check > i{
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-right: 5px;
+    margin-top: 5px;
+    z-index: 99;
+    opacity: 0;
+    display: none;
+    cursor: pointer;
+    transition: all 0.5s;
+    font-size: 1em;
+    color: #ffffff;
+}
+
+.container__img .btn__check > input{
+    /* Oculta la apariencia predeterminada del checkbox */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 5px;
+    background-color: #ffffff;
+    border: 2px solid #0a89cd;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.5s;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 98;
+    opacity: 0;
+}
+
+.container__img .btn__check > input:checked{
+    background-color: #0a89cd;
+    border: 2px solid #ffffff;
+}
+
+.container__img .btn__check > input:checked + i{
+    display: block;
+}
+
+.container__img:hover .btn__check > i,
+.container__img:hover .btn__check > input{
+    opacity: 1;
+}
+
+.container__img .btn__check:hover > input{
+    background-color: #0a89cd;
+    border: 2px solid #ffffff;
+}
+
+.container__img > div > img{
+    width: 100px;
+    height: 100px;
+    border-radius: 10px;
+}
+
+.container__img > div:nth-child(2){
+    position: relative;
+}
+
+.container__img > div:nth-child(2) > span{
+    position: absolute;
+    font-size: 0.8em;
+    font-weight: 600;
+    color: #ffffff;
+    bottom: 0;
+    right: 0;
+    padding: 0.3em 0.5em;
+    border-radius: 30px;
+}
+
+.container__img .span__train{
+    background-color: #85057b;
+}
+
+.container__img .span__validation{
+    background-color: #089fdf;
+}
+
+.container__img > .div__name{
+    white-space: nowrap; 
+    width: 100%; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.8em;
+    font-weight: 400;
+    margin-top: 0.5em;
+    text-align: center;
+}

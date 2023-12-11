@@ -32,6 +32,27 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for modelo in modelosYOLOv5 %}
+                            <tr class="">
+                                <td>{{ modelo.id_Modelo_y5 }}</td>
+                                <td>YOLOv5</td>
+                                <td>{{ modelo.nombreModelo_y5 }}</td>
+                                <!-- <td>{{ modelo.pesosModelo_y5 }}</td> -->
+                                <td>{{ modelo.datasetModelo_y5.nombreDataset }}</td>
+                                <td>{{ modelo.epocas_y5 }}</td>
+                                <td>{{ modelo.batch_size_y5 }}</td>
+                                <td>{{ modelo.user.username }}</td>
+                                <td>
+                                    <div class="tooltip__div">
+                                        <div class="tooltip">
+                                            <span class="tooltip__text">Eliminar</span>
+                                            <i class="fa-solid fa-sort-down"></i>
+                                        </div>
+                                        <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarModelo_YOLOv5' modelo.id_Modelo_y5%}" role="button"><i class="fa-solid fa-trash"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
                         {% for modelo in modelosYOLOv7 %}
                             <tr class="">
                                 <td>{{ modelo.id_Modelo_y7 }}</td>
@@ -43,13 +64,6 @@
                                 <td>{{ modelo.batch_size_y7 }}</td>
                                 <td>{{ modelo.user.username }}</td>
                                 <td>
-                                    <div class="tooltip__div">
-                                        <div class="tooltip">
-                                            <span class="tooltip__text">Editar</span>
-                                            <i class="fa-solid fa-sort-down"></i>
-                                        </div>
-                                        <a name="" id="" class="btn btn-info" href="{% url 'editarModelo_YOLOv7' modelo.id_Modelo_y7%}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
-                                    </div>
                                     <div class="tooltip__div">
                                         <div class="tooltip">
                                             <span class="tooltip__text">Eliminar</span>
@@ -73,22 +87,15 @@
                                 <td>
                                     <div class="tooltip__div">
                                         <div class="tooltip">
-                                            <span class="tooltip__text">Editar</span>
-                                            <i class="fa-solid fa-sort-down"></i>
-                                        </div>
-                                        <a name="" id="" class="btn btn-info" href="{% url 'editarModelo_YOLOv7' modelo.id_Modelo_transformer%}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
-                                    </div>
-                                    <div class="tooltip__div">
-                                        <div class="tooltip">
                                             <span class="tooltip__text">Eliminar</span>
                                             <i class="fa-solid fa-sort-down"></i>
                                         </div>
-                                        <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarModelo_YOLOv7' modelo.id_Modelo_transformer%}" role="button"><i class="fa-solid fa-trash"></i></a>
+                                        <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarModelo_Transformer' modelo.id_Modelo_transformer%}" role="button"><i class="fa-solid fa-trash"></i></a>
                                     </div>
                                 </td>
                             </tr>
                         {% endfor %}
-                        {% if modelosYOLOv7|length == 0 and modelosTransformer|length == 0 %}
+                        {% if modelosYOLOv5|length == 0 and modelosYOLOv7|length == 0 and modelosTransformer|length == 0 %}
                             <tr>
                                 <td colspan="8">No hay registros</td>
                             </tr>

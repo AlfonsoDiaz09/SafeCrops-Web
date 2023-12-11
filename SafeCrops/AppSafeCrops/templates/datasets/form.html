@@ -15,8 +15,16 @@
 
         <select name="segmentacion_SAM" id="" class="form-select formulario__select" >
           <option value="" selected>------ SELECCIONE ------</option>
-          <option value="Si">Si segmentar</option>
-          <option value="No">No segmentar</option>
+          <option value="Si">Si está segmentado</option>
+          <option value="No">No está segmentado</option>
+        </select>
+
+      {% elif campo.name == 'homogenizacion_YIQ' %} <!-- Si el campo es homogeneización YIQ -->
+
+        <select name="homogenizacion_YIQ" id="" class="form-select formulario__select" >
+          <option value="" selected>------ SELECCIONE ------</option>
+          <option value="Si">Si está homogeneizado</option>
+          <option value="No">No está homogeneizado</option>
         </select>
         
       {% elif campo.name == 'tipoDataset' %}

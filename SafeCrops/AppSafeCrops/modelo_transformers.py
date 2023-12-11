@@ -6,7 +6,7 @@ from datasets import load_metric
 from transformers import AutoImageProcessor
 from transformers import AutoModelForImageClassification, TrainingArguments, Trainer
 from transformers import pipeline
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, mean_squared_error
 from PIL import Image
 import requests
 
@@ -14,6 +14,15 @@ from .GLOBAL_VARIABLES import HOME
 
 class Transformer:
     def training_model(nombreTransformer, nombreDataset, epocas, batch_size):
+
+        # HOME = 'D:\SafeCrops-Web\SafeCrops'
+
+        # nombreTransformer = 'WD_Corn_Resized_SAM_Completo'
+        # epocas = 15
+        # nombreDataset = 'Corn_Resized_SAM_Completo'
+        # batch_size = 32
+
+
 
         print("Directorio principal: ", HOME)
 
@@ -51,7 +60,7 @@ class Transformer:
         labels = dataset["train"].features["label"].names
         label2id, id2label = dict(), dict()
         for i, label in enumerate(labels):
-            label2id[label] = i
+            label2id[label] = i 
             id2label[i] = label
 
         # # # # # # #  # # # # #
@@ -82,19 +91,19 @@ class Transformer:
 
         train_transforms = Compose(
             [
-                RandomResizedCrop(crop_size),
-                RandomHorizontalFlip(),
-                ToTensor(),
-                normalize,
+                RandomResizedCrop(crop_size), # Aplica un recorte aleatorio de la imagen y luego la cambia de tamaño a size
+                RandomHorizontalFlip(), # Voltea horizontalmente la imagen con una probabilidad del 50%
+                ToTensor(), # Convierte la imagen a un tensor de PyTorch
+                normalize, # Normaliza el tensor de imagen con mean y std, en donde mean y std son los valores de imagen_mean y image_std de image_processor los cuales se obtienen del modelo pre-entrenado
             ]
         )
 
         val_transforms = Compose(
             [
-                Resize(size),
-                CenterCrop(crop_size),
-                ToTensor(),
-                normalize,
+                Resize(size), # Cambia el tamaño de la imagen a size
+                CenterCrop(crop_size), # Recorta la imagen a una región de tamaño (crop_size) centrada en el centro
+                ToTensor(), # Convierte la imagen a un tensor de PyTorch
+                normalize, # Normaliza el tensor de imagen con mean y std 
             ]
         )
 
@@ -129,7 +138,7 @@ class Transformer:
         )
 
         #model_name = model_checkpoint.split("/")[-1]
-        
+
         args = TrainingArguments(
             f"{model_name}-finetuned",
             remove_unused_columns=False,
@@ -145,7 +154,10 @@ class Transformer:
             load_best_model_at_end=True,
             metric_for_best_model="accuracy",
             push_to_hub=False,
+            weight_decay=0.65,
         )
+
+        metrics_for_epoch = []
 
         # the compute_metrics function takes a Named Tuple as input:
         # predictions, which are the logits of the model as Numpy arrays,
@@ -155,9 +167,10 @@ class Transformer:
             predictions = np.argmax(eval_pred.predictions, axis=1)
             accuracy = metric.compute(predictions=predictions, references=eval_pred.label_ids)['accuracy']
             f1 = f1_score(eval_pred.label_ids, predictions, average='weighted')  # Puedes ajustar el average según tus necesidades
-            loss = eval_pred.loss
-            result_metrics = {"accuracy": accuracy, "f1": f1, "loss": loss}
+
+            result_metrics = {"accuracy": accuracy, "f1": f1}
             print("METRIc_FA: ", result_metrics)
+            metrics_for_epoch.append(result_metrics)
             return result_metrics
 
         def collate_fn(examples):
@@ -189,35 +202,58 @@ class Transformer:
         trainer.log_metrics("eval", metrics)
         trainer.save_metrics("eval", metrics)
 
+        return metrics, metrics_for_epoch
+
     # Inferencia
     def prediction_model():
-        url = HOME+"/SafeCrops/datasets/Corn/validate/Corn_NLS/nls_550.jpg"
-        print(url)
-        #image = Image.open(requests.get(url, stream=True).raw)
-        image = Image.open(url)
 
-        repo_name = HOME+"/swin-tiny-patch4-window7-224-finetuned/"
+        url = HOME+"/datasets/Corn_TEST/"
+        modelo = 'MT_Corn_SAM_15e_8bs'
+        dir_modelo = os.path.join(HOME, 'modelos', 'transformer', modelo+'-finetuned')
+        errores_cuadraticos = []
+        for division in os.listdir(url):
+            if division == "test":
+                for disease in os.listdir(url+division):
+                    for img in os.listdir(url+division+"/"+disease):
+                        img = url+division+"/"+disease+"/"+img
+                        print("\n"+img)
+                        #image = Image.open(requests.get(url, stream=True).raw)
+                        image = Image.open(img)
 
-        image_processor = AutoImageProcessor.from_pretrained(repo_name)
-        model = AutoModelForImageClassification.from_pretrained(repo_name)
+                        repo_name = dir_modelo
 
-        # prepare image for the model
-        encoding = image_processor(image.convert("RGB"), return_tensors="pt")
-        print("Encoding: ", encoding.pixel_values.shape)
+                        # image_processor = AutoImageProcessor.from_pretrained(repo_name)
+                        # model = AutoModelForImageClassification.from_pretrained(repo_name)
 
-        # forward pass
-        with torch.no_grad():
-            outputs = model(**encoding)
-            logits = outputs.logits
+                        # # prepare image for the model
+                        # encoding = image_processor(image.convert("RGB"), return_tensors="pt")
+                        # print("Encoding: ", encoding.pixel_values.shape)
 
-        predicted_class_idx = logits.argmax(-1).item()
-        print("Predicted class: ", model.config.id2label[predicted_class_idx])
+                        # # forward pass
+                        # with torch.no_grad():
+                        #     outputs = model(**encoding)
+                        #     logits = outputs.logits
 
-        pipe = pipeline("image-classification", repo_name)
-        print(pipe(image)[0])
-        print(pipe(image)[1])
-        print(pipe(image)[2])
+                        # predicted_class_idx = logits.argmax(-1).item()
+                        # print("Predicted class: ", model.config.id2label[predicted_class_idx])
 
+                        pipe = pipeline("image-classification", repo_name)
+                        prediction = pipe(image)[0]['label']
+                        print("Prediction: ", prediction)
+                        score = pipe(image)[0]['score']
+                        print("Score: ", score)
+                        
+
+                        #Error cuadrado medio
+                        y_true = [0.9730]
+                        y_pred = [score]
+
+                        mse = round(mean_squared_error(y_true, y_pred), 3)
+                        print(f"Error cuadrático medio: {mse}\n")
+                        
+                        errores_cuadraticos.append(mse)
+        promedio_MSE = round(sum(errores_cuadraticos)/len(errores_cuadraticos), 3)
+        print("Promedio de error cuadrático médio: ", promedio_MSE)
 
 
     # EJECUTAR FUCIONES #

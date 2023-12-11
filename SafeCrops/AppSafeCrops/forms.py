@@ -25,6 +25,12 @@ Batch_Size = (
     (1, 1),
 )
 
+estadoDataset = (
+    ('Todos', 'Todos'),
+    ('Activo', 'Activo'),
+    ('Inactivo', 'Inactivo'),
+)
+
 class TempUsuario(forms.ModelChoiceField): # Se crea una clase para el campo de tipo ModelChoiceField
     def label_from_instance(self, obj): # Se define el método label_from_instance
         return str(obj.id)+" - "+str(obj.username) # Se retorna el valor que se va a mostrar en el campo
@@ -80,7 +86,7 @@ class ChangePasswordForm(forms.Form):
     }))
 
 class EnfermedadForm(forms.ModelForm):
-    cultivoEnfermedad = forms.ModelChoiceField(queryset=Cultivo.objects.all().order_by('-id_Cultivo'), label=None, widget=forms.Select(attrs={'class':'form-select formulario__select'}), empty_label='------ SELECCIONE ------') # Se crea un campo de tipo ModelChoiceField
+    cultivoEnfermedad = forms.ModelChoiceField(queryset=Cultivo.objects.all().order_by('-id_Cultivo'), label="Cultivo en el que se presenta", widget=forms.Select(attrs={'class':'form-select formulario__select'}), empty_label='------ SELECCIONE ------') # Se crea un campo de tipo ModelChoiceField
     
     class Meta:
         model = Enfermedad
@@ -91,7 +97,7 @@ class DatasetForm(forms.ModelForm):
     tipoDataset = forms.ModelChoiceField(queryset=Cultivo.objects.all().order_by('-id_Cultivo'), label="Tipo de Dataset", widget=forms.Select(attrs={'class':'form-select formulario__select'}), empty_label='------ SELECCIONE ------') # Se crea un campo de tipo ModelChoiceField
     class Meta:
         model = Dataset
-        fields = ['nombreDataset', 'tipoDataset', 'ruta', 'segmentacion_SAM', 'formatoImg']
+        fields = ['nombreDataset', 'tipoDataset', 'ruta', 'segmentacion_SAM', 'homogenizacion_YIQ', 'formatoImg']
 
 class CultivoForm(forms.ModelForm):
     class Meta:
@@ -99,14 +105,14 @@ class CultivoForm(forms.ModelForm):
         fields = '__all__'
 
 class Modelo_YOLOv5_Form(forms.ModelForm):
-    datasetModelo_y5 = forms.ModelChoiceField(queryset=Dataset.objects.all().order_by('-id_Dataset'), label="Dataset", widget=forms.Select(attrs={'class':'form-select'}), empty_label='------ SELECCIONE ------') # Se crea un campo de tipo ModelChoiceField
+    datasetModelo_y5 = forms.ModelChoiceField(queryset=Dataset.objects.all().order_by('-id_Dataset'), label="Dataset", widget=forms.Select(attrs={'class':'form-select formulario__select'}), empty_label='------ SELECCIONE ------') # Se crea un campo de tipo ModelChoiceField
     batch_size_y5 = forms.ChoiceField(choices=Batch_Size, widget=forms.Select(attrs={'class':'form-select formulario__select'}))
     class Meta:
         model = Modelo_YOLOv5
         fields = ['nombreModelo_y5', 'datasetModelo_y5', 'pesosModelo_y5', 'epocas_y5', 'batch_size_y5']
 
 class Modelo_YOLOv7_Form(forms.ModelForm):
-    datasetModelo_y7 = forms.ModelChoiceField(queryset=Dataset.objects.all().order_by('-id_Dataset'), label="Dataset", widget=forms.Select(attrs={'class':'form-select'}), empty_label='------ SELECCIONE ------') # Se crea un campo de tipo ModelChoiceField
+    datasetModelo_y7 = forms.ModelChoiceField(queryset=Dataset.objects.all().order_by('-id_Dataset'), label="Dataset", widget=forms.Select(attrs={'class':'form-select formulario__select'}), empty_label='------ SELECCIONE ------') # Se crea un campo de tipo ModelChoiceField
     batch_size_y7 = forms.ChoiceField(choices=Batch_Size, widget=forms.Select(attrs={'class':'form-select formulario__select'}))
     class Meta:
         model = Modelo_YOLOv7
@@ -126,6 +132,18 @@ class TempDataset(forms.ModelChoiceField): # Se crea una clase para el campo de 
         return obj.nombreDataset # Se retorna el valor que se va a mostrar en el campo
 
 class ReporteForm(forms.Form):
+    nombreDataset = TempDataset(queryset=Dataset.objects.all(), label="Dataset", widget=forms.Select(attrs={'class':'form-select formulario__select'}), empty_label='------ SELECCIONE ------') # Se crea un campo de tipo ModelChoiceField
+
+    class Meta:
+        fields = ['nombreDataset']
+
+class ListaDatasetsForm(forms.Form):
+    estadoDataset = forms.ChoiceField(choices=estadoDataset, label="Estado de Dataset", widget=forms.Select(attrs={'class':'form-select formulario__select'}))
+
+    class Meta:
+        fields = ['estadoDataset']
+
+class HomogeneizacionForm(forms.Form):
     nombreDataset = TempDataset(queryset=Dataset.objects.all(), label="Dataset", widget=forms.Select(attrs={'class':'form-select formulario__select'}), empty_label='------ SELECCIONE ------') # Se crea un campo de tipo ModelChoiceField
 
     class Meta:

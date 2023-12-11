@@ -45,6 +45,11 @@
     width: auto;
 }
 
+#btn_YIQ{
+    background-color: #059b9d;
+    color: #fff;
+}
+
 .tooltip__div{
     position: relative;
     display: inline-block;

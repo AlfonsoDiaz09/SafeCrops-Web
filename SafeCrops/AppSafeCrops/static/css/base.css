@@ -86,7 +86,7 @@ header{
     font-size: 1em;
 }
 
-#userCollapse{
+.displayNone{
     display: none;
 }
 

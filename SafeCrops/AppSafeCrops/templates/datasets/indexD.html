@@ -17,15 +17,21 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <form action="" method="get">
+                <form enctype="multipart/form-data" action="" method="get">
+                    {% csrf_token %} <!-- Token de seguridad -->
+                    {% for campo in formulario %}
                     <div class="input-group">
                         <div class="mb-3 group__filter_dataset">
-                            <label for="">Estado de Dataset</label>
+                            <label for="" class="form-label">{{ campo.label }}</label>
+                            {% if campo.name == 'estadoDataset' %}
+                                {{ campo.form.estadoDataset }}
+                            {% endif %}
+                            <!-- <label for="">Estado de Dataset</label>
                             <select name="estadoDataset" id="" class="form-select">
-                                <option value="Todos" selected>Todos</option>
+                                <option value="Todos">Todos</option>
                                 <option value="Activo">Activo</option>
                                 <option value="Inactivo">Inactivo</option>
-                            </select>
+                            </select> -->
                             <div class="tooltip__div">
                                 <div class="tooltip_right">
                                     <i class="fa-solid fa-caret-left"></i>
@@ -35,6 +41,7 @@
                             </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </form>
                 <table class="table table-primary">
                     <thead>
@@ -46,6 +53,7 @@
                             <th scope="col">Img Test</th>
                             <th scope="col">Clases</th>
                             <th scope="col">SAM</th>
+                            <th scope="col">YIQ</th>
                             <th scope="col">Estado</th>
                             <th scope="col" class="col-md-3">Acciones</th>
                         </tr>
@@ -59,7 +67,28 @@
                                 <td>{{ dataset.numImgValidacion }}</td>
                                 <td>{{ dataset.numImgPrueba }}</td>
                                 <td>{{ dataset.numClases }}</td>
-                                <td>{{ dataset.segmentacion_SAM }}</td>
+                                <td>
+                                    {% if dataset.segmentacion_SAM == "No" and dataset.estadoDataset == "Activo" %}
+                                        <div class="tooltip__div">
+                                            <div class="tooltip">
+                                                <span class="tooltip__text">SAM</span>
+                                                <i class="fa-solid fa-sort-down"></i>
+                                            </div>
+                                            <a name="" id="" class="btn btn-primary" href="{% url 'generarSegmentacionSAM' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-scissors"></i></a>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if dataset.homogenizacion_YIQ == "No" and dataset.estadoDataset == "Activo" %}
+                                        <div class="tooltip__div">
+                                            <div class="tooltip">
+                                                <span class="tooltip__text">YIQ</span>
+                                                <i class="fa-solid fa-sort-down"></i>
+                                            </div>
+                                            <a name="" id="btn_YIQ" class="btn btn-light" href="{% url 'homogeneizacionYIQ' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-sun"></i></a>
+                                        </div>
+                                    {% endif %}
+                                </td>
                                 <td>
                                     {% if dataset.estadoDataset == "Activo" %}
                                         <span class="badge bg-success">Activo</span>
@@ -68,20 +97,6 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <div class="tooltip__div">
-                                        <div class="tooltip tooltip_ver">
-                                            <span class="tooltip__text tooltip__text_ver">Ver Imagenes</span>
-                                            <i class="fa-solid fa-sort-down"></i>
-                                        </div>
-                                        <a name="" id="" class="btn btn-success" href="{% url 'verDataset' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-images"></i></a>
-                                    </div>
-                                    <div class="tooltip__div">
-                                        <div class="tooltip">
-                                            <span class="tooltip__text">Editar</span>
-                                            <i class="fa-solid fa-sort-down"></i>
-                                        </div>
-                                        <a name="" id="" class="btn btn-info" href="{% url 'editarDataset' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
-                                    </div>
                                     {% if dataset.estadoDataset == "Inactivo" %}
                                         <div class="tooltip__div">
                                             <div class="tooltip">
@@ -98,6 +113,20 @@
                                             <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarDataset' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-trash"></i></a>
                                         </div>
                                     {% elif dataset.estadoDataset == "Activo" %}
+                                        <div class="tooltip__div">
+                                            <div class="tooltip tooltip_ver">
+                                                <span class="tooltip__text tooltip__text_ver">Ver Imagenes</span>
+                                                <i class="fa-solid fa-sort-down"></i>
+                                            </div>
+                                            <a name="" id="" class="btn btn-success" href="{% url 'verDataset' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-images"></i></a>
+                                        </div>
+                                        <div class="tooltip__div">
+                                            <div class="tooltip">
+                                                <span class="tooltip__text">Editar</span>
+                                                <i class="fa-solid fa-sort-down"></i>
+                                            </div>
+                                            <a name="" id="" class="btn btn-info" href="{% url 'editarDataset' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
+                                        </div>
                                         <div class="tooltip__div">
                                             <div class="tooltip tooltip__desactivar">
                                                 <span class="tooltip__text tooltip__text_desactivar">Desactivar</span>

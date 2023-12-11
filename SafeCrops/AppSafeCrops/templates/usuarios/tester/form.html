@@ -13,8 +13,11 @@
       {% endif %}
 
       {% if campo.name == 'fechaNac' %} <!-- Si el campo es fechaNac, lo mostramos -->
-          <input type="date" class="form-control formulario__input" name="{{ campo.name }}" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
+        <input type="date" class="form-control formulario__input" name="{{ campo.name }}" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
       
+        {% elif campo.name == 'imagen' %}
+          <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" accept="image/*" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" />
+
         {% elif campo.name == 'userType' %} <!-- Si el campo es userType, lo mostramos -->
           <input type="hidden" class="form-control" name="{{ campo.name }}" aria-describedby="helpId" placeholder="{{ campo.label }}" value="Tester" />
         
