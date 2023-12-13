@@ -275,6 +275,7 @@ class SAM:
 
         generar_segmentacion_automatica() # Segmentar dibujando un cuadro delimitador de forma manual
 
+        cd(HOME)
         return 'ok'
 
 

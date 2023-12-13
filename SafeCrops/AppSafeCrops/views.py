@@ -1379,19 +1379,10 @@ def generarHomogeneizacionYIQ(request):
                 shutil.rmtree(rutaNuevoDataset)
 
         if respuesta_sentencia == 'ok':
-            # # Las variables de ruta_actual y nueva_ruta se utilizan para renombrar la carpeta del dataset sin alterar la ruta relativa de la base de datos que indica que el dataset está guardado dentro de la carpeta 'datasets' sin pasarle la dirección completa
-
-            # # Obtener la ruta actual del dataset
-            # ruta_actual = dataset_homogeneizar.ruta
-
-            # # Modificar la ruta agregando '_YIQ' al final
-            # nueva_ruta = os.path.join(os.path.dirname(ruta_actual), f"{os.path.basename(ruta_actual)}_YIQ")
-            # print("Nueva ruta: ", nueva_ruta)
-
-            # dataset_homogeneizar.nombreDataset = nombreDataset_homogeneizar+'_YIQ'
-            # dataset_homogeneizar.ruta = dataset_homogeneizar.nombreDataset
-            # dataset_homogeneizar.homogenizacion_YIQ = 'Si'
-            # dataset_homogeneizar.save()
+            dataset_homogeneizar.nombreDataset = nombreDataset_homogeneizar+'_YIQ'
+            dataset_homogeneizar.ruta = os.path.join('datasets', nombreDataset_homogeneizar+'_YIQ')
+            dataset_homogeneizar.homogenizacion_YIQ = 'Si'
+            dataset_homogeneizar.save()
             messages.success(request, f'El dataset {nombreDataset_homogeneizar} se ha homogeneizado correctamente')
 
     return redirect('datasets')

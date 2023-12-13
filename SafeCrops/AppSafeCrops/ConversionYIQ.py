@@ -5,6 +5,7 @@ Created on Fri Sep 29 15:32:25 2023
 @author: Deny
 """
 
+import shutil
 import cv2
 import numpy as np
 import os
@@ -23,9 +24,8 @@ def cd(path):
         print("Error al cambiar de directorio")
 
 class YIQ:
-    def yiq_conversion(ruta_imagen_referencia, nombreDataset):
-        print("RUTA_IMAGEN_REFERENACIA: ",ruta_imagen_referencia)
-        print("NOMBRE_DATASET: ",nombreDataset)
+    def yiq_conversion(ruta_imagen_referencia, nombreDataset_homogeneizar):
+        # Función para convertir una imagen a YIQ
         def conversionYIQ(ruta_img_conversion, ruta_img_referencia, conversion):
             imagen_ref = cv2.imread(ruta_img_referencia) # Imagen de referencia
             imagen_conv = cv2.imread(ruta_img_conversion) # Imagen a homogeneizar
@@ -82,7 +82,7 @@ class YIQ:
             cv2.waitKey(0)
             cv2.destroyAllWindows()
 
-        datasetName = nombreDataset
+        datasetName = nombreDataset_homogeneizar
         dir_dataset = os.path.join(HOME, 'datasets', datasetName)
         
         # Arreglo con extensiones de imagenes válidas
@@ -92,7 +92,7 @@ class YIQ:
         for division in os.listdir(dir_dataset) if os.path.isdir(dir_dataset) else []:
             dir_division = os.path.join(dir_dataset, division)
             for disease in os.listdir(dir_division) if os.path.isdir(dir_division) else []:
-                dir_disease = os.path.join(dir_division, disease) 
+                dir_disease = os.path.join(dir_division, disease)
 
                 # Nuevo directorio homogeneizado
                 datasetNameYIQ = datasetName+"_YIQ"
@@ -100,15 +100,19 @@ class YIQ:
                 os.makedirs(dirYIQ, exist_ok=True)
                 cd(dirYIQ)
 
-                for image in os.listdir(dir_disease):
+                for file in os.listdir(dir_disease):
                     for ext in extensiones_imagen:
-                        if image.endswith(ext):
-                            conversionYIQ(os.path.join(dir_disease, image), os.path.join(HOME, 'datasets', ruta_imagen_referencia), image)
+                        if file.endswith(ext):
+                            conversionYIQ(os.path.join(dir_disease, file), os.path.join(HOME, 'datasets', ruta_imagen_referencia), file)
+                    if file.endswith('.txt'):
+                        shutil.copy(os.path.join(dir_disease, file), dirYIQ)
 
+
+        cd(HOME)
         return 'ok'
 
 
-        # datasetName = nombreDataset
+        # datasetName = nombreDataset_homogeneizar
         # dir = (HOME+"/datasets/"+datasetName+"/train/")
 
         # diseaseContent = os.listdir(dir)

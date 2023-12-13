@@ -131,28 +131,30 @@ class Dataset(models.Model):
         for i in range(len(splitNombreDataset)):
             if splitNombreDataset[i] != 'SAM' and splitNombreDataset[i] != 'YIQ':
                 nombreDataset = splitNombreDataset[i]
-                print(f"Nombre del dataset a eliminar: {nombreDataset}")
                 break
-        print("NOMBRE: ", nombreDataset)
+        
         try:
-            shutil.rmtree(os.path.join(HOME, 'datasets', nombreDataset))
-            print(f"Se eliminó el dataset {nombreDataset}")
+            shutil.rmtree(os.path.join(HOME, nombreDataset))
         except:
             print(f"No se encontró el dataset {nombreDataset}")
+
         try:
-            shutil.rmtree(os.path.join(HOME, 'datasets', nombreDataset+'_SAM_YIQ'))
+            shutil.rmtree(os.path.join(HOME, nombreDataset+'_SAM_YIQ'))
         except:
             print(f"No se encontró el dataset {nombreDataset+'_SAM_YIQ'}")
+
         try:
-            shutil.rmtree(os.path.join(HOME, 'datasets', nombreDataset+'_YIQ_SAM'))
+            shutil.rmtree(os.path.join(HOME, nombreDataset+'_YIQ_SAM'))
         except:
             print(f"No se encontró el dataset {nombreDataset+'_YIQ_SAM'}")
+
         try:
-            shutil.rmtree(os.path.join(HOME, 'datasets', nombreDataset+'_SAM'))
+            shutil.rmtree(os.path.join(HOME, nombreDataset+'_SAM'))
         except:
             print(f"No se encontró el dataset {nombreDataset+'_SAM'}")
+
         try:
-            shutil.rmtree(os.path.join(HOME, 'datasets', nombreDataset+'_YIQ'))
+            shutil.rmtree(os.path.join(HOME, nombreDataset+'_YIQ'))
         except:
             print(f"No se encontró el dataset {nombreDataset+'_YIQ'}")
 
