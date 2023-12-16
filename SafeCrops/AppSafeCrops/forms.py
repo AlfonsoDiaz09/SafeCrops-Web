@@ -148,3 +148,24 @@ class HomogeneizacionForm(forms.Form):
 
     class Meta:
         fields = ['nombreDataset']
+
+class TempTransformer(forms.ModelChoiceField): # Se crea una clase para el campo de tipo ModelChoiceField
+    def label_from_instance(self, obj): # Se define el método label_from_instance
+        return obj.nombreModelo_transformer # Se retorna el valor que se va a mostrar en el campo
+
+class TempYolov5(forms.ModelChoiceField): # Se crea una clase para el campo de tipo ModelChoiceField
+    def label_from_instance(self, obj): # Se define el método label_from_instance
+        return obj.nombreModelo_y5 # Se retorna el valor que se va a mostrar en el campo
+
+class TempYolov7(forms.ModelChoiceField): # Se crea una clase para el campo de tipo ModelChoiceField
+    def label_from_instance(self, obj): # Se define el método label_from_instance
+        return obj.nombreModelo_y7 # Se retorna el valor que se va a mostrar en el campo
+
+class EvaluacionModelosForm(forms.Form):
+    modelo_Transformer = TempTransformer(queryset=Modelo_Transformer.objects.all().order_by('-id_Modelo_transformer'), label="Modelo Transformer", widget=forms.Select(attrs={'class':'form-select formulario__select'}), empty_label='------ SELECCIONE ------') # Se crea un campo de tipo ModelChoiceField
+    # modelo_YOLOv5 = TempYolov5(queryset=Modelo_YOLOv5.objects.all().order_by('-id_Modelo_y5'), label="Modelo YOLOv5", widget=forms.Select(attrs={'class':'form-select formulario__select'}), empty_label='------ SELECCIONE ------') # Se crea un campo de tipo ModelChoiceField
+    # modelo_YOLOv7 = TempYolov7(queryset=Modelo_YOLOv7.objects.all().order_by('-id_Modelo_y7'), label="Modelo YOLOv7", widget=forms.Select(attrs={'class':'form-select formulario__select'}), empty_label='------ SELECCIONE ------') # Se crea un campo de tipo ModelChoiceField
+    nombreDataset = TempDataset(queryset=Dataset.objects.all(), label="Dataset", widget=forms.Select(attrs={'class':'form-select formulario__select'}), empty_label='------ SELECCIONE ------') # Se crea un campo de tipo ModelChoiceField
+
+    class Meta:
+        fields = ['modelo_Transformer','nombreDataset']

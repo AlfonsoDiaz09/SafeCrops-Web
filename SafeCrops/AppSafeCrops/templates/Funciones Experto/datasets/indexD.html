@@ -1,0 +1,162 @@
+{% extends "baseE.html" %}
+
+{% block titulo %} Lista de Datasets {% endblock %}
+
+{% block contenido %}
+
+<link rel="stylesheet" href="../static/css/index.css">
+
+    <div class="card">
+        <div class="card-header">
+            <div class="title__header__index">
+                <a href="{{ regresar }}" class="btn__return"><i class="fa-solid fa-chevron-left"></i></a>
+                <i class="fa-solid fa-graduation-cap"></i>
+                <h4 class="">Datasets</h4>
+            </div>
+            <a name="" id="" class="btn btn-warning" href="{% url 'crearDataset' %}" role="button"><i class="fa-solid fa-circle-plus"></i> Nuevo</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <form enctype="multipart/form-data" action="" method="get">
+                    {% csrf_token %} <!-- Token de seguridad -->
+                    {% for campo in formulario %}
+                    <div class="input-group">
+                        <div class="mb-3 group__filter_dataset">
+                            <label for="" class="form-label">{{ campo.label }}</label>
+                            {% if campo.name == 'estadoDataset' %}
+                                {{ campo.form.estadoDataset }}
+                            {% endif %}
+                            <!-- <label for="">Estado de Dataset</label>
+                            <select name="estadoDataset" id="" class="form-select">
+                                <option value="Todos">Todos</option>
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                            </select> -->
+                            <div class="tooltip__div">
+                                <div class="tooltip_right">
+                                    <i class="fa-solid fa-caret-left"></i>
+                                    <span class="tooltip__text tooltip__text_right">Filtrar</span>
+                                </div>
+                                <button type="submit" class="btn btn-success"><i class="fa-solid fa-filter"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </form>
+                <table class="table table-primary">
+                    <thead>
+                        <tr>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Img Total</th>
+                            <th scope="col">Img Train</th>
+                            <th scope="col">Img Validation</th>
+                            <th scope="col">Img Test</th>
+                            <th scope="col">Clases</th>
+                            <th scope="col">SAM</th>
+                            <th scope="col">YIQ</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col" class="col-md-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dataset in datasets %}
+                            <tr class="">
+                                <td>{{ dataset.nombreDataset }}</td>
+                                <td>{{ dataset.numImgTotal }}</td>
+                                <td>{{ dataset.numImgEntrenamiento }}</td>
+                                <td>{{ dataset.numImgValidacion }}</td>
+                                <td>{{ dataset.numImgPrueba }}</td>
+                                <td>{{ dataset.numClases }}</td>
+                                <td>
+                                    {% if dataset.segmentacion_SAM == "No" and dataset.estadoDataset == "Activo" %}
+                                        <div class="tooltip__div">
+                                            <div class="tooltip">
+                                                <span class="tooltip__text">SAM</span>
+                                                <i class="fa-solid fa-sort-down"></i>
+                                            </div>
+                                            <a name="" id="" class="btn btn-primary" href="{% url 'generarSegmentacionSAM' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-scissors"></i></a>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if dataset.homogenizacion_YIQ == "No" and dataset.estadoDataset == "Activo" %}
+                                        <div class="tooltip__div">
+                                            <div class="tooltip">
+                                                <span class="tooltip__text">YIQ</span>
+                                                <i class="fa-solid fa-sort-down"></i>
+                                            </div>
+                                            <a name="" id="btn_YIQ" class="btn btn-light" href="{% url 'homogeneizacionYIQ' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-sun"></i></a>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if dataset.estadoDataset == "Activo" %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if dataset.estadoDataset == "Inactivo" %}
+                                        <div class="tooltip__div">
+                                            <div class="tooltip">
+                                                <span class="tooltip__text">Activar</span>
+                                                <i class="fa-solid fa-sort-down"></i>
+                                            </div>
+                                            <a name="" id="" class="btn btn-success" href="{% url 'activarDataset' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-check"></i></a>
+                                        </div>
+                                        <div class="tooltip__div">
+                                            <div class="tooltip">
+                                                <span class="tooltip__text">Eliminar</span>
+                                                <i class="fa-solid fa-sort-down"></i>
+                                            </div>
+                                            <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarDataset' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-trash"></i></a>
+                                        </div>
+                                    {% elif dataset.estadoDataset == "Activo" %}
+                                        <div class="tooltip__div">
+                                            <div class="tooltip tooltip_ver">
+                                                <span class="tooltip__text tooltip__text_ver">Ver Imagenes</span>
+                                                <i class="fa-solid fa-sort-down"></i>
+                                            </div>
+                                            <a name="" id="" class="btn btn-success" href="{% url 'verDataset' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-images"></i></a>
+                                        </div>
+                                        <div class="tooltip__div">
+                                            <div class="tooltip">
+                                                <span class="tooltip__text">Editar</span>
+                                                <i class="fa-solid fa-sort-down"></i>
+                                            </div>
+                                            <a name="" id="" class="btn btn-info" href="{% url 'editarDataset' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
+                                        </div>
+                                        <div class="tooltip__div">
+                                            <div class="tooltip tooltip__desactivar">
+                                                <span class="tooltip__text tooltip__text_desactivar">Desactivar</span>
+                                                <i class="fa-solid fa-sort-down"></i>
+                                            </div>
+                                            <a name="" id="" class="btn btn-warning btnDeleteDataset" href="{% url 'desactivarDataset' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-ban"></i></a>
+                                        </div>
+                                        <div class="tooltip__div">
+                                            <div class="tooltip">
+                                                <span class="tooltip__text">Eliminar</span>
+                                                <i class="fa-solid fa-sort-down"></i>
+                                            </div>
+                                            <a name="" id="" class="btn btn-danger btnDelete" href="{% url 'eliminarDataset' dataset.id_Dataset%}" role="button"><i class="fa-solid fa-trash"></i></a>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="11">No hay registros de dataset</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+        <div class="card-footer text-muted">
+            
+        </div>
+    </div>
+
+{% endblock %}

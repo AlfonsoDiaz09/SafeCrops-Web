@@ -1,0 +1,49 @@
+<link rel="stylesheet" href="../static/css/base.css">
+<link rel="stylesheet" href="../static/css/validationForm.css">
+<link rel="stylesheet" href="../static/css/loadingAnimation.css">
+
+<form enctype="multipart/form-data" method="post" id="formulario__crear-evaluacionModelos" data-formulario>
+  {% csrf_token %} <!-- Token de seguridad -->
+
+  {% for campo in formulario %} <!-- Recorremos los campos del formulario -->
+
+    <div class="mb-3 formulario__grupo" id="grupo__{{ campo.name }}"> 
+
+      <label for="" class="form-label">{{ campo.label }}</label>
+
+      {% if campo.name == 'modelo_Transformer' %}
+
+        {{ campo.form.modelo_Transformer }}
+
+      {% elif campo.name == 'modelo_YOLOv5' %}
+
+        {{ campo.form.modelo_YOLOv5 }}
+
+      {% elif campo.name == 'modelo_YOLOv7' %}
+
+        {{ campo.form.modelo_YOLOv7 }}
+
+      {% elif campo.name == 'nombreDataset' %}
+
+        {{ campo.form.nombreDataset }}
+
+      {% else %}
+
+        <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="" /> 
+      
+      {% endif %}
+
+    </div>
+
+    <div class="col-12 help-text" id="help-text-{{ campo.name }}">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
+
+  {% endfor %}
+  
+  <input name="" id="" class="btn btn-success" type="submit" value="Enviar información"> <!-- Botón para enviar el formulario -->
+  <a name="" id="" class="btn btn-primary" href="{% url 'datasets' %}" role="button">Cancelar</a> <!-- Botón para cancelar el formulario -->
+</form>
+
+<script type="module" src="../../static/js/validationForm/validation.js"></script>
+
+
+

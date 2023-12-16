@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+
+    <style type="text/css">
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+    
+        .container__principal{
+            width: 100%;
+            padding: 0 5%;
+        }
+
+        .container__email{
+            margin: 0 auto;
+            max-width: 500px;
+            border: 1px solid #E5E5E5;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px gray;
+        }
+    
+        .container__email__header{
+            text-align: center;
+            gap: 1em;
+            margin: 20px;
+        }
+    
+        .container__email__header img{
+            width: 100px;
+            height: 100px;
+        }
+    
+        .container__email__header h1{
+            font-size: 2rem;
+            font-weight: bolder!important;
+            margin: 0 0 10px 0;
+            color: #1FBF42;
+        }
+
+        .container__email__header p{
+            font-size: 1.5rem;
+            font-weight: 100!important;
+            margin: 0 0 10px 0;
+            color: #000000;
+        }
+
+        .container__email__header > img{
+            width: 50px;
+            height: 50px;
+        }
+
+        .container__email__header > span{
+            font-size: 1em;
+            font-weight: 100;
+        }
+
+        .container__email__header  span  a{
+            text-decoration: none;
+            pointer-events: none;
+            cursor: default;
+            color: #000000;
+        }
+
+        .hr{
+            height: 1px;
+            border: none;
+            background: rgba(128, 128, 128, 0.404);
+            box-shadow: 0 0 10px gray;
+        }
+    
+        .container__email__body{
+            text-align: center;
+            margin: 20px 0;
+        }
+    
+        .container__email__body > span{
+            font-size: 1.5rem;
+            font-weight: 200;
+            color: #000000;
+        }
+
+        .container__email__body > p{
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
+
+        .datos_modelo{
+            text-align: left;
+            margin-left: 15%;
+        }
+
+        .container__email__body > p > span{
+            font-weight: 200;
+            color: #0b8b27;
+        }
+
+        .container__email__body .btn-warning{
+            background-color: #FF9E00;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: 200;
+            text-decoration: none;
+        }
+
+        .container__email__body .btn__restablecer,
+        .container__email__body .btn__modelos{
+            margin: 60px 0 40px 0;
+        }
+
+        .container__email__footer{
+            text-align: center;
+            margin: 60px 0 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container__principal">
+        <div class="container__email">
+            <div class="container__email__header">
+                <img src="https://raw.githubusercontent.com/Alfonso1311/SafeCrops-Web/develop/SafeCrops/AppSafeCrops/static/img/logoSafeCrops.png" title="logoSafeCrops">
+                <h1>SafeCrops</h1>
+                <p>Nuevo Modelo</p>
+            </div>
+            <hr class="hr">
+            <div class="container__email__body">
+                <span><strong>Hola {{ nombre }}!</strong></span>
+                <p>
+                    El {{ userType }} <span><b>{{ usuario }}</b></span> ha generado un nuevo modelo con la arquitectura <span><b>{{ arquitectura }}</b></span>, este modelo fue entrenado con los siguientes parametros:
+                </p>
+                <p class="datos_modelo">
+                    <span><b>Nombre del modelo</b></span> : {{ nombreModelo }} <br>
+                    <span><b>Dataset</b></span> : {{ nombreDataset }} <br>
+                    <span><b>Numero de epocas</b></span> : {{ numEpocas }} <br>
+                    <span><b>Batch size</b></span> : {{ batchSize }} <br>
+                </p>
+                <p>
+                    Se adjunta documento con información más detallada acerca del modelo. <br><br>
+                    Para ver el modelo en la plataforma de <span>SafeCrops</span>, haga click en el siguiente botón: <br>
+                </p>
+                <div class="btn__modelos">
+                    <a href="{{ link_models }}" class="btn btn-warning">Ir a modelos</a>
+                </div>
+                <div class="btn__pagina_inicio">
+                    <a href="{{ link_home }}" class="btn-home-web">O visite nuestro sitio web</a>
+                </div>
+            </div>
+            <div class="container__email__footer">
+                <p>Este correo es únicamente con fines informativos, favor de no responder a este.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

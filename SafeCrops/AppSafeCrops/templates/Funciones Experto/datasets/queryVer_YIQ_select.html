@@ -1,0 +1,48 @@
+<link rel="stylesheet" href="../static/css/base.css">
+<link rel="stylesheet" href="../static/css/queryDataset_YIQ_select.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+{% for enfermedad in diccionarioTrain.train %}
+    {%for imagen in enfermedad.imagenes%}
+        <div class="container__img" id="container_referencia">
+            <div class="opciones_img">
+                <div class="btn__check">
+                    <input type="checkbox" value="{{ nombreDataset_referencia }}/train/{{ enfermedad.enfermedad }}/{{ imagen }}|{{ id_dataset_homogeneizar }}" name="imagenReferencia">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+            </div>
+            <div>
+                <img src="{{ datasetTrain }}/{{ enfermedad.enfermedad }}/{{ imagen }}">
+                <span class="span__train">Train</span>
+            </div>
+            <div class="div__name">{{ imagen }}</div>
+        </div>
+    {%endfor%}
+{% endfor %}
+
+{% for enfermedad in diccionarioValidation.validation %}
+    {%for imagen in enfermedad.imagenes%}
+        <div class="container__img" id="container_referencia">
+            <div class="opciones_img">
+                <div class="btn__check">
+                    <input type="checkbox" value="{{ nombreDataset_referencia }}/validation/{{ enfermedad.enfermedad }}/{{ imagen }}|{{ id_dataset_homogeneizar }}" name="imagenReferencia">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+            </div>
+            <div>
+                <img src="{{ datasetValidation }}/{{ enfermedad.enfermedad }}/{{ imagen }}">
+                <span class="span__validation">Validation</span>
+            </div>
+            <div class="div__name">{{ imagen }}</div>
+        </div>
+    {%endfor%}
+{% endfor %}
+
+<!-- Script para validar solo marcar un checkbox y desmarcar los demas -->
+<script>
+    $('input[type="checkbox"]').on('change', function() {
+        $('input[name="' + this.name + '"]').not(this).prop('checked', false);
+    });
+</script>
+
+<!-- <script src="../../static/js/app.js"></script> -->

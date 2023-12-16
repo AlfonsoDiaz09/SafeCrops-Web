@@ -1,0 +1,54 @@
+{% extends "baseE.html" %}
+
+{% block titulo %} Homogeneizar imágenes con YIQ {% endblock %}
+
+{% block contenido %}
+    <link rel="stylesheet" href="../static/css/base.css">
+    <link rel="stylesheet" href="../static/css/validationForm.css">
+    <link rel="stylesheet" href="../static/css/loadingAnimation.css">
+
+    <div class="card">
+        <div class="card-header">
+            <a href="{{ regresar }}" class="btn__return"><i class="fa-solid fa-circle-arrow-left"></i></a>
+            Proceso de homogeneización con YIQ
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Seleccione el dataset para listar sus imágenes y seleccionar la imagen de referencia</h4>
+
+            <form enctype="multipart/form-data" action="" method="get" id="" data-formulario>
+                {% csrf_token %} <!-- Token de seguridad -->
+              
+                <!-- Campo nombreDataset -->
+                {% for campo in formulario %}
+              
+                  <div class="mb-3 formulario__grupo" id="grupo__{{ campo.name }}"> 
+              
+                    <label for="" class="form-label">{{ campo.label }}</label>
+                    {{ campo.form.nombreDataset }}
+              
+                  </div>
+              
+                  <div class="col-12 help-text" id="help-text-{{ campo.name }}">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
+              
+                {% endfor %}
+                
+                <input name="" id="" class="btn btn-success" type="submit" value="Listar imágenes"> <!-- Botón para enviar el formulario -->
+                <a name="" id="" class="btn btn-primary" href="{% url 'datasets' %}" role="button">Cancelar</a> <!-- Botón para cancelar el formulario -->
+            </form>
+            <form enctype="multipart/form-data" action="{% url 'generarHomogeneizacionYIQ' %}" method="get" id="" data-formulario>
+              {% csrf_token %} <!-- Token de seguridad -->
+              <div class="">
+                {% include 'Funciones Experto/datasets/queryVer_YIQ_select.html' %}
+              </div>
+
+              <div class="col-12 help-text" id="help-text-{{ campo.name }}">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
+
+              <input name="" id="" class="btn btn-success" type="submit" value="Comenzar Homogeneización"> <!-- Botón para enviar el formulario -->
+              <a name="" id="" class="btn btn-primary" href="{% url 'datasets' %}" role="button">Cancelar</a> <!-- Botón para cancelar el formulario -->
+            </form>
+        </div>
+    </div>
+
+    <!-- <script type="module" src="../../static/js/validationForm/validation.js"></script> -->
+
+{% endblock %}

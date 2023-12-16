@@ -140,7 +140,7 @@ class Transformer:
         #model_name = model_checkpoint.split("/")[-1]
 
         args = TrainingArguments(
-            f"{model_name}-finetuned",
+            f"{model_name}",
             remove_unused_columns=False,
             evaluation_strategy = "epoch",
             save_strategy = "epoch",
@@ -205,55 +205,63 @@ class Transformer:
         return metrics, metrics_for_epoch
 
     # Inferencia
-    def prediction_model():
+    def prediction_model(nombreDataset, nombreModeloT, accuracy):
+        print("NData: ", str(nombreDataset))
+        print("NModel: ", str(nombreModeloT))
+        print("NModel: ", accuracy)
 
-        url = HOME+"/datasets/Corn_TEST/"
-        modelo = 'MT_Corn_SAM_15e_8bs'
-        dir_modelo = os.path.join(HOME, 'modelos', 'transformer', modelo+'-finetuned')
+        nombreDataset = str(nombreDataset)
+        nombreModeloT = str(nombreModeloT)
+
+        url = os.path.join(HOME, 'datasets', nombreDataset)
+        modelo = nombreModeloT
+        dir_modelo = os.path.join(HOME, 'modelos', 'transformer', modelo)
         errores_cuadraticos = []
-        for division in os.listdir(url):
+        diccionario_evaluacion_vit = {}
+
+        # Arreglo con extensiones de imagenes válidas
+        extensiones_imagen = ['.jpg', '.jpeg', '.png', '.webp']
+
+        for division in os.listdir(url) if os.path.isdir(url) else []:
             if division == "test":
-                for disease in os.listdir(url+division):
-                    for img in os.listdir(url+division+"/"+disease):
-                        img = url+division+"/"+disease+"/"+img
-                        print("\n"+img)
-                        #image = Image.open(requests.get(url, stream=True).raw)
-                        image = Image.open(img)
+                contador = 0
+                dir_division = os.path.join(url, division)
+                for disease in os.listdir(dir_division) if os.path.isdir(dir_division) else []:
+                    dir_disease = os.path.join(dir_division, disease)
+                    for img in os.listdir(dir_disease):
+                        for ext in extensiones_imagen:
+                            if img.endswith(ext):
+                                dir_img = os.path.join(dir_disease, img)
+                                print("\n"+dir_img)
+                                #image = Image.open(requests.get(url, stream=True).raw)
+                                image = Image.open(dir_img)
 
-                        repo_name = dir_modelo
+                                repo_name = dir_modelo
 
-                        # image_processor = AutoImageProcessor.from_pretrained(repo_name)
-                        # model = AutoModelForImageClassification.from_pretrained(repo_name)
+                                pipe = pipeline("image-classification", repo_name)
+                                prediction = pipe(image)[0]['label']
+                                print("Prediction: ", prediction)
+                                score = pipe(image)[0]['score']
+                                print("Score: ", score)
+                                
+                                if 'vit' not in diccionario_evaluacion_vit:
+                                    diccionario_evaluacion_vit['vit'] = []
+                                diccionario_evaluacion_vit['vit'].append({'contador':contador+1, 'enfermedad':disease, 'imagen':img, 'prediccion':prediction})
 
-                        # # prepare image for the model
-                        # encoding = image_processor(image.convert("RGB"), return_tensors="pt")
-                        # print("Encoding: ", encoding.pixel_values.shape)
+                                #Error cuadrado medio
+                                y_true = [accuracy]
+                                y_pred = [score]
 
-                        # # forward pass
-                        # with torch.no_grad():
-                        #     outputs = model(**encoding)
-                        #     logits = outputs.logits
+                                mse = round(mean_squared_error(y_true, y_pred), 3)
+                                print(f"Error cuadrático medio: {mse}\n")
 
-                        # predicted_class_idx = logits.argmax(-1).item()
-                        # print("Predicted class: ", model.config.id2label[predicted_class_idx])
-
-                        pipe = pipeline("image-classification", repo_name)
-                        prediction = pipe(image)[0]['label']
-                        print("Prediction: ", prediction)
-                        score = pipe(image)[0]['score']
-                        print("Score: ", score)
-                        
-
-                        #Error cuadrado medio
-                        y_true = [0.9730]
-                        y_pred = [score]
-
-                        mse = round(mean_squared_error(y_true, y_pred), 3)
-                        print(f"Error cuadrático medio: {mse}\n")
-                        
-                        errores_cuadraticos.append(mse)
+                                contador = contador+1
+                                
+                                errores_cuadraticos.append(mse)
         promedio_MSE = round(sum(errores_cuadraticos)/len(errores_cuadraticos), 3)
         print("Promedio de error cuadrático médio: ", promedio_MSE)
+
+        return diccionario_evaluacion_vit
 
 
     # EJECUTAR FUCIONES #

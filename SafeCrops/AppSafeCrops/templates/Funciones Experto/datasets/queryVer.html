@@ -30,18 +30,3 @@
         </div>
     {%endfor%}
 {% endfor %}
-
-{% for enfermedad in diccionarioTest.test %}
-    {%for imagen in enfermedad.imagenes%}
-        <div class="container__img">
-            <div class="btn__eliminar">
-                <a name="" id="" class="btnDelete" href="{% url 'eliminarImagen' id_Dataset imagen %}" role="button"><i class="fa-solid fa-trash"></i></a>
-            </div>
-            <div>
-                <img src="{{ datasetTest }}/{{ enfermedad.enfermedad }}/{{ imagen }}">
-                <span class="span__test">Test</span>
-            </div>
-            <div class="div__name">{{ imagen }}</div>
-        </div>
-    {%endfor%}
-{% endfor %}

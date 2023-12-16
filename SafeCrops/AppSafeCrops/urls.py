@@ -67,11 +67,12 @@ urlpatterns = [
 
     path('modelos', login_required(views.modelos), name='modelos'), #consulta de modelos
     path('modelo/arquitectura', login_required(views.seleccionarArquitectura), name='seleccionarArquitectura'),
-    #path('modelo/crear', login_required(views.crearModelo_YOLOv7), name='crearModelo_YOLOv7'), #crear modelo YOLOv7
-    #path('modelo/editar?id=<int:id_Modelo>', login_required(views.editarModelo_YOLOv7), name='editarModelo_YOLOv7'), #editar modelo YOLOv7
     path('eliminarModelo/YOLOv5/?id=<int:id_Modelo>', login_required(views.eliminarModelo_YOLOv5), name='eliminarModelo_YOLOv5'), #eliminar modelo YOLOv5
     path('eliminarModelo/YOLOv7/?id=<int:id_Modelo>', login_required(views.eliminarModelo_YOLOv7), name='eliminarModelo_YOLOv7'), #eliminar modelo YOLOv7
     path('eliminarModelo/Transformer/?id=<int:id_Modelo>', login_required(views.eliminarModelo_Transformer), name='eliminarModelo_Transformer'), #eliminar modelo eliminarModelo_Transformer
+
+    path('modelo/evaluacion', login_required(views.crearEvaluacionModelos), name='crearEvaluacion'), #crear cultivo
+    # path('modelo/evaluacion/veredicto', login_required(views.veredicto_experto), name='veredicto'), #mostrar las predicciones y dar un veredicto
 
     path('reportes', login_required(views.reportes), name='reportes'), #consulta de reportes
     path('reportes_generar', login_required(views.generarReportesPDF), name='generarReportes'), #consulta de reportes

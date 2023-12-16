@@ -1,0 +1,82 @@
+<link rel="stylesheet" href="../static/css/base.css">
+<link rel="stylesheet" href="../static/css/validationForm.css">
+
+<form enctype="multipart/form-data" method="post" id="formulario">
+  {% csrf_token %}
+  {% for campo in formulario %}
+
+    <div class="mb-3 formulario__grupo" id="grupo__{{ campo.name }}">
+
+      {% if campo.name != 'numImgTotal' and campo.name != 'numImgEntrenamiento' and campo.name != 'numImgValidacion' and campo.name != 'estadoDataset' %}
+        <label for="" class="form-label">{{ campo.label }}</label>
+      {% endif %}
+
+      {% if campo.name != 'numImgTotal' and campo.name != 'numImgEntrenamiento' and campo.name != 'numImgValidacion' %}
+
+        {% if campo.name == 'segmentacion_SAM' %} <!-- Si el campo es segmenatación SAM -->
+
+            <select name="segmentacion_SAM" id="" class="form-select formulario__select" >
+              
+              <option value="{{ campo.value }}" selected>------- {{ campo.value }} segmentar -------</option>
+              
+              {% if campo.value != 'Si' %}
+                <option value="Si">Si segmentar</option>
+              {% endif %}
+
+              {% if campo.value != 'No' %}
+                <option value="No">No segmentar</option>
+              {% endif %}
+
+            </select> 
+
+          {% elif campo.name == 'formatoImg' %} <!-- Si el campo es formato de imagen -->
+          
+            <select name="formatoImg" id="" class="form-select formulario__select" >
+
+              <option value="{{ campo.value }}" selected>------- {{ campo.value }} -------</option>
+
+              {% if campo.value != 'jpg' %}
+                <option value="jpg">JPG</option>
+              {% endif %}
+
+              {% if campo.value != 'jpeg' %}
+                <option value="jpeg">JPEG</option>
+              {% endif %}
+
+              {% if campo.value != 'png' %}
+                <option value="png">PNG</option>
+              {% endif %}
+
+              {% if campo.value != 'webp' %}
+                <option value="webp">WEBP</option>
+              {% endif %}
+
+            </select> 
+
+          {% elif campo.name == 'estadoDataset' %}
+
+            <input type="hidden" class="form-control" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="Activo" /> 
+
+          {% elif campo.name == 'ruta' %}
+
+            <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value=""  accept=".zip" /> 
+
+          {% else %} <!-- Si el campo es otro -->
+
+            <input type="{{ campo.field.widget.input_type }}" class="form-control formulario__input" name="{{ campo.name }}" id="" aria-describedby="helpId" placeholder="{{ campo.label }}" value="{{ campo.value }}" />
+          
+        {% endif %}
+
+      {% endif %}
+        
+    </div>
+
+    <div class="col-12 help-text" id="help-text-{{ campo.name }}">{{ campo.errors }}</div>
+
+  {% endfor %}
+
+  <input name="" id="" class="btn btn-success" type="submit" value="Enviar información">
+  <a name="" id="" class="btn btn-primary" href="{% url 'datasets' %}" role="button">Cancelar</a>
+</form>
+
+<script type="module" src="../../static/js/validationForm/validation.js"></script>

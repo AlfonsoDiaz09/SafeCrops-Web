@@ -8,7 +8,7 @@ from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required 
 from .models import Administrador, Experto, Tester, Enfermedad, Dataset, Usuario, Cultivo, Modelo_YOLOv5, Modelo_YOLOv7, Modelo_Transformer
-from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm, ChangePasswordForm, EnfermedadForm, DatasetForm, CultivoForm, Modelo_YOLOv5_Form, Modelo_YOLOv7_Form, Modelo_Transformer_Form, ReporteForm, ListaDatasetsForm, HomogeneizacionForm
+from .forms import AdministradorForm, ExpertoForm, TesterForm, UsuarioForm, ResetPasswordForm, ChangePasswordForm, EnfermedadForm, DatasetForm, CultivoForm, Modelo_YOLOv5_Form, Modelo_YOLOv7_Form, Modelo_Transformer_Form, ReporteForm, ListaDatasetsForm, HomogeneizacionForm, EvaluacionModelosForm
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
@@ -470,7 +470,12 @@ def perfil(request):
     #obtener el usuario logueado
     usuario = User.objects.get(id=id)
     #obtener el administrador logueado
-    perfil = Administrador.objects.get(user_id=usuario.id)
+    if Administrador.objects.filter(user_id=usuario.id).exists():
+        perfil = Administrador.objects.get(user_id=usuario.id)
+    elif Experto.objects.filter(user_id=usuario.id).exists():
+        perfil = Experto.objects.get(user_id=usuario.id)
+    elif Tester.objects.filter(user_id=usuario.id).exists():
+        perfil = Tester.objects.get(user_id=usuario.id)
     #obtener el nombre del administrador logueado
     nombre = perfil.nombre
     #obtener el apellido del administrador logueado
@@ -479,6 +484,7 @@ def perfil(request):
     correo = perfil.correo
     #obtener la foto del administrador logueado
     imagen = '/imagenes/'+str(perfil.imagen)
+    tipoUsuario = perfil.userType
 
     context = {
                'id': id,
@@ -487,7 +493,8 @@ def perfil(request):
                'nombre': nombre, 
                'apellido': apellidoP,
                'correo': correo, 
-               'imagen': imagen
+               'imagen': imagen,
+               'tipoUsuario': tipoUsuario
               }
     return context
 
@@ -540,23 +547,11 @@ def inicioA(request):
 
 #función para redireccionar a la página principal del experto
 def inicioE(request):
-    #obtener el id del usuario logueado
-    id = request.user.id
-    #obtener el usuario logueado
-    usuario = User.objects.get(id=id)
-    #obtener el experto logueado
-    experto = Experto.objects.get(user_id=usuario.id)
-    #obtener el nombre del experto logueado
-    nombre = experto.nombre
-    #obtener el apellido del experto logueado
-    apellidoP = experto.apellidoP
-    #obtener el correo del experto logueado
-    correo = experto.correo
-    #obtener la foto del experto logueado
-    imagen = '/imagenes/'+str(experto.imagen)
-    print("Imagen ", imagen)
-
-    context = {'nombre': nombre, 'apellido': apellidoP, 'correo': correo, 'imagen': imagen}
+    context = perfil(request)
+    context['direccion'] =  'Experto'
+    context['num_datasets'] = contarDatasets()
+    context['num_modelos'] = contarModelos()
+    # context['num_reportes'] = contarReportes()
 
     return render(request, 'usuarios/experto/inicioE.html', context)
 
@@ -1088,12 +1083,16 @@ def datasets(request): #función para redireccionar a la página donde se enlist
         datasets = Dataset.objects.filter(estadoDataset='Inactivo')
 
     context = perfil(request)
-    context['direccion'] =  'Administrador / Datasets'
+    context['direccion'] =  f'{context["tipoUsuario"]} / Datasets'
     context['datasets'] = datasets
     context['formulario'] = formulario
-    context['regresar'] = 'http://{}/{}'.format(URL, 'Panel_administrador')
-
-    return render(request, 'datasets/indexD.html', context)
+    if context['tipoUsuario'] == 'Administrador':
+        context['regresar'] = 'http://{}/{}'.format(URL, 'Panel_administrador')
+        return render(request, 'datasets/indexD.html', context)
+    
+    elif context['tipoUsuario'] == 'Experto':
+        context['regresar'] = 'http://{}/{}'.format(URL, 'Panel_experto')
+        return render(request, 'Funciones Experto/datasets/indexD.html', context)
 
 def crearDataset(request):
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
@@ -1165,18 +1164,21 @@ def crearDataset(request):
             #formulario = DatasetForm()
 
             context = perfil(request)
-            context['direccion'] =  'Administrador / Datasets / Registrar'
+            context['direccion'] =  f'{context["tipoUsuario"]} / Datasets / Registrar'
             context['formulario'] = formulario
             context['regresar'] = 'http://{}/{}'.format(URL, 'datasets')
     else:
         formulario = DatasetForm()
 
         context = perfil(request)
-        context['direccion'] =  'Administrador / Datasets / Registrar'
+        context['direccion'] =  f'{context["tipoUsuario"]} / Datasets / Registrar'
         context['formulario'] = formulario
         context['regresar'] = 'http://{}/{}'.format(URL, 'datasets')
 
-    return render(request, 'datasets/crear.html', context)
+    if context['tipoUsuario'] == 'Administrador':
+        return render(request, 'datasets/crear.html', context)
+    elif context['tipoUsuario'] == 'Experto':
+        return render(request, 'Funciones Experto/datasets/crear.html', context)
 
 def verDataset(request, id_Dataset):
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
@@ -1193,6 +1195,7 @@ def verDataset(request, id_Dataset):
 
     diccionarioTrain = {}
     diccionarioValidation = {}
+    diccionarioTest = {}
 
     for division_file in os.listdir(rutaDataset):
         for enfermedad in os.listdir(os.path.join(rutaDataset, division_file)) if os.path.isdir(os.path.join(rutaDataset, division_file)) else []:
@@ -1210,23 +1213,33 @@ def verDataset(request, id_Dataset):
                 if 'validation' not in diccionarioValidation:
                     diccionarioValidation['validation'] = []
                 diccionarioValidation['validation'].append({'enfermedad':enfermedad, 'imagenes':imagenes})
+            elif division_file == 'test':
+                if 'test' not in diccionarioTest:
+                    diccionarioTest['test'] = []
+                diccionarioTest['test'].append({'enfermedad':enfermedad, 'imagenes':imagenes})
 
     rutaDatasetValidation = '/datasets/'+dataset.ruta.name+'/validation/'
+    rutaDatasetTest = '/datasets/'+dataset.ruta.name+'/test/'
 
     context = perfil(request)
-    context['direccion'] =  'Administrador / Datasets / '+nombre
+    context['direccion'] =  f'{context["tipoUsuario"]} / Datasets / '+nombre
     context['diccionarioTrain'] = diccionarioTrain
     context['diccionarioValidation'] = diccionarioValidation
+    context['diccionarioTest'] = diccionarioTest
     context['id_Dataset'] = id_Dataset
     context['datasetTrain'] = rutaDatasetTrain
     context['datasetValidation'] = rutaDatasetValidation
+    context['datasetTest'] = rutaDatasetTest
     context['dataset_info'] = dataset
     context['numImagenes'] = dataset.numImgTotal
     context['numTrain'] = dataset.numImgEntrenamiento
     context['numValidation'] = dataset.numImgValidacion
     context['regresar'] = 'http://{}/{}'.format(URL, 'datasets') 
 
-    return render(request, 'datasets/ver.html', context)
+    if context['tipoUsuario'] == 'Administrador':
+        return render(request, 'datasets/ver.html', context)
+    elif context['tipoUsuario'] == 'Experto':
+        return render(request, 'Funciones Experto/datasets/ver.html', context)
 
 def editarDataset(request, id_Dataset):
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
@@ -1264,12 +1277,15 @@ def editarDataset(request, id_Dataset):
         return redirect('datasets')
     
     context = perfil(request)
-    context['direccion'] =  'Administrador / Datasets / Modificar'
+    context['direccion'] =  f'{context["tipoUsuario"]} / Datasets / Modificar'
     context['formulario'] = formulario
     context['dataset'] = dataset
     context['regresar'] = 'http://{}/{}'.format(URL, 'datasets') 
 
-    return render(request, 'datasets/editar.html', context)
+    if context['tipoUsuario'] == 'Administrador':
+        return render(request, 'datasets/editar.html', context)
+    elif context['tipoUsuario'] == 'Experto':
+        return render(request, 'Funciones Experto/datasets/editar.html', context)
 
 def eliminarDataset(request, id_Dataset):
     dataset = Dataset.objects.get(id_Dataset=id_Dataset)
@@ -1337,7 +1353,7 @@ def homogeneizacion_YIQ(request, id_Dataset_homogeneizar):
 
             rutaDatasetValidation = '/datasets/'+dataset_referencia.ruta.name+'/validation/'
             context = perfil(request)
-            context['direccion'] =  'Administrador / YIQ / '+nombre_homogeneizar
+            context['direccion'] =  f'{context["tipoUsuario"]} / YIQ / '+nombre_homogeneizar
             context['diccionarioTrain'] = diccionarioTrain
             context['diccionarioValidation'] = diccionarioValidation
             context['id_dataset_homogeneizar'] = id_Dataset_homogeneizar
@@ -1347,14 +1363,20 @@ def homogeneizacion_YIQ(request, id_Dataset_homogeneizar):
             context['formulario'] = formulario
             context['regresar'] = 'http://{}/{}'.format(URL, 'datasets')
 
-            return render(request, 'datasets/homogeneizarYIQ.html', context)
+            if context['tipoUsuario'] == 'Administrador':
+                return render(request, 'datasets/homogeneizarYIQ.html', context)
+            elif context['tipoUsuario'] == 'Experto':
+                return render(request, 'Funciones Experto/datasets/homogeneizarYIQ.html', context)
 
     context = perfil(request)
-    context['direccion'] =  'Administrador / YIQ / '+nombre_homogeneizar
+    context['direccion'] =  '{context["tipoUsuario"]} / YIQ / '+nombre_homogeneizar
     context['formulario'] = formulario
     context['regresar'] = 'http://{}/{}'.format(URL, 'datasets')
 
-    return render(request, 'datasets/homogeneizarYIQ.html', context)
+    if context['tipoUsuario'] == 'Administrador':
+        return render(request, 'datasets/homogeneizarYIQ.html', context)
+    elif context['tipoUsuario'] == 'Experto':
+        return render(request, 'Funciones Experto/datasets/homogeneizarYIQ.html', context)
 
 def generarHomogeneizacionYIQ(request):
     if request.method == 'GET':
@@ -1590,6 +1612,9 @@ def seleccionarArquitectura(request): #función para seleccionar la arquitectura
                 id = context['id']
                 # Asignar el valor de 'id' al campo correspondiente del formulario
                 formularioTransformer.instance.user_id = id
+                formularioTransformer.instance.accuracy_transformer = round(metrics[0]['eval_accuracy'], 3)
+                formularioTransformer.instance.f1Score_transformer = round(metrics[0]['eval_f1'], 3)
+                formularioTransformer.instance.loss_transformer = round(metrics[0]['eval_loss'], 3)
                 formularioTransformer.save()
             
             profile = context['perfil']
@@ -1693,23 +1718,6 @@ def crearModelo_Transformer(request, nombreTransformer, nombreDataset, epocas, b
     metrics = Transformer.training_model(nombreTransformer, nombreDataset, epocas, batch_size)
 
     return metrics
-def editarModelo_YOLOv7(request, id_Modelo):
-    URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
-
-    modelo = Modelo_YOLOv7.objects.get(id_Modelo=id_Modelo)
-    formulario = Modelo_YOLOv7_Form(request.POST or None, request.FILES or None, instance=modelo)
-    if formulario.is_valid():
-        messages.success(request, f'Modelo modificado correctamente')
-        formulario.save()
-        return redirect('modelos')
-    
-    context = perfil(request)
-    context['direccion'] =  'Administrador / Modelos / Modificar'
-    context['formulario'] = formulario
-    context['modelo'] = modelo
-    context['regresar'] = 'http://{}/{}'.format(URL, 'modelos') 
-
-    return render(request, 'modelos/editar.html', context)
 
 def eliminarModelo_YOLOv5(request, id_Modelo):
     modelo = Modelo_YOLOv5.objects.get(id_Modelo_y5=id_Modelo)
@@ -1726,33 +1734,54 @@ def eliminarModelo_Transformer(request, id_Modelo):
     modelo.delete()
     return redirect('modelos')
 
-def crearModeloTransformer(request):
+def crearEvaluacionModelos(request):
     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
 
-    if request.method == 'POST':
-        formulario = Modelo_Transformer_Form(request.POST, request.FILES)
-        if formulario.is_valid():
-            formulario.save()
-            messages.success(request, f'Modelo creado correctamente')
-            return redirect('modelos')
-        else:
-            messages.error(request, 'Error al crear el modelo.')
-            formulario = Modelo_Transformer_Form()
-
-            context = perfil(request)
-            context['direccion'] =  'Administrador / Modelos / Registrar'
-            context['formulario'] = formulario
-            context['regresar'] = 'http://{}/{}'.format(URL, 'seleccionarArquitectura')
-    else:
-        formulario = Modelo_Transformer_Form()
-
+    formulario = EvaluacionModelosForm(request.POST or None)
+    if formulario.is_valid():
+        nombreModeloT = formulario.cleaned_data['modelo_Transformer']
+        nombreDataset = formulario.cleaned_data['nombreDataset']
+        diccionario_prediccion = prediccionModelos(request, nombreDataset, nombreModeloT)
+        # veredicto_experto(request, str(nombreDataset), diccionario_prediccion)
+        rutaDatasetTest = '/datasets/datasets/'+str(nombreDataset)+'/test/'
+        print("Dic: ", diccionario_prediccion)
         context = perfil(request)
-        context['direccion'] =  'Administrador / Modelos / Registrar'
-        context['formulario'] = formulario
-        context['regresar'] = 'http://{}/{}'.format(URL, 'modelos')
+        context['direccion'] =  f'{context["tipoUsuario"]} / Modelos / Evaluación / Veredicto'
+        context['diccionarioPrediccion'] = diccionario_prediccion
+        context['datasetTest'] = rutaDatasetTest
+        context['regresar'] = 'http://{}/{}'.format(URL, 'Panel_experto')
 
-    return render(request, 'modelos/crear.html', context)
+        if context['tipoUsuario'] == 'Administrador':
+            return render(request, 'modelos/modelos_evaluacion/veredicto_experto.html', context)
+        elif context['tipoUsuario'] == 'Experto':
+            print("retornandooooooo")
+            return render(request, 'Funciones Experto/modelos/modelos_evaluacion/veredicto_experto.html', context)
+        messages.success(request, f'Evaluación de modelos finalizada con éxito')
+        # return redirect('crearEvaluacion')
+    
+    context = perfil(request)
+    context['direccion'] =  f'{context["tipoUsuario"]} / Modelos / Evaluación'
+    context['formulario'] = formulario
+    context['regresar'] = 'http://{}/{}'.format(URL, 'Panel_experto')
 
+    if context['tipoUsuario'] == 'Administrador':
+        return render(request, 'modelos/modelos_evaluacion/evaluacion.html', context)
+    elif context['tipoUsuario'] == 'Experto':
+        return render(request, 'Funciones Experto/modelos/modelos_evaluacion/evaluacion.html', context)
+
+def prediccionModelos(request, nombreDataset, nombreModeloT):
+    modelo_transformer = Modelo_Transformer.objects.get(nombreModelo_transformer=nombreModeloT)
+    accuracy = modelo_transformer.accuracy_transformer
+    nombreModeloT = modelo_transformer.nombreModelo_transformer
+    #messages.success(request, f'Resultado {nombreDataset}')
+    diccionario_prediccion = Transformer.prediction_model(nombreDataset, nombreModeloT, accuracy)
+
+    return diccionario_prediccion
+
+# def veredicto_experto(request, nombreDataset, diccionario_prediccion):
+#     URL = settings.DOMAIN if not settings.DEBUG else request.META['HTTP_HOST']
+
+    
 
 #*****************************************************************************************************#
 #**********                 ENVIAR EMAIL DESPUES DE GENERAR UN NUEVO MODELO                 **********#

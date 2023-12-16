@@ -222,7 +222,7 @@ class Modelo_Transformer(models.Model): # Clase para el modelo Transformer que c
         return fila #Se retorna la variable fila
 
     def delete(self, using=None, keep_parents=False): #Se sobreescribe el método delete para que no se elimine el usuario de django
-        shutil.rmtree(os.path.join(HOME, 'modelos', 'transformer', self.nombreModelo_transformer+"-finetuned"))
+        shutil.rmtree(os.path.join(HOME, 'modelos', 'transformer', self.nombreModelo_transformer))
         if self.ruta_resultados_transformer != None: #Se verifica que la ruta de resultados no sea nula
             shutil.rmtree(self.ruta_resultados_transformer.name) #Se elimina la carpeta de resultados
         super().delete() #Se llama al método delete de la clase padre (Model)

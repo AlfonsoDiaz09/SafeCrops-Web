@@ -1,0 +1,19 @@
+<link rel="stylesheet" href="../static/css/base.css">
+
+{% extends "baseE.html" %}
+
+{% block titulo %} Editar dataset {% endblock %}
+
+{% block contenido %} 
+    <div class="card">
+        <div class="card-header">
+            <a href="{{ regresar }}" class="btn__return"><i class="fa-solid fa-circle-arrow-left"></i></a>
+            Editar informacion del dataset
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Datos del dataset</h4>
+
+            {% include 'Funciones Experto/datasets/formEdit.html' %}
+        </div>
+    </div>
+{% endblock %}

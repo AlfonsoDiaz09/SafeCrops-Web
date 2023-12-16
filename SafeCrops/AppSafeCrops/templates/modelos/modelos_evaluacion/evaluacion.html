@@ -1,0 +1,17 @@
+{% extends "baseA.html" %}
+
+{% block titulo %} Evaluación de modelos {% endblock %}
+
+{% block contenido %} 
+    <div class="card">
+        <div class="card-header">
+            <a href="{{ regresar }}" class="btn__return"><i class="fa-solid fa-circle-arrow-left"></i></a>
+            Evaluar modelos
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Modelos a evaluar</h4>
+
+            {% include 'modelos/modelos_evaluacion/form.html' %}
+        </div>
+    </div>
+{% endblock %}

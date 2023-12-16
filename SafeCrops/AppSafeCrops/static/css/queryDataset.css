@@ -60,6 +60,10 @@
     background-color: #089fdf;
 }
 
+.container__img .span__test{
+    background-color: #e9aa0b;
+}
+
 .container__img > .div__name{
     white-space: nowrap; 
     width: 100%; 

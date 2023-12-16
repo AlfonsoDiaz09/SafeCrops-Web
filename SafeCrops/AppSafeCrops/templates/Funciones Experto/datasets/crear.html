@@ -1,0 +1,17 @@
+{% extends "baseE.html" %}
+
+{% block titulo %} Agregar nuevo dataset {% endblock %}
+
+{% block contenido %} 
+    <div class="card">
+        <div class="card-header">
+            <a href="{{ regresar }}" class="btn__return"><i class="fa-solid fa-circle-arrow-left"></i></a>
+            Agregar un dataset
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Datos del dataset</h4>
+
+            {% include 'Funciones Experto/datasets/form.html' %}
+        </div>
+    </div>
+{% endblock %}

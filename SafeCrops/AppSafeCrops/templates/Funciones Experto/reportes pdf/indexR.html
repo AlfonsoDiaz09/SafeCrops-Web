@@ -1,0 +1,78 @@
+{% extends "baseA.html" %}
+
+{% block titulo %} Generar nuevo reporte PDF {% endblock %}
+
+{% block contenido %}
+    <link rel="stylesheet" href="../static/css/base.css">
+    <link rel="stylesheet" href="../static/css/validationForm.css">
+    <link rel="stylesheet" href="../static/css/loadingAnimation.css">
+
+    <div class="card">
+        <div class="card-header">
+            <a href="{{ regresar }}" class="btn__return"><i class="fa-solid fa-circle-arrow-left"></i></a>
+            Generar reporte dinámico
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Filtros para generar reporte dinámico</h4>
+
+            <form enctype="multipart/form-data" action="{% url 'generarReportes' %}" method="get" id="formulario__crear-reporte" data-formulario>
+                {% csrf_token %} <!-- Token de seguridad -->
+              
+                <!-- Campo nombreDataset -->
+                {% for campo in formulario %}
+              
+                  <div class="mb-3 formulario__grupo" id="grupo__{{ campo.name }}"> 
+              
+                    <label for="" class="form-label">{{ campo.label }}</label>
+                    {{ campo.form.nombreDataset }}
+              
+                  </div>
+              
+                  <div class="col-12 help-text" id="help-text-{{ campo.name }}">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
+              
+                {% endfor %}
+
+                <!-- Campo Arquitectura -->
+                <div class="mb-3 formulario__grupo" id="grupo__arquitectura"> 
+              
+                  <label for="" class="form-label">Arquitectura</label>
+                  <select name="arquitectura" id="" class="form-select formulario__select" >
+                    <option value="" selected>------ SELECCIONE ------</option>
+                    <option value="transformer">Transformer</option>
+                    <option value="yolov7">YOLOv7</option>
+                    <option value="yolov5">YOLOv5</option>
+                  </select>
+            
+                </div>
+            
+                <div class="col-12 help-text" id="help-text-arquitectura">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
+
+                <!-- Campo Accuracy Mínimo -->
+                <div class="mb-3 formulario__grupo" id="grupo__accuracyMinimo"> 
+              
+                  <label for="" class="form-label">Accuracy Mínimo</label>
+                  <input type="number" class="form-control formulario__input" name="accuracyMinimo" aria-describedby="helpId" placeholder="0.0" min="0" max="1" step="0.1">
+            
+                </div>
+            
+                <div class="col-12 help-text" id="help-text-accuracyMinimo">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
+
+                <!-- Campo Accuracy Máximo -->
+                <div class="mb-3 formulario__grupo" id="grupo__accuracyMaximo"> 
+              
+                  <label for="" class="form-label">Accuracy Máximo</label>
+                  <input type="number" class="form-control formulario__input" name="accuracyMaximo" aria-describedby="helpId" placeholder="0.0" min="0" max="1" step="0.1">
+            
+                </div>
+            
+                <div class="col-12 help-text" id="help-text-accuracyMaximo">{{ campo.errors }}</div> <!-- Mostramos los errores del campo -->
+                
+                <input name="" id="" class="btn btn-success" type="submit" value="Enviar información"> <!-- Botón para enviar el formulario -->
+                <a name="" id="" class="btn btn-primary" href="{% url 'datasets' %}" role="button">Cancelar</a> <!-- Botón para cancelar el formulario -->
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="../../static/js/validationForm/validation.js"></script>
+
+{% endblock %}
